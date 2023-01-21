@@ -1,0 +1,8 @@
+import I[:repository_name]Repository from '@modules/[:module_name]/domain/repositories/I[:repository_name]Repository';
+import [:repository_name]RepositoryCore from '@modules/@core/infrastructure/mongoose/repositories/[:repository_name]Repository';
+import { injectable } from 'inversify';
+import [:repository_name] from '@modules/@core/domain/entities/[:repository_name]';
+import [:repository_name]Model from '@modules/@core/infrastructure/mongoose/models/[:repository_name]';
+
+@injectable()
+export default class [:repository_name]Repository extends [:repository_name]RepositoryCore implements I[:repository_name]Repository {}

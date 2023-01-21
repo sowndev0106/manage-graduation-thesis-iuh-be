@@ -1,0 +1,103 @@
+{
+	"name": "manage-graduation-thesis-iuh",
+	"version": "1.0.0",
+	"description": "manage graduation thesis iuh",
+	"author": "nguyenthanhson162001@gmail.com",
+	"license": "ISC",
+	"scripts": {
+		"build": "node ./tools/scripts/build.js",
+		"start": "node -r module-alias/register ./dist",
+		"develop": "nodemon",
+		"deploy": "npm run start",
+		"lint:fix": "eslint ./src/**/*.ts --fix",
+		"lint:staged": "lint-staged",
+		"knex:migrate:make": "knex --knexfile src/@core/infrastructure/knex/index.ts migrate:make",
+		"knex:migrate:latest": "knex --knexfile src/@core/infrastructure/knex/index.ts migrate:latest",
+		"knex:migrate:rollback": "knex --knexfile src/@core/infrastructure/knex/index.ts migrate:rollback",
+		"core:repository:create": "node ./tools/scripts/create-mongoose-core-repository/index.js --module @core --repository ",
+		"api:repository:create": "node ./tools/scripts/create-mongoose-modules-extends-repository/index.js --module api --repository "
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://"
+	},
+	"nodemonConfig": {
+		"watch": [
+			"src"
+		],
+		"ext": "ts, html",
+		"ignore": [
+			"src/public"
+		],
+		"exec": "node --inspect -r ts-node/register -r tsconfig-paths/register ./src"
+	},
+	"lint-staged": {
+		"./src/**/*.ts": [
+			"prettier --write --config ./.prettierrc --ignore-path ./.prettierignore",
+			"eslint"
+		]
+	},
+	"_moduleAliases": {
+		"@modules": "dist/modules",
+		"@bootstrap": "dist/bootstrap",
+		"@core": "dist/modules/@core"
+	},
+	"dependencies": {
+		"@types/ejs": "^3.0.4",
+		"@types/express-flash": "0.0.2",
+		"@types/express-session": "^1.17.0",
+		"@types/lodash": "^4.14.161",
+		"@types/nodemailer": "^6.4.0",
+		"axios": "^0.22.0",
+		"cookie-parser": "^1.4.5",
+		"cors": "^2.8.5",
+		"csv-parser": "^3.0.0",
+		"dotenv": "^8.2.0",
+		"ejs": "^3.1.5",
+		"express": "^4.17.1",
+		"express-async-errors": "^3.1.1",
+		"express-flash": "0.0.2",
+		"express-session": "^1.17.0",
+		"glob": "^7.1.7",
+		"helmet": "^4.6.0",
+		"inversify": "^5.1.1",
+		"jsonwebtoken": "^8.5.1",
+		"knex": "^2.4.1",
+		"lodash": "^4.17.21",
+		"module-alias": "^2.2.2",
+		"mongoose": "^5.10.2",
+		"morgan": "^1.10.0",
+		"multer": "^1.4.4",
+		"mysql": "^2.18.1",
+		"nodemailer": "^6.4.16",
+		"reflect-metadata": "^0.1.13",
+		"urlencode": "^1.1.0",
+		"winston": "^3.3.3"
+	},
+	"devDependencies": {
+		"@types/command-line-args": "^5.0.0",
+		"@types/cookie-parser": "^1.4.2",
+		"@types/cors": "^2.8.7",
+		"@types/express": "^4.17.8",
+		"@types/find": "^0.2.1",
+		"@types/fs-extra": "^9.0.3",
+		"@types/helmet": "0.0.48",
+		"@types/jasmine": "^3.5.14",
+		"@types/jsonfile": "^6.0.0",
+		"@types/jsonwebtoken": "^8.5.4",
+		"@types/mongoose": "^5.7.36",
+		"@types/morgan": "^1.9.1",
+		"@types/multer": "^1.4.5",
+		"@types/node": "^14.6.3",
+		"@types/supertest": "^2.0.10",
+		"@types/urlencode": "^1.1.2",
+		"fs-extra": "^9.0.1",
+		"jasmine": "^3.6.1",
+		"nodemon": "^2.0.4",
+		"supertest": "^4.0.2",
+		"ts-node": "^10.9.1",
+		"tsconfig-paths": "^3.9.0",
+		"tslint": "^6.1.3",
+		"typescript": "^4.7.4"
+	}
+}

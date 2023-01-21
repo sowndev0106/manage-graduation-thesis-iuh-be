@@ -1,0 +1,7 @@
+**/node_modules
+log
+dist
+k8s
+.gitlab-ci.yml
+.idea
+.git

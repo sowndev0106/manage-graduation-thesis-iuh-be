@@ -1,0 +1,7 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"sourceMap": false
+	},
+	"exclude": ["src/public/", "src/modules/@core/infrastructure/knex/migrations/"]
+}

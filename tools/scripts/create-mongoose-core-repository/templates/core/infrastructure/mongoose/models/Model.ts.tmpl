@@ -1,0 +1,18 @@
+import { Schema, model } from 'mongoose';
+
+export interface I[:repository_name]Model {
+	createdDate: Date;
+	updatedDate: Date;
+}
+
+const [:first_char_lowercase_repository_name]Schema = new Schema<I[:repository_name]Model>(
+	{
+		createdDate: { type: Date, required: true },
+		updatedDate: { type: Date, required: true, default: Date.now() },
+	},
+	{
+		strict: false,
+	}
+);
+
+export default model('[:first_char_lowercase_repository_name]', [:first_char_lowercase_repository_name]Schema);
