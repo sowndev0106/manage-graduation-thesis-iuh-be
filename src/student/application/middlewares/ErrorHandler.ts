@@ -1,4 +1,4 @@
-import ValidationError from '@modules/api/domain/errors/ValidationError';
+import ValidationError from '@core/domain/errors/ValidationError';
 import { NextFunction, Request, Response } from 'express';
 
 export default function (err: Error, req: Request, res: Response, next: NextFunction) {

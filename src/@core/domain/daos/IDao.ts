@@ -1,5 +1,5 @@
-import { IEntity } from '@modules/@core/domain/entities/Entity';
-import EntityID from '@modules/@core/domain/value-objects/EntityID';
+import { IEntity } from '@core/domain/entities/Entity';
+import EntityID from '@core/domain/value-objects/EntityID';
 
 export default interface IDao<E extends IEntity> {
 	insertEntity(entity: E): Promise<E>;

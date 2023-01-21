@@ -1,4 +1,4 @@
-import HeaderTokenInvalidError from '@modules/api/domain/errors/HeaderTokenInvalidError';
+import HeaderTokenInvalidError from '@core/domain/errors/HeaderTokenInvalidError';
 import { Request, Response, NextFunction } from 'express';
 
 export default (headerKey: string, secretValue: string) => {

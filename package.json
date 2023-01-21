@@ -6,7 +6,7 @@
 	"license": "ISC",
 	"scripts": {
 		"build": "node ./tools/scripts/build.js",
-		"start": "node -r module-alias/register ./dist",
+		"start": "node -r ts-node/register -r tsconfig-paths/register ./dist",
 		"develop": "nodemon",
 		"deploy": "npm run start",
 		"lint:fix": "eslint ./src/**/*.ts --fix",
@@ -38,9 +38,11 @@
 		]
 	},
 	"_moduleAliases": {
-		"@modules": "dist/modules",
-		"@bootstrap": "dist/bootstrap",
-		"@core": "dist/modules/@core"
+		"@core/*": ["dist/@core"],
+		"@admin": ["dist/admin"],
+		"@lecturer": ["dist/lecturer"],
+		"@student": ["dist/student"],
+		"@env": ["env"]
 	},
 	"dependencies": {
 		"@types/ejs": "^3.0.4",
