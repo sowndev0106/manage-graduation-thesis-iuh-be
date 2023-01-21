@@ -38,11 +38,21 @@
 		]
 	},
 	"_moduleAliases": {
-		"@core/*": ["dist/@core"],
-		"@admin": ["dist/admin"],
-		"@lecturer": ["dist/lecturer"],
-		"@student": ["dist/student"],
-		"@env": ["env"]
+		"@core/*": [
+			"dist/@core"
+		],
+		"@admin": [
+			"dist/admin"
+		],
+		"@lecturer": [
+			"dist/lecturer"
+		],
+		"@student": [
+			"dist/student"
+		],
+		"@env": [
+			"env"
+		]
 	},
 	"dependencies": {
 		"@types/ejs": "^3.0.4",
