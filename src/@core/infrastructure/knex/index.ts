@@ -11,7 +11,9 @@ const config = {
       database : process.env.DB_NAME
     }
   }
-  console.log(config)
+
+
+// check config
 const knex = require('knex')(config);
 
 export default config;
