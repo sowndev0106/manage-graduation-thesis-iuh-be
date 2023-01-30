@@ -2,14 +2,14 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { NextFunction, Request, Response } from 'express';
 
 export default function (err: Error, req: Request, res: Response, next: NextFunction) {
-	console.log('ERROR LOG', new Date());
-	console.log('======================================================================');
-	console.log('Request:', req.method, req.originalUrl);
-	console.log('Params:', req.params);
-	console.log('Body:', req.body);
-	console.log('Query:', req.query);
-	console.log('Error: ', err);
-	console.log('Error stack: ', err.stack);
+	// console.log('ERROR LOG', new Date());
+	// console.log('======================================================================');
+	// console.log('Request:', req.method, req.originalUrl);
+	// console.log('Params:', req.params);
+	// console.log('Body:', req.body);
+	// console.log('Query:', req.query);
+	// console.log('Error: ', err);
+	// console.log('Error stack: ', err.stack);
 
 	const error: any = {
 		success: false,

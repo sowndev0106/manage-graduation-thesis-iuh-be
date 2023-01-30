@@ -8,7 +8,7 @@ import adminRoutes from '@admin/application/routes';
 const router = Router();
 
 router.use('/api', coreRoutes);
-router.use('/api/students', studentRoutes);
+router.use('/api/student', studentRoutes);
 router.use('/api/lecturer', lecturerRoutes);
 router.use('/api/admin', adminRoutes);
 

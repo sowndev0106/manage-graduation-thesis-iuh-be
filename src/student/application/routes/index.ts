@@ -1,12 +1,7 @@
 import { Request, Response, Router } from 'express';
-import testRoutes from './test';
-
-
+import authenticationRoute from './authentication';
 const router = Router();
 
-router.use('/test', testRoutes);
-
-router.use('/', (req:Request,res:Response)=>res.send("student router"));
-
+router.use('/auth', authenticationRoute);
 
 export default router;
