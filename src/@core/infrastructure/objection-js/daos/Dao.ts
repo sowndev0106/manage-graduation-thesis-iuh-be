@@ -1,6 +1,5 @@
-import IDao from "@core/domain/daos/IDao";
-import Entity, { IEntity } from "@core/domain/entities/Entity";
-import EntityID from "@core/domain/value-objects/EntityID";
+import IDao from '@core/domain/daos/IDao';
+import Entity, { IEntity } from '@core/domain/entities/Entity';
 import { Model, PartialModelObject, QueryBuilder } from 'objection';
 
 export default abstract class Dao<E extends IEntity, M extends Model> implements IDao<E> {
@@ -22,8 +21,8 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 		return this.convertModelToEntity(model);
 	}
 
-	async findEntityById(id: EntityID): Promise<E | null> {
-		const model = await this.initQuery().findById(id.value).execute();
+	async findEntityById(id: number): Promise<E | null> {
+		const model = await this.initQuery().findById(id).execute();
 
 		if (model == undefined || model == null) {
 			return null;

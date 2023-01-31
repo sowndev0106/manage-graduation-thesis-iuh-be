@@ -12,7 +12,7 @@ export default class Password {
 
 		const schema = Joi.string().required().min(6).max(30);
 
-		const { error, value } = schema.validate(props.value);
+		const { error, value } = schema.validate(props.value.trim());
 
 		if (error) throw new Error(error?.message.replace(/"/g, '').trim());
 

@@ -1,16 +1,17 @@
 import 'express-async-errors';
 // parse variable environment *** requie first
-import "@env/index.js"
+import '@env/index.js';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
 import router from './router';
+// connect database
+import '@core/infrastructure/objection-js';
 
-  
-const port = Number(process.env.PORT || 3000)
-const baseURL = `${process.env.BASE_URL || "http://localhost:"+port}`
+const port = Number(process.env.PORT || 3000);
+const baseURL = `${process.env.BASE_URL || 'http://localhost:' + port}`;
 const app = express();
 
 app.use(cors());

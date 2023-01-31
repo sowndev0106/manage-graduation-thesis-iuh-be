@@ -12,7 +12,7 @@ export default class Username {
 
 		const schema = Joi.string().required().alphanum().min(6).max(60);
 
-		const { error, value } = schema.validate(props.value);
+		const { error, value } = schema.validate(props.value.trim());
 
 		if (error) throw new Error(error?.message.replace(/"/g, '').trim());
 

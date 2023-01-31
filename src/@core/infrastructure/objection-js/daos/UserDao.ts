@@ -26,7 +26,7 @@ export default class UserDao extends Dao<User, UserModel> {
 			role_id: entity.roleId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
-		})
+		});
 
 		return model;
 	}
@@ -34,16 +34,16 @@ export default class UserDao extends Dao<User, UserModel> {
 	convertModelToEntity(model: UserModel) {
 		const dbJson = model.$toDatabaseJson();
 		const entity = User.create(
-			{		
-				code: dbJson["code"] ,
-				avatar: dbJson["avatar"] ,
-				phoneNumber: dbJson["phone_number"] ,
-				password: dbJson["password"] ,
-				email: dbJson["email"] ,
-				name: dbJson["name"] ,
-				gender: dbJson["gender"] ,
-				level: dbJson["level"] ,
-				roleId: dbJson["role_id"] ,
+			{
+				code: dbJson['code'],
+				avatar: dbJson['avatar'],
+				phoneNumber: dbJson['phone_number'],
+				password: dbJson['password'],
+				email: dbJson['email'],
+				name: dbJson['name'],
+				gender: dbJson['gender'],
+				level: dbJson['level'],
+				roleId: dbJson['role_id'],
 				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
 				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
