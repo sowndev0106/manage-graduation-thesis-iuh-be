@@ -2,10 +2,10 @@ import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
-import Text from '@core/domain/validate-objects/SortText';
 import Username from '@core/domain/validate-objects/Username';
 import Password from '@core/domain/validate-objects/Password';
 import IUserDao from '@student/domain/daos/IUserDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	username: string;
@@ -30,6 +30,8 @@ export default class LoginHandlers extends RequestHandler {
 		const input = await this.validate(request);
 
 		const user = this.userDao.findOneByUsernameAndPassword(input.username, input.password);
+
+		if (!user) throw new NotFoundError('user not found');
 
 		return user;
 	}

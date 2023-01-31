@@ -212,6 +212,11 @@
   dependencies:
     "@types/express" "*"
 
+"@types/http-errors@^2.0.1":
+  "integrity" "sha512-/K3ds8TRAfBvi5vfjuz8y6+GiAYBZ0x4tXv1Av6CWBWn0IlADc+ZX9pMq7oU0fNQPnBwIZl3rmeLp6SBApbxSQ=="
+  "resolved" "https://registry.npmjs.org/@types/http-errors/-/http-errors-2.0.1.tgz"
+  "version" "2.0.1"
+
 "@types/jasmine@^3.5.14":
   "integrity" "sha512-PVpjh8S8lqKFKurWSKdFATlfBHGPzgy0PoDdzQ+rr78jTQ0aacyh9YndzZcAUPxhk4kRujItFFGQdUJ7flHumw=="
   "resolved" "https://registry.npmjs.org/@types/jasmine/-/jasmine-3.9.1.tgz"
@@ -1115,7 +1120,12 @@
   "resolved" "https://registry.npmjs.org/helmet/-/helmet-4.6.0.tgz"
   "version" "4.6.0"
 
-"http-errors@2.0.0":
+"http-error@^0.0.6":
+  "integrity" "sha512-1okadUMOfkA8o9mvatq5dopVrPdIsKw3K9JL2izosTqFJVa+ID8Siw4ichfW7AvXRVHVvpfQpEekPvrjZ3bqSg=="
+  "resolved" "https://registry.npmjs.org/http-error/-/http-error-0.0.6.tgz"
+  "version" "0.0.6"
+
+"http-errors@^2.0.0", "http-errors@2.0.0":
   "integrity" "sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ=="
   "resolved" "https://registry.npmjs.org/http-errors/-/http-errors-2.0.0.tgz"
   "version" "2.0.0"
