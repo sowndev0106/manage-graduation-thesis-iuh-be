@@ -3,7 +3,7 @@ POST http://localhost:3000/api/student/auth/login HTTP/1.1
 content-type: application/json
 
 {
-    "username": "19507571",
+    "username": "19507574",
     "password": "162001"
 }
 
@@ -12,7 +12,16 @@ POST http://localhost:3000/api/student/auth/register HTTP/1.1
 content-type: application/json
 
 {
-    "username": "19507573",
+    "username": "19507574",
     "password": "162001",
     "majorsId":1
+}
+
+### refresh token 
+POST http://localhost:3000/api/student/auth/refresh-token HTTP/1.1
+content-type: application/json
+
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicm9sZSI6InN0dWRlbnQiLCJpYXQiOjE2NzUyNDc5ODYsImV4cCI6MTcwNjgwNTU4Nn0.KlqMScThGTXaFotccV33kfmMLL5dSoaanR1yQTaqhsQ"
 }

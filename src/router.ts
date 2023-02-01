@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import ErrorHandler from '@core/application/middlewares/ErrorHandler';
+import ErrorHandler from '@core/application/middlewares/errorHandler';
 import coreRoutes from '@core/application/routes';
 import studentRoutes from '@student/application/routes';
 import lecturerRoutes from '@lecturer/application/routes';

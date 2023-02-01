@@ -10,40 +10,36 @@ import ConflictError from '@core/domain/errors/ConflictError';
 import User from '@core/domain/entities/User';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
+import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
+import Text from '@core/domain/validate-objects/Text';
+import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefrestToken } from '@core/infrastructure/jsonwebtoken';
 
 interface ValidatedInput {
-	username: string;
-	password: string;
-	majorsId: number;
+	refreshToken: string;
 }
 
 @injectable()
-export default class RegisterHandlers extends RequestHandler {
+export default class RefreshTokenHandlers extends RequestHandler {
 	@inject('UserDao') private userDao!: IUserDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {
-		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
-		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
-		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
+		const refreshToken = this.errorCollector.collect('refreshToken', () => Text.validate({ value: request.body['refreshToken'] }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 
-		return { username, password, majorsId };
+		return { refreshToken };
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		let user = await this.userDao.findOneByUsername(input.username);
-		if (user) throw new ConflictError('username already exists');
+		const { id, role } = verifyRefrestToken(input.refreshToken);
 
-		let majors = await this.majorsDao.findEntityById(input.majorsId);
-		if (!majors) throw new NotFoundError('majors not found');
+		const accessToken = signAccessToken(id, role);
+		const refreshToken = signRefreshToken(id, role);
 
-		user = await this.userDao.insertEntity(User.create({ username: input.username, password: input.password, majorsId: 1 }));
-
-		return user.toResponses;
+		return { accessToken, refreshToken };
 	}
 }

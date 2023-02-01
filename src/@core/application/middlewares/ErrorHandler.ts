@@ -25,7 +25,7 @@ export default function (err: Error, req: Request, res: Response, next: NextFunc
 			res.status(404);
 			break;
 
-		case 'HeaderTokenInvalidError':
+		case 'ForbiddenError':
 			res.status(403);
 			break;
 

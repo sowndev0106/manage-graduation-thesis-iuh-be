@@ -9,6 +9,8 @@ import cors from 'cors';
 import router from './router';
 // connect database
 import '@core/infrastructure/objection-js';
+// connect redis
+import '@core/infrastructure/redis';
 
 const port = Number(process.env.PORT || 3000);
 const baseURL = `${process.env.BASE_URL || 'http://localhost:' + port}`;
