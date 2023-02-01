@@ -4,4 +4,5 @@ import { injectable } from 'inversify';
 
 export default interface IUserDao extends IDao<User> {
 	findOneByUsernameAndPassword(username: string, password: string): Promise<User | null>;
+	findOneByUsername(username: string): Promise<User | null>;
 }

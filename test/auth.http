@@ -1,0 +1,18 @@
+### login
+POST http://localhost:3000/api/student/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "19507571",
+    "password": "162001"
+}
+
+### register
+POST http://localhost:3000/api/student/auth/register HTTP/1.1
+content-type: application/json
+
+{
+    "username": "19507573",
+    "password": "162001",
+    "majorsId":1
+}

@@ -6,16 +6,23 @@ import Username from '@core/domain/validate-objects/Username';
 import Password from '@core/domain/validate-objects/Password';
 import IUserDao from '@student/domain/daos/IUserDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
+import ConflictError from '@core/domain/errors/ConflictError';
+import User from '@core/domain/entities/User';
+import IMajorsDao from '@student/domain/daos/IMajorsDao';
+import EntityId from '@core/domain/validate-objects/EntityID';
 
 interface ValidatedInput {
 	username: string;
 	password: string;
+	majorsId: number;
 }
 
 @injectable()
-export default class LoginHandlers extends RequestHandler {
+export default class RegisterHandlers extends RequestHandler {
 	@inject('UserDao') private userDao!: IUserDao;
+	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {
+		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
 		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
 
@@ -23,16 +30,20 @@ export default class LoginHandlers extends RequestHandler {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 
-		return { username, password };
+		return { username, password, majorsId };
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		const user = await this.userDao.findOneByUsernameAndPassword(input.username, input.password);
+		let user = await this.userDao.findOneByUsername(input.username);
+		if (user) throw new ConflictError('username already exists');
 
-		if (!user) throw new NotFoundError('user not found');
+		let majors = await this.majorsDao.findEntityById(input.majorsId);
+		if (!majors) throw new NotFoundError('majors not found');
 
-		return user;
+		user = await this.userDao.insertEntity(User.create({ username: input.username, password: input.password, majorsId: 1 }));
+
+		return user.toResponses;
 	}
 }

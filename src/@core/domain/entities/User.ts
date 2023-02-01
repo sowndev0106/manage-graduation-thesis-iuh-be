@@ -1,27 +1,28 @@
 import Entity from './Entity';
+import lodash from 'lodash';
 export enum TypeGender {
 	Male = 'male',
 	Female = 'female',
 }
 export interface IProps {
-	code: string;
-	avatar: string;
-	phoneNumber: string;
+	username: string;
 	password: string;
-	email: string;
-	name: string;
-	gender: TypeGender;
-	level: string;
-	roleId: number;
-	createdAt: Date;
-	updatedAt: Date;
+	majorsId: number;
+	avatar?: string;
+	phoneNumber?: string;
+	email?: string;
+	name?: string;
+	gender?: TypeGender;
+	level?: string;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 export default class User extends Entity<IProps> {
 	static create(props: IProps, id?: number) {
 		return new User(props, id);
 	}
-	get code() {
-		return this.props.code;
+	get username() {
+		return this.props.username;
 	}
 	get avatar() {
 		return this.props.avatar;
@@ -44,13 +45,20 @@ export default class User extends Entity<IProps> {
 	get level() {
 		return this.props.level;
 	}
-	get roleId() {
-		return this.props.roleId;
+	get majorsId() {
+		return this.props.majorsId;
 	}
 	get createdAt() {
 		return this.props.createdAt;
 	}
 	get updatedAt() {
 		return this.props.updatedAt;
+	}
+	get toResponses() {
+		const reponse: Partial<IProps> = lodash.cloneDeep(this.props);
+
+		delete reponse['password'];
+
+		return reponse;
 	}
 }

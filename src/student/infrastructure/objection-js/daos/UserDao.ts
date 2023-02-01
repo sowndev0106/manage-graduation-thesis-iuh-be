@@ -6,6 +6,17 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class UserDao extends UserDaoCore implements IUserDao {
+	async findOneByUsername(username: string): Promise<User | null> {
+		const query = this.initQuery();
+
+		const model = await query.findOne({
+			username: username,
+		});
+
+		const entity = model ? this.convertModelToEntity(model) : null;
+
+		return entity;
+	}
 	async findOneByUsernameAndPassword(username: string, password: string): Promise<User | null> {
 		const query = this.initQuery();
 

@@ -34,6 +34,10 @@ export default function (err: Error, req: Request, res: Response, next: NextFunc
 			error.error = (err as ValidationError).messageBag;
 			break;
 
+		case 'ConflictError':
+			res.status(409);
+			break;
+
 		default:
 			res.status(400);
 	}

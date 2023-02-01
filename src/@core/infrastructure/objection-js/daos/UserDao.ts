@@ -15,7 +15,7 @@ export default class UserDao extends Dao<User, UserModel> {
 
 		model.$set({
 			id: entity.id,
-			code: entity.code,
+			username: entity.username,
 			avatar: entity.avatar,
 			phone_number: entity.phoneNumber,
 			password: entity.password,
@@ -23,7 +23,7 @@ export default class UserDao extends Dao<User, UserModel> {
 			name: entity.name,
 			gender: entity.gender,
 			level: entity.level,
-			role_id: entity.roleId,
+			majors_id: entity.majorsId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -35,7 +35,7 @@ export default class UserDao extends Dao<User, UserModel> {
 		const dbJson = model.$toDatabaseJson();
 		const entity = User.create(
 			{
-				code: dbJson['code'],
+				username: dbJson['username'],
 				avatar: dbJson['avatar'],
 				phoneNumber: dbJson['phone_number'],
 				password: dbJson['password'],
@@ -43,7 +43,7 @@ export default class UserDao extends Dao<User, UserModel> {
 				name: dbJson['name'],
 				gender: dbJson['gender'],
 				level: dbJson['level'],
-				roleId: dbJson['role_id'],
+				majorsId: dbJson['majors_id'],
 				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
 				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},

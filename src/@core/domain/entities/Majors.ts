@@ -1,9 +1,9 @@
 import Entity from './Entity';
 export interface IProps {
 	name: string;
-	ownerId: string;
-	createdAt: Date;
-	updatedAt: Date;
+	headLecturerId: string;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 export default class Majors extends Entity<IProps> {
 	static create(props: IProps, id?: number) {
@@ -13,8 +13,8 @@ export default class Majors extends Entity<IProps> {
 	get name() {
 		return this.props.name;
 	}
-	get ownerId() {
-		return this.props.ownerId;
+	get headLecturerId() {
+		return this.props.headLecturerId;
 	}
 	get createdAt() {
 		return this.props.createdAt;
