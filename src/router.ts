@@ -12,6 +12,6 @@ router.use('/api/student', studentRoutes);
 router.use('/api/lecturer', lecturerRoutes);
 router.use('/api/admin', adminRoutes);
 
-router.use(rrrorHandler);
+router.use(errorHandler);
 
 export default router;
