@@ -1,6 +1,6 @@
 import logger from '@core/infrastructure/logger/Logger';
 import { Router } from 'express';
-import ErrorHandler from '../middlewares/errorHandler';
+import ErrorHandler from '@core/application/middlewares/errorHandler';
 
 const router = Router();
 router.get('/logs', (req, res) => {
