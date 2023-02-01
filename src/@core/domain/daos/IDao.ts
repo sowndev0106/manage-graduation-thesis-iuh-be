@@ -1,9 +1,8 @@
 import { IEntity } from '@core/domain/entities/Entity';
-import EntityID from '@core/domain/value-objects/EntityID';
 
 export default interface IDao<E extends IEntity> {
 	insertEntity(entity: E): Promise<E>;
-	findEntityById(id: EntityID): Promise<E | null>;
+	findEntityById(id: number): Promise<E | null>;
 	updateEntity(entity: E): Promise<E>;
 	deleteEntity(entity: E): Promise<E>;
 	insertBulkOfEntities(entities: E[]): Promise<E[]>;
