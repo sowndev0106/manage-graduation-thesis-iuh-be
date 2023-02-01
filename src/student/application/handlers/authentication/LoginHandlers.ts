@@ -10,6 +10,7 @@ import { compareTextBcrypt } from '@core/infrastructure/bcrypt';
 import ForbiddenError from '@core/domain/errors/ForbiddenError';
 import { signAccessToken, signRefreshToken } from '@core/infrastructure/jsonwebtoken';
 import { TypeRoleUser } from '@core/domain/entities/User';
+import IStudentDao from '@student/domain/daos/IStudentDao';
 
 interface ValidatedInput {
 	username: string;
@@ -19,6 +20,7 @@ interface ValidatedInput {
 @injectable()
 export default class LoginHandlers extends RequestHandler {
 	@inject('UserDao') private userDao!: IUserDao;
+	@inject('StudentDao') private studentDao!: IStudentDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
 		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
@@ -40,6 +42,8 @@ export default class LoginHandlers extends RequestHandler {
 		const isCorrectPassword = await compareTextBcrypt(input.password, user.password);
 
 		if (!isCorrectPassword) throw new ForbiddenError('incorect password');
+
+		const student = await this.studentDao.findEntityById(1);
 
 		const accessToken = signAccessToken(user.id!, TypeRoleUser.Student);
 		const refreshToken = signRefreshToken(user.id!, TypeRoleUser.Student);

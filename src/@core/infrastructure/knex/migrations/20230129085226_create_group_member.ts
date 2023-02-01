@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-	return knex.schema.createTable('create_group_member', table => {
+	return knex.schema.createTable('group_member', table => {
 		table.increments('id').primary();
 
 		table.integer('group_id').unsigned().references('id').inTable('group');

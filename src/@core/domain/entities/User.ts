@@ -2,7 +2,7 @@ import Entity from './Entity';
 import lodash from 'lodash';
 export enum TypeRoleUser {
 	Student = 'student',
-	Lecture = 'lecture',
+	Lecturer = 'lecturer',
 	Admin = 'admin',
 }
 export enum TypeGender {
