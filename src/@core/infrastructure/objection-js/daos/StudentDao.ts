@@ -23,16 +23,17 @@ export default class StudentDao extends Dao<Student, StudentModel> {
 	}
 
 	convertModelToEntity(model: StudentModel) {
-		console.log(model);
+		// console.log(model);
 		const dbJson = model.$toDatabaseJson();
 		const entity = Student.create(
 			{
-				typeTraining: dbJson['typeTraining'],
+				typeTraining: dbJson['type_training'],
 				schoolYear: dbJson['school_year'],
-				userId: dbJson['user_id'] && Number(dbJson['user_id']),
+				user: dbJson['user_id'] && Number(dbJson['user_id']),
 			},
 			Number(dbJson['id'])
 		);
+		console.log(dbJson['user']);
 
 		return entity;
 	}

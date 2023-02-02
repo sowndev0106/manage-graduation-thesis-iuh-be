@@ -43,7 +43,8 @@ export default class LoginHandlers extends RequestHandler {
 
 		if (!isCorrectPassword) throw new ForbiddenError('incorect password');
 
-		const student = await this.studentDao.findEntityById(1);
+		const student = await this.studentDao.findByUsername(input.username);
+		console.log(student?.toResponses);
 
 		const accessToken = signAccessToken(user.id!, TypeRoleUser.Student);
 		const refreshToken = signRefreshToken(user.id!, TypeRoleUser.Student);

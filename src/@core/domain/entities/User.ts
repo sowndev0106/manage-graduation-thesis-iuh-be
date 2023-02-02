@@ -64,6 +64,6 @@ export default class User extends Entity<IProps> {
 
 		delete reponse['password'];
 
-		return reponse;
+		return { id: this.id, ...reponse };
 	}
 }
