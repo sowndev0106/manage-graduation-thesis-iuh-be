@@ -5,6 +5,7 @@ export default class Student extends Model {
 	static get tableName() {
 		return 'student';
 	}
+
 	static relationMappings = {
 		user: {
 			relation: Model.HasOneRelation,

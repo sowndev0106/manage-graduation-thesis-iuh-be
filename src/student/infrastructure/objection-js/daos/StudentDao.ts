@@ -14,7 +14,6 @@ export default class StudentDao extends StudentDaoCore implements IStudentDao {
 		query.where('user.username', username);
 
 		const result = await query.execute();
-
 		return result && result[0] ? this.convertModelToEntity(result[0]) : null;
 	}
 }

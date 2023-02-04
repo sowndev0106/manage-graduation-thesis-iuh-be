@@ -3,6 +3,8 @@ import Dao from './Dao';
 import StudentModel from '@core/infrastructure/objection-js/models/Student';
 import Student from '@core/domain/entities/Student';
 import { QueryBuilder } from 'objection';
+import UserModel from '../models/User';
+import UserDao from './UserDao';
 
 @injectable()
 export default class StudentDao extends Dao<Student, StudentModel> {
@@ -24,7 +26,7 @@ export default class StudentDao extends Dao<Student, StudentModel> {
 
 	convertModelToEntity(model: StudentModel) {
 		// console.log(model);
-		const dbJson = model.$toDatabaseJson();
+		const dbJson = model.$parseDatabaseJson(model.toJSON());
 		const entity = Student.create(
 			{
 				typeTraining: dbJson['type_training'],
@@ -33,7 +35,9 @@ export default class StudentDao extends Dao<Student, StudentModel> {
 			},
 			Number(dbJson['id'])
 		);
-		console.log(dbJson['user']);
+		const user = dbJson['user'] && UserModel.convertEntityToPartialModelObject(dbJson['user']);
+
+		if (user) entity.updateUser(user);
 
 		return entity;
 	}

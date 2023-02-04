@@ -21,9 +21,7 @@ export default class Student extends Entity<IProps> {
 	get schoolYear() {
 		return this.props.schoolYear;
 	}
-	get user() {
-		return this.props.user;
-	}
+
 	get userId(): number {
 		if (this.props.user instanceof User) {
 			return this.props.user.id!;
@@ -44,5 +42,9 @@ export default class Student extends Entity<IProps> {
 			...props,
 			...userProps,
 		};
+	}
+	public toString = (): any => {};
+	updateUser(user: number | User) {
+		this._props.user = user;
 	}
 }
