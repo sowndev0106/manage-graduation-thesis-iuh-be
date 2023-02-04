@@ -35,19 +35,19 @@ export default class LoginHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		const user = await this.userDao.findOneByUsername(input.username);
+		const student = await this.studentDao.findByUsername(input.username);
 
-		if (!user) throw new NotFoundError('username not found');
+		if (!student) throw new NotFoundError('username not found');
 
-		const isCorrectPassword = await compareTextBcrypt(input.password, user.password);
+		const isCorrectPassword = await compareTextBcrypt(input.password, student.user);
 
 		if (!isCorrectPassword) throw new ForbiddenError('incorect password');
 
-		const student = await this.studentDao.findEntityById(1);
+		console.log(student?.toResponses);
 
-		const accessToken = signAccessToken(user.id!, TypeRoleUser.Student);
-		const refreshToken = signRefreshToken(user.id!, TypeRoleUser.Student);
+		const accessToken = signAccessToken(student.id!, TypeRoleUser.Student);
+		const refreshToken = signRefreshToken(student.id!, TypeRoleUser.Student);
 
-		return { accessToken, refreshToken, user: user.toResponses };
+		return { accessToken, refreshToken, user: student?.toResponses };
 	}
 }

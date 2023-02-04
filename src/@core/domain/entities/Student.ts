@@ -1,5 +1,6 @@
 import Entity from './Entity';
 import lodash from 'lodash';
+import User from './User';
 
 enum TypeTraining {
 	College = 'college',
@@ -8,7 +9,7 @@ enum TypeTraining {
 export interface IProps {
 	typeTraining: TypeTraining;
 	schoolYear: string;
-	userId: number;
+	user: number | User;
 }
 export default class Student extends Entity<IProps> {
 	static create(props: IProps, id?: number) {
@@ -20,10 +21,30 @@ export default class Student extends Entity<IProps> {
 	get schoolYear() {
 		return this.props.schoolYear;
 	}
-	get userId() {
-		return this.props.userId;
+
+	get userId(): number {
+		if (this.props.user instanceof User) {
+			return this.props.user.id!;
+		}
+		return this.props.user;
 	}
 	get toResponses() {
-		return lodash.cloneDeep(this.props);
+		const { user, ...props } = lodash.cloneDeep(this.props);
+		let userProps: any;
+		if (user instanceof User) {
+			userProps = user.toResponses;
+			delete userProps['id'];
+		} else {
+			userProps = { userId: user };
+		}
+		return {
+			id: this.id,
+			...props,
+			...userProps,
+		};
+	}
+	public toString = (): any => {};
+	updateUser(user: number | User) {
+		this._props.user = user;
 	}
 }

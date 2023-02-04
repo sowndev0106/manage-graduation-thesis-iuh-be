@@ -5,4 +5,15 @@ import StudentModel from '@core/infrastructure/objection-js/models/Student';
 import { injectable } from 'inversify';
 
 @injectable()
-export default class StudentDao extends StudentDaoCore implements IStudentDao {}
+export default class StudentDao extends StudentDaoCore implements IStudentDao {
+	async findByUsername(username: string): Promise<Student | null> {
+		const query = this.initQuery();
+
+		query.withGraphFetched('user');
+		query.join('user', 'student.user_id', '=', 'user.id');
+		query.where('user.username', username);
+
+		const result = await query.execute();
+		return result && result[0] ? this.convertModelToEntity(result[0]) : null;
+	}
+}
