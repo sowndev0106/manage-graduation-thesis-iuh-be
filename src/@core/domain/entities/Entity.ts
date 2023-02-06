@@ -19,6 +19,6 @@ export default abstract class Entity<T> implements IEntity {
 	}
 
 	public get props(): T {
-		return Lodash.cloneDeep(this._props);
+		return this._props;
 	}
 }

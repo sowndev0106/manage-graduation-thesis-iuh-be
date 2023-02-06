@@ -1,7 +1,7 @@
 import Entity from './Entity';
 export interface IProps {
 	name: string;
-	headLecturerId: string;
+	headLecturerId: number;
 	createdAt?: Date;
 	updatedAt?: Date;
 }

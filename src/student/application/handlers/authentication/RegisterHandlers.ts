@@ -48,6 +48,6 @@ export default class RegisterHandlers extends RequestHandler {
 
 		user = await this.userDao.insertEntity(entity);
 
-		return user.toResponses;
+		return user.toJSON;
 	}
 }

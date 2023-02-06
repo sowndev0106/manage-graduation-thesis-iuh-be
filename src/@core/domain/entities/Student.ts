@@ -21,6 +21,9 @@ export default class Student extends Entity<IProps> {
 	get schoolYear() {
 		return this.props.schoolYear;
 	}
+	get user() {
+		return this.props.user;
+	}
 
 	get userId(): number {
 		if (this.props.user instanceof User) {
@@ -28,11 +31,11 @@ export default class Student extends Entity<IProps> {
 		}
 		return this.props.user;
 	}
-	get toResponses() {
+	get toJSON() {
 		const { user, ...props } = lodash.cloneDeep(this.props);
 		let userProps: any;
 		if (user instanceof User) {
-			userProps = user.toResponses;
+			userProps = user.toJSON;
 			delete userProps['id'];
 		} else {
 			userProps = { userId: user };
@@ -43,7 +46,6 @@ export default class Student extends Entity<IProps> {
 			...userProps,
 		};
 	}
-	public toString = (): any => {};
 	updateUser(user: number | User) {
 		this._props.user = user;
 	}

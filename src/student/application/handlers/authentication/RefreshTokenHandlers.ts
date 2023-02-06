@@ -12,7 +12,7 @@ import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
 import Text from '@core/domain/validate-objects/Text';
-import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefrestToken } from '@core/infrastructure/jsonwebtoken';
+import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 
 interface ValidatedInput {
 	refreshToken: string;
@@ -35,10 +35,9 @@ export default class RefreshTokenHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		const { id, role } = verifyRefrestToken(input.refreshToken);
+		const { id, role } = JWTService.verifyRefrestToken(input.refreshToken);
 
-		const accessToken = signAccessToken(id, role);
-		const refreshToken = signRefreshToken(id, role);
+		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(id, role);
 
 		return { accessToken, refreshToken };
 	}

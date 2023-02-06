@@ -18,7 +18,6 @@ export interface IProps {
 	email?: string;
 	name?: string;
 	gender?: TypeGender;
-	level?: string;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -47,9 +46,6 @@ export default class User extends Entity<IProps> {
 	get gender() {
 		return this.props.gender;
 	}
-	get level() {
-		return this.props.level;
-	}
 	get majorsId() {
 		return this.props.majorsId;
 	}
@@ -59,7 +55,7 @@ export default class User extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt;
 	}
-	get toResponses() {
+	get toJSON() {
 		const reponse: Partial<IProps> = lodash.cloneDeep(this.props);
 
 		delete reponse['password'];

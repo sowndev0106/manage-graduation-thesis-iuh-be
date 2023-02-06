@@ -31,6 +31,6 @@ export default class GetMyInfoHandlers extends RequestHandler {
 
 		if (!user) throw new ConflictError('student not found');
 
-		return user!.toResponses;
+		return user!.toJSON;
 	}
 }
