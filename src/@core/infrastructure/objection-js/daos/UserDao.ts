@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import Dao from './Dao';
-import UserModel from '@core/infrastructure/objection-js/models/User';
+import UserModel from '@core/infrastructure/objection-js/models/UserModel';
 import User from '@core/domain/entities/User';
 import Objection, { QueryBuilder, PartialModelObject } from 'objection';
 
@@ -11,7 +11,7 @@ export default class UserDao extends Dao<User, UserModel> {
 	}
 
 	convertEntityToPartialModelObject(entity: User) {
-		return UserModel.convertModelToEntity(entity);
+		return UserModel.convertEntityToPartialModelObject(entity);
 	}
 
 	convertModelToEntity(model: UserModel) {

@@ -22,6 +22,9 @@ export interface IProps {
 	updatedAt?: Date;
 }
 export default class User extends Entity<IProps> {
+	static createById(id: number) {
+		return new User(undefined, id);
+	}
 	static create(props: IProps, id?: number) {
 		return new User(props, id);
 	}
@@ -56,7 +59,7 @@ export default class User extends Entity<IProps> {
 		return this.props.updatedAt;
 	}
 	get toJSON() {
-		const reponse: Partial<IProps> = lodash.cloneDeep(this.props);
+		const reponse: Partial<IProps> = lodash.cloneDeep(this.props || {});
 
 		delete reponse['password'];
 

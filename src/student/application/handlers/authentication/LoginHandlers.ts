@@ -11,7 +11,6 @@ import ForbiddenError from '@core/domain/errors/ForbiddenError';
 import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 import User, { TypeRoleUser } from '@core/domain/entities/User';
 import IStudentDao from '@student/domain/daos/IStudentDao';
-import Lecturer from '@core/domain/entities/Lecturer';
 
 interface ValidatedInput {
 	username: string;
@@ -35,15 +34,15 @@ export default class LoginHandlers extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-		Lecturer.create({ level: '', majorsId: 1, password: '', username: '', userId: 1 });
 		const student = await this.studentDao.findByUsername(input.username);
 
 		if (!student) throw new NotFoundError('username not found');
 
-		const user = student.user instanceof User ? student.user : await this.userDao.findEntityById(student.userId);
+		const user = student.user instanceof User ? student.user : await this.userDao.findEntityById(student.id);
+
 		if (!user) throw new Error('Data user missing, please contact lecturer');
 
-		const isCorrectPassword = await compareTextBcrypt(input.password, user.password);
+		const isCorrectPassword = await compareTextBcrypt(input.password, user.password!);
 
 		if (!isCorrectPassword) throw new ForbiddenError('incorect password');
 

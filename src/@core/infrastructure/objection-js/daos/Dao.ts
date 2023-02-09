@@ -21,7 +21,8 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 		return this.convertModelToEntity(model);
 	}
 
-	async findEntityById(id: number): Promise<E | null> {
+	async findEntityById(id: number | undefined): Promise<E | null> {
+		if (!id) return null;
 		const model = await this.initQuery().findById(id).execute();
 
 		if (model == undefined || model == null) {

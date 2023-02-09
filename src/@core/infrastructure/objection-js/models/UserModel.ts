@@ -1,10 +1,10 @@
 import UserEntity from '@core/domain/entities/User';
 import Objection, { Model } from 'objection';
 
-export default class User extends Model {
-	static convertModelToEntity(model: User | Objection.Pojo) {
+export default class UserModel extends Model {
+	static convertModelToEntity(model: UserModel | Objection.Pojo) {
 		let dbJson: Objection.Pojo;
-		if (model instanceof User) {
+		if (model instanceof UserModel) {
 			dbJson = model.$parseDatabaseJson(model.toJSON());
 		} else {
 			dbJson = model;
@@ -28,7 +28,7 @@ export default class User extends Model {
 		return entity;
 	}
 	static convertEntityToPartialModelObject(entity: UserEntity) {
-		const model = new User();
+		const model = new UserModel();
 
 		model.$set({
 			id: entity.id,
@@ -43,7 +43,7 @@ export default class User extends Model {
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
-
+		console.log(model);
 		return model;
 	}
 	static get tableName() {

@@ -6,10 +6,12 @@ export interface IProps {
 	updatedAt?: Date;
 }
 export default class Majors extends Entity<IProps> {
-	static create(props: IProps, id?: number) {
+	static create(props?: IProps, id?: number) {
 		return new Majors(props, id);
 	}
-
+	static createById(id?: number) {
+		return new Majors(undefined, id);
+	}
 	get name() {
 		return this.props.name;
 	}

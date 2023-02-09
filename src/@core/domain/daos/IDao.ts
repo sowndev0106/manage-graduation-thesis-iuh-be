@@ -2,7 +2,7 @@ import { IEntity } from '@core/domain/entities/Entity';
 
 export default interface IDao<E extends IEntity> {
 	insertEntity(entity: E): Promise<E>;
-	findEntityById(id: number): Promise<E | null>;
+	findEntityById(id: number | undefined): Promise<E | null>;
 	updateEntity(entity: E): Promise<E>;
 	deleteEntity(entity: E): Promise<E>;
 	insertBulkOfEntities(entities: E[]): Promise<E[]>;

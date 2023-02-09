@@ -9,9 +9,12 @@ enum TypeTraining {
 export interface IProps {
 	typeTraining: TypeTraining;
 	schoolYear: string;
-	user: number | User;
+	user: User;
 }
 export default class Student extends Entity<IProps> {
+	static createById(id?: number) {
+		return new Student(undefined, id);
+	}
 	static create(props: IProps, id?: number) {
 		return new Student(props, id);
 	}
@@ -21,32 +24,26 @@ export default class Student extends Entity<IProps> {
 	get schoolYear() {
 		return this.props.schoolYear;
 	}
-	get user() {
+	get user(): User {
 		return this.props.user;
 	}
 
-	get userId(): number {
-		if (this.props.user instanceof User) {
-			return this.props.user.id!;
-		}
-		return this.props.user;
+	get userId(): number | undefined {
+		return this.props.user.id;
 	}
 	get toJSON() {
 		const { user, ...props } = lodash.cloneDeep(this.props);
 		let userProps: any;
-		if (user instanceof User) {
-			userProps = user.toJSON;
-			delete userProps['id'];
-		} else {
-			userProps = { userId: user };
-		}
+		userProps = user.toJSON;
+		delete userProps['id'];
+
 		return {
 			id: this.id,
 			...props,
 			...userProps,
 		};
 	}
-	updateUser(user: number | User) {
+	updateUser(user: User) {
 		this._props.user = user;
 	}
 }

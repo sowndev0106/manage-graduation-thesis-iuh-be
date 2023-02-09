@@ -1,7 +1,7 @@
 import Student from '@core/domain/entities/Student';
 import StudentDaoCore from '@core/infrastructure/objection-js/daos/StudentDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
-import StudentModel from '@core/infrastructure/objection-js/models/Student';
+import StudentModel from '@core/infrastructure/objection-js/models/StudentModel';
 import { injectable } from 'inversify';
 
 @injectable()

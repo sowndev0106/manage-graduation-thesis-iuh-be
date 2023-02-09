@@ -44,6 +44,7 @@ export default class RegisterHandlers extends RequestHandler {
 		if (!majors) throw new NotFoundError('majors not found');
 
 		const passwordEncript = await encriptTextBcrypt(input.password);
+
 		const entity = User.create({ username: input.username, password: passwordEncript, majorsId: 1 });
 
 		user = await this.userDao.insertEntity(entity);

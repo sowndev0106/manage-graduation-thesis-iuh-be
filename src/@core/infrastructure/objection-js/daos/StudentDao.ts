@@ -1,10 +1,11 @@
 import { injectable } from 'inversify';
 import Dao from './Dao';
-import StudentModel from '@core/infrastructure/objection-js/models/Student';
+import StudentModel from '@core/infrastructure/objection-js/models/StudentModel';
 import Student from '@core/domain/entities/Student';
 import { QueryBuilder } from 'objection';
-import UserModel from '../models/User';
+import UserModel from '../models/UserModel';
 import UserDao from './UserDao';
+import User from '@core/domain/entities/User';
 
 @injectable()
 export default class StudentDao extends Dao<Student, StudentModel> {
@@ -25,19 +26,7 @@ export default class StudentDao extends Dao<Student, StudentModel> {
 	}
 
 	convertModelToEntity(model: StudentModel) {
-		// console.log(model);
-		const dbJson = model.$parseDatabaseJson(model.toJSON());
-		const entity = Student.create(
-			{
-				typeTraining: dbJson['type_training'],
-				schoolYear: dbJson['school_year'],
-				user: dbJson['user_id'] && Number(dbJson['user_id']),
-			},
-			Number(dbJson['id'])
-		);
-		const user = dbJson['user'] && UserModel.convertEntityToPartialModelObject(dbJson['user']);
-
-		if (user) entity.updateUser(user);
+		const entity = StudentModel.convertModelToEntity(model);
 
 		return entity;
 	}

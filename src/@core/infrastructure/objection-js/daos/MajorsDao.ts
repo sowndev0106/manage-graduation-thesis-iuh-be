@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import Dao from './Dao';
-import MajorsModel from '@core/infrastructure/objection-js/models/Majors';
+import MajorsModel from '@core/infrastructure/objection-js/models/MajorsModel';
 import Majors from '@core/domain/entities/Majors';
 import { QueryBuilder } from 'objection';
 
