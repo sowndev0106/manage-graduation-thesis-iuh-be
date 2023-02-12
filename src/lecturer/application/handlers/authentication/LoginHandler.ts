@@ -10,7 +10,7 @@ import { compareTextBcrypt } from '@core/infrastructure/bcrypt';
 import ForbiddenError from '@core/domain/errors/ForbiddenError';
 import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 import User, { TypeRoleUser } from '@core/domain/entities/User';
-import ILecturerDao from '@lecturer/domain/daos/IlecturerDao';
+import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 
 interface ValidatedInput {
 	username: string;
