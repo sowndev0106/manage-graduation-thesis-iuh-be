@@ -1,24 +1,24 @@
 import Objection, { Model } from 'objection';
-import StudentEntity from '@core/domain/entities/Student';
+import LecturerEntity from '@core/domain/entities/Lecturer';
 import UserEntity from '@core/domain/entities/User';
 import UserModel from './UserModel';
 import User from './UserModel';
 
-export default class StudentModel extends Model {
+export default class LecturerModel extends Model {
 	static get tableName() {
-		return 'student';
+		return 'lecturer';
 	}
-	static convertModelToEntity(model: StudentModel | Objection.Pojo) {
+	static convertModelToEntity(model: LecturerModel | Objection.Pojo) {
 		let dbJson: Objection.Pojo;
-		if (model instanceof StudentModel) {
+		if (model instanceof LecturerModel) {
 			dbJson = model.$parseDatabaseJson(model.toJSON());
 		} else {
 			dbJson = model;
 		}
-		const entity = StudentEntity.create(
+		const entity = LecturerEntity.create(
 			{
-				typeTraining: dbJson['type_training'],
-				schoolYear: dbJson['school_year'],
+				degree: dbJson['degree'],
+				isAdmin: dbJson['isAdmin'] == 1,
 				user: dbJson['user_id'] && UserEntity.createById(Number(dbJson['user_id'])),
 			},
 			Number(dbJson['id'])
@@ -30,23 +30,23 @@ export default class StudentModel extends Model {
 
 		return entity;
 	}
-	static convertEntityToPartialModelObject(entity: StudentEntity) {
-		const model = new StudentModel();
+	static convertEntityToPartialModelObject(entity: LecturerEntity) {
+		const model = new LecturerModel();
 
 		model.$set({
 			id: entity.id,
-			type_training: entity.typeTraining,
-			school_year: entity.schoolYear,
+			degree: entity.degree,
+			is_admin: entity.isAdmin,
 			user_id: entity.userId,
 		});
 
 		return model;
 	}
-	static convertEntityToPartialModelGraph(entity: StudentEntity): Object {
+	static convertEntityToPartialModelGraph(entity: LecturerEntity): Object {
 		const model = {
 			id: entity.id,
-			type_training: entity.typeTraining,
-			school_year: entity.schoolYear,
+			degree: entity.degree,
+			is_admin: entity.isAdmin,
 			user: UserModel.convertEntityToPartialModelObject(entity.user),
 		};
 
@@ -57,7 +57,7 @@ export default class StudentModel extends Model {
 			relation: Model.HasOneRelation,
 			modelClass: User,
 			join: {
-				from: 'student.user_id',
+				from: 'lecturer.user_id',
 				to: 'user.id',
 			},
 		},

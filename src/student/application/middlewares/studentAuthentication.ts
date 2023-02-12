@@ -7,6 +7,9 @@ async function studentAuthentication(req: Request, res: Response, next: NextFunc
 
 	if (role !== TypeRoleUser.Student) throw new AuthorizationError('you can not access to student apis');
 
+	req.headers['id'] = String(id);
+	req.headers['role'] = role;
+
 	next();
 }
 

@@ -6,6 +6,9 @@ import Objection, { QueryBuilder, PartialModelObject } from 'objection';
 
 @injectable()
 export default class UserDao extends Dao<User, UserModel> {
+	protected convertEntityToPartialModelGraph(entity: User): Objection.PartialModelGraph<UserModel, UserModel & Objection.GraphParameters> {
+		throw new Error('Method not implemented.');
+	}
 	protected initQuery(): QueryBuilder<UserModel, UserModel[]> {
 		return UserModel.query();
 	}

@@ -43,7 +43,6 @@ export default class UserModel extends Model {
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
-		console.log(model);
 		return model;
 	}
 	static get tableName() {

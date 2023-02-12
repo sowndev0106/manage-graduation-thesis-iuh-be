@@ -1,11 +1,52 @@
 import IDao from '@core/domain/daos/IDao';
 import Entity, { IEntity } from '@core/domain/entities/Entity';
-import { Model, PartialModelObject, QueryBuilder } from 'objection';
+import { Model, PartialModelGraph, PartialModelObject, QueryBuilder } from 'objection';
 
 export default abstract class Dao<E extends IEntity, M extends Model> implements IDao<E> {
 	protected abstract initQuery(): QueryBuilder<M, M[]>;
 	protected abstract convertModelToEntity(model: M): E;
 	protected abstract convertEntityToPartialModelObject(entity: E): PartialModelObject<M>;
+	protected abstract convertEntityToPartialModelGraph(entity: E): PartialModelGraph<M>;
+
+	async findGraphEEntityById(id: number, grap: string): Promise<E | null> {
+		if (!id) return null;
+
+		const model = await this.initQuery().withGraphFetched(grap).findById(id).execute();
+
+		if (model == undefined || model == null) {
+			return null;
+		}
+
+		return this.convertModelToEntity(model);
+	}
+	async updateGraphEntity(entity: E): Promise<E> {
+		if (entity == undefined || entity == null) {
+			throw new Error('Cannot insert undefined or null');
+		}
+		const partialModelObject = this.convertEntityToPartialModelGraph(entity);
+
+		const model = await this.initQuery().upsertGraphAndFetch(partialModelObject);
+
+		if (model == undefined || model == null) {
+			throw new Error('Fail to insert entity');
+		}
+
+		return this.convertModelToEntity(model);
+	}
+	async insertGraphEntity(entity: E): Promise<E> {
+		if (entity == undefined || entity == null) {
+			throw new Error('Cannot insert undefined or null');
+		}
+		const partialModelObject = this.convertEntityToPartialModelGraph(entity);
+
+		const model = await this.initQuery().insertGraphAndFetch(partialModelObject);
+
+		if (model == undefined || model == null) {
+			throw new Error('Fail to insert entity');
+		}
+
+		return this.convertModelToEntity(model);
+	}
 
 	async insertEntity(entity: E): Promise<E> {
 		if (entity == undefined || entity == null) {

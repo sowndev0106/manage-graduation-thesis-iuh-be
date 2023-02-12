@@ -2,10 +2,13 @@ import { injectable } from 'inversify';
 import Dao from './Dao';
 import MajorsModel from '@core/infrastructure/objection-js/models/MajorsModel';
 import Majors from '@core/domain/entities/Majors';
-import { QueryBuilder } from 'objection';
+import { GraphParameters, PartialModelGraph, QueryBuilder } from 'objection';
 
 @injectable()
 export default class MajorsDao extends Dao<Majors, MajorsModel> {
+	protected convertEntityToPartialModelGraph(entity: Majors): PartialModelGraph<MajorsModel, MajorsModel & GraphParameters> {
+		throw new Error('Method not implemented.');
+	}
 	protected initQuery(): QueryBuilder<MajorsModel, MajorsModel[]> {
 		return MajorsModel.query();
 	}

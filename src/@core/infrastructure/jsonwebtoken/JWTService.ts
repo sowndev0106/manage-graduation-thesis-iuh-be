@@ -46,9 +46,6 @@ class JWTService {
 		try {
 			const data = this.verifyAccessToken(token);
 
-			req.headers['id'] = String(data.id);
-			req.headers['role'] = data.role;
-
 			return data;
 		} catch (error: any) {
 			throw new AuthorizationError(error.message);
