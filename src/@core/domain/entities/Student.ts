@@ -2,13 +2,13 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import User from './User';
 
-enum TypeTraining {
+export enum TypeTraining {
 	College = 'college',
 	University = 'university',
 }
 export interface IProps {
-	typeTraining: TypeTraining;
-	schoolYear: string;
+	typeTraining?: TypeTraining;
+	schoolYear?: string;
 	user: User;
 }
 export default class Student extends Entity<IProps> {
@@ -33,10 +33,10 @@ export default class Student extends Entity<IProps> {
 	}
 	get toJSON() {
 		const { user, ...props } = lodash.cloneDeep(this.props);
-		let userProps: any;
-		userProps = user.toJSON;
+		let userProps: any = { ...user };
 		delete userProps['id'];
-
+		delete userProps['password'];
+		console.log(userProps);
 		return {
 			id: this.id,
 			...props,
