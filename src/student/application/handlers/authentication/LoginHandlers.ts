@@ -38,7 +38,7 @@ export default class LoginHandlers extends RequestHandler {
 
 		if (!student) throw new NotFoundError('username not found');
 
-		const user = student.user instanceof User ? student.user : await this.userDao.findEntityById(student.id);
+		const user = student.user instanceof User ? student.user : await this.userDao.findEntityById(student.userId);
 
 		if (!user) throw new Error('Data user missing, please contact lecturer');
 

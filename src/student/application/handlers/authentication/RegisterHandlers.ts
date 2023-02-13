@@ -11,6 +11,8 @@ import User from '@core/domain/entities/User';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
+import StudentDao from '@student/infrastructure/objection-js/daos/StudentDao';
+import Student, { TypeTraining } from '@core/domain/entities/Student';
 
 interface ValidatedInput {
 	username: string;
@@ -22,6 +24,7 @@ interface ValidatedInput {
 export default class RegisterHandlers extends RequestHandler {
 	@inject('UserDao') private userDao!: IUserDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
+	@inject('StudentDao') private studentDao!: StudentDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
@@ -49,6 +52,10 @@ export default class RegisterHandlers extends RequestHandler {
 
 		user = await this.userDao.insertEntity(entity);
 
-		return user.toJSON;
+		const student = await this.studentDao.insertEntity(
+			Student.create({ user: user, schoolYear: new Date().getFullYear().toString(), typeTraining: TypeTraining.University })
+		);
+
+		return student.toJSON;
 	}
 }
