@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import authenticationRoute from './authentication';
 import userRoute from './user';
 import adminRoute from './admin';
+import termRoute from './term';
 import { adminAuthentication, lecturerAuthentication } from '../middlewares/LecturerAuthentication';
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use('/auth', authenticationRoute);
 router.use(lecturerAuthentication);
 
 router.use('/user', userRoute);
+router.use('/term', termRoute);
 
 // authorization api Admin
 router.use(adminAuthentication);

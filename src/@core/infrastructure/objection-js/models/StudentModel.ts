@@ -2,7 +2,6 @@ import Objection, { Model } from 'objection';
 import StudentEntity from '@core/domain/entities/Student';
 import UserEntity from '@core/domain/entities/User';
 import UserModel from './UserModel';
-import User from './UserModel';
 
 export default class StudentModel extends Model {
 	static get tableName() {
@@ -61,7 +60,7 @@ export default class StudentModel extends Model {
 	static relationMappings = {
 		user: {
 			relation: Model.HasOneRelation,
-			modelClass: User,
+			modelClass: UserModel,
 			join: {
 				from: 'student.user_id',
 				to: 'user.id',

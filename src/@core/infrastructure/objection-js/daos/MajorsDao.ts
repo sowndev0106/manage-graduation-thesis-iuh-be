@@ -14,25 +14,10 @@ export default class MajorsDao extends Dao<Majors, MajorsModel> {
 	}
 
 	convertEntityToPartialModelObject(entity: Majors) {
-		const model = new MajorsModel();
-		model.$set({
-			id: entity.id,
-			name: entity.name,
-		});
-
-		return model;
+		return MajorsModel.convertEntityToPartialModelObject(entity);
 	}
 
 	convertModelToEntity(model: MajorsModel) {
-		const dbJson = model.$toDatabaseJson();
-		const entity = Majors.create(
-			{
-				name: dbJson['name'],
-				headLecturerId: dbJson['head_lecturer_id'] && Number(dbJson['head_lecturer_id']),
-			},
-			Number(dbJson['id'])
-		);
-
-		return entity;
+		return MajorsModel.convertModelToEntity(model);
 	}
 }
