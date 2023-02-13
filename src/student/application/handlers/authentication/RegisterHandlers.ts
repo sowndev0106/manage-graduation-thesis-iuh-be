@@ -56,6 +56,8 @@ export default class RegisterHandlers extends RequestHandler {
 			Student.create({ user: user, schoolYear: new Date().getFullYear().toString(), typeTraining: TypeTraining.University })
 		);
 
+		student.updateUser(user);
+
 		return student.toJSON;
 	}
 }

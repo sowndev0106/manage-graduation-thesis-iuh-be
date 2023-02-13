@@ -52,10 +52,13 @@ export default class RegisterHandlers extends RequestHandler {
 
 		user = User.create({ username: input.username, password: passwordEncript, majorsId: 1 });
 
-		let lecturer = Lecturer.create({ user: user, degree: TypeDegree.Masters, isAdmin: false });
-		console.log(LecturerModel.convertEntityToPartialModelGraph(lecturer));
+		user = await this.userDao.insertEntity(user);
 
-		lecturer = await this.lecturerDao.insertGraphEntity(lecturer);
+		let lecturer = Lecturer.create({ user: user, degree: TypeDegree.Masters, isAdmin: false });
+
+		lecturer = await this.lecturerDao.insertEntity(lecturer);
+
+		lecturer.updateUser(user);
 
 		return lecturer.toJSON;
 	}

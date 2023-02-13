@@ -20,6 +20,8 @@ export default class StudentModel extends Model {
 				typeTraining: dbJson['type_training'],
 				schoolYear: dbJson['school_year'],
 				user: dbJson['user_id'] && UserEntity.createById(Number(dbJson['user_id'])),
+				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
+				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
 			Number(dbJson['id'])
 		);
@@ -38,6 +40,8 @@ export default class StudentModel extends Model {
 			type_training: entity.typeTraining,
 			school_year: entity.schoolYear,
 			user_id: entity.userId,
+			created_at: entity.createdAt,
+			updated_at: entity.updatedAt,
 		});
 
 		return model;
@@ -48,6 +52,8 @@ export default class StudentModel extends Model {
 			type_training: entity.typeTraining,
 			school_year: entity.schoolYear,
 			user: UserModel.convertEntityToPartialModelObject(entity.user),
+			created_at: entity.createdAt,
+			updated_at: entity.updatedAt,
 		};
 
 		return model;

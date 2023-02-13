@@ -10,6 +10,8 @@ export interface IProps {
 	degree: TypeDegree;
 	isAdmin: boolean;
 	user: User;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 export default class Lecturer extends Entity<IProps> {
 	static createById(id?: number) {
@@ -31,16 +33,21 @@ export default class Lecturer extends Entity<IProps> {
 	get userId(): number | undefined {
 		return this.props.user.id;
 	}
+	get createdAt() {
+		return this.props.createdAt;
+	}
+	get updatedAt() {
+		return this.props.updatedAt;
+	}
 	get toJSON() {
 		const { user, ...props } = lodash.cloneDeep(this.props);
-		let userProps: any;
-		userProps = user?.toJSON;
+		let userProps: any = user?.toJSON;
 		delete userProps['id'];
 
 		return {
 			id: this.id,
-			...props,
 			...userProps,
+			...props,
 		};
 	}
 	updateUser(user: User) {
