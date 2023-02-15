@@ -6,6 +6,6 @@ const router = Router();
 router.post('/', TermController.createTerm);
 router.put('/:id', TermController.updateTerm);
 router.get('/', TermController.getListTerm);
-router.get('/:id(d+)', TermController.getTermById);
+router.get('/:id', TermController.getTermById);
 
 export default router;

@@ -12,7 +12,6 @@ import Term from '@core/domain/entities/Term';
 import Majors from '@core/domain/entities/Majors';
 
 interface ValidatedInput {
-	id: number;
 	name: string;
 	majorsId: number;
 	startDate: Date;
@@ -25,11 +24,10 @@ interface ValidatedInput {
 	dateReport: Date;
 }
 @injectable()
-export default class UpdateTermHandlers extends RequestHandler {
+export default class CreateTermHandler extends RequestHandler {
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('TermDao') private termDao!: ITermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
-		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: String(request.params['id']) }));
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
 		const startDate: Date = this.errorCollector.collect('startDate', () => DateValidate.validate({ value: request.body['startDate'] }));
@@ -58,7 +56,6 @@ export default class UpdateTermHandlers extends RequestHandler {
 		if (startDateChooseTopic >= endDateChooseTopic) throw new Error('startDateChooseTopic must be better endDateChooseTopic');
 
 		return {
-			id,
 			name,
 			majorsId,
 			startDate,
@@ -74,34 +71,26 @@ export default class UpdateTermHandlers extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-
 		let majors = await this.majorsDao.findEntityById(input.majorsId);
 		if (!majors) throw new NotFoundError('majors not found');
 
-		let term = await this.termDao.findEntityById(input.id);
-		if (!term) throw new Error('term not found');
+		let term = await this.termDao.findByNameAndMajors(input.name, input.majorsId);
 
-		let termCheck = await this.termDao.findByNameAndMajors(input.name, input.majorsId);
+		if (term) throw new Error('name already exists in majors');
 
-		if (termCheck?.id && termCheck.id != term.id) throw new Error('name already exists in majors');
-
-		term = await this.termDao.updateEntity(
-			Term.create(
-				{
-					name: input.name,
-					majors: Majors.createById(input.majorsId),
-					startDate: input.startDate,
-					endDate: input.endDate,
-					startDateSubmitTopic: input.startDateSubmitTopic,
-					endDateSubmitTopic: input.endDateSubmitTopic,
-					dateDiscussion: input.dateDiscussion,
-					dateReport: input.dateReport,
-					startDateChooseTopic: input.startDateChooseTopic,
-					endDateChooseTopic: input.endDateChooseTopic,
-					updatedAt: new Date(),
-				},
-				input.id
-			)
+		term = await this.termDao.insertEntity(
+			Term.create({
+				name: input.name,
+				majors: Majors.createById(input.majorsId),
+				startDate: input.startDate,
+				endDate: input.endDate,
+				startDateSubmitTopic: input.startDateSubmitTopic,
+				endDateSubmitTopic: input.endDateSubmitTopic,
+				dateDiscussion: input.dateDiscussion,
+				dateReport: input.dateReport,
+				startDateChooseTopic: input.startDateChooseTopic,
+				endDateChooseTopic: input.endDateChooseTopic,
+			})
 		);
 		if (!term) throw new Error('Create term fail');
 
