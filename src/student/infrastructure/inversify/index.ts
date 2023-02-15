@@ -8,6 +8,8 @@ import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import MajorsDao from '@student/infrastructure/objection-js/daos/MajorsDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 import StudentDao from '@student/infrastructure/objection-js/daos/StudentDao';
+import TermDao from '../objection-js/daos/TermDao';
+import ITermDao from '@student/domain/daos/ITermDao';
 
 const container = new Container({
 	autoBindInjectable: true,
@@ -24,5 +26,6 @@ container.bind<Nodemailer>('Nodemailer').to(Nodemailer);
 container.bind<IUserDao>('UserDao').to(UserDao);
 container.bind<IMajorsDao>('MajorsDao').to(MajorsDao);
 container.bind<IStudentDao>('StudentDao').to(StudentDao);
+container.bind<ITermDao>('TermDao').to(TermDao);
 
 export default container;

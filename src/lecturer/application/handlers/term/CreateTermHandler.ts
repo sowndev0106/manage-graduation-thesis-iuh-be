@@ -74,9 +74,11 @@ export default class CreateTermHandler extends RequestHandler {
 		let majors = await this.majorsDao.findEntityById(input.majorsId);
 		if (!majors) throw new NotFoundError('majors not found');
 
-		let term = await this.termDao.findByNameAndMajors(input.name, input.majorsId);
+		let termsByYear = await this.termDao.findByYearAndMajors(input.startDate.getFullYear(), input.endDate.getFullYear(), input.majorsId);
 
-		if (term) throw new Error('name already exists in majors');
+		let term = termsByYear.find(e => e.name == input.name);
+
+		if (term) throw new Error(`name already exists in majors and year ${input.startDate.getFullYear()} - ${input.endDate.getFullYear()}`);
 
 		term = await this.termDao.insertEntity(
 			Term.create({
