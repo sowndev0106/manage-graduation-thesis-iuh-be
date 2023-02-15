@@ -25,9 +25,9 @@ export default class TermModel extends Model {
 				endDateChooseTopic: dbJson['end_date_choose_topic'],
 				dateDiscussion: dbJson['date_discussion'],
 				dateReport: dbJson['date_report'],
-				majors: dbJson['majors_id'] && Majors.createById(Number(dbJson['user_id'])),
-				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
-				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
+				majors: dbJson['majors_id'] && Majors.createById(Number(dbJson['majors_id'])),
+				createdAt: dbJson['created_at'],
+				updatedAt: dbJson['updated_at'],
 			},
 			Number(dbJson['id'])
 		);

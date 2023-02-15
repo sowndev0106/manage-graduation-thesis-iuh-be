@@ -25,7 +25,6 @@ interface ValidatedInput {
 export default class RegisterHandlers extends RequestHandler {
 	@inject('UserDao') private userDao!: IUserDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
-
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));

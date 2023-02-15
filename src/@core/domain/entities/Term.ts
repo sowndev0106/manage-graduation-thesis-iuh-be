@@ -1,5 +1,6 @@
 import Entity from './Entity';
 import Majors from './Majors';
+import lodash from 'lodash';
 export interface IProps {
 	name: string;
 	majors: Majors;
@@ -55,12 +56,17 @@ export default class Term extends Entity<IProps> {
 		return this.props.dateReport;
 	}
 	get createdAt() {
-		return this.props.createdAt;
+		return this.props.createdAt || new Date();
 	}
 	get updatedAt() {
-		return this.props.updatedAt;
+		return this.props.updatedAt || new Date();
 	}
 	updateMajors(majors: Majors) {
 		return (this._props.majors = majors);
+	}
+	get toJSON() {
+		const { majors, ...props } = lodash.cloneDeep(this.props);
+
+		return { id: this.id, ...props, majors: majors.toJSON };
 	}
 }

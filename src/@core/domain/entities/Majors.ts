@@ -1,4 +1,5 @@
 import Entity from './Entity';
+import lodash from 'lodash';
 export interface IProps {
 	name: string;
 	headLecturerId: number;
@@ -23,5 +24,8 @@ export default class Majors extends Entity<IProps> {
 	}
 	get updatedAt() {
 		return this.props.updatedAt;
+	}
+	get toJSON() {
+		return { id: this.id, ...lodash.cloneDeep(this.props) };
 	}
 }
