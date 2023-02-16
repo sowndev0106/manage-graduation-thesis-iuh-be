@@ -74,7 +74,7 @@ export default class CreateTermHandler extends RequestHandler {
 		let majors = await this.majorsDao.findEntityById(input.majorsId);
 		if (!majors) throw new NotFoundError('majors not found');
 
-		let termsByYear = await this.termDao.findByYearAndMajors(input.startDate.getFullYear(), input.endDate.getFullYear(), input.majorsId);
+		let termsByYear = await this.termDao.findByYearAndMajors(input.majorsId, input.startDate.getFullYear(), input.endDate.getFullYear());
 
 		let term = termsByYear.find(e => e.name == input.name);
 

@@ -81,12 +81,13 @@ export default class UpdateTermHandler extends RequestHandler {
 		let term = await this.termDao.findEntityById(input.id);
 		if (!term) throw new Error('term not found');
 
-		let termsByYear = await this.termDao.findByYearAndMajors(input.startDate.getFullYear(), input.endDate.getFullYear(), input.majorsId);
+		let termsByYear = await this.termDao.findByYearAndMajors(input.majorsId, input.startDate.getFullYear(), input.endDate.getFullYear());
 
 		let termCheckName = termsByYear.find(e => e.name == input.name);
 
 		if (termCheckName?.id && termCheckName.id != term.id)
 			throw new Error(`name already exists in majors and year ${input.startDate.getFullYear()} - ${input.endDate.getFullYear()}`);
+
 		term = await this.termDao.updateEntity(
 			Term.create(
 				{
