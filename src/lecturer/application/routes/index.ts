@@ -3,6 +3,7 @@ import authenticationRoute from './authentication';
 import userRoute from './user';
 import adminRoute from './admin';
 import termRoute from './term';
+import majorsRoute from './majors';
 import { adminAuthentication, lecturerAuthentication } from '../middlewares/LecturerAuthentication';
 const router = Router();
 
@@ -14,6 +15,7 @@ router.use(lecturerAuthentication);
 
 router.use('/user', userRoute);
 router.use('/term', termRoute);
+router.use('/majors', majorsRoute);
 
 // authorization api Admin
 router.use(adminAuthentication);

@@ -1,0 +1,59 @@
+import { inject, injectable } from 'inversify';
+import RequestHandler from '@core/application/RequestHandler';
+import ValidationError from '@core/domain/errors/ValidationError';
+import { Request } from 'express';
+import SortText from '@core/domain/validate-objects/SortText';
+import EntityId from '@core/domain/validate-objects/EntityID';
+import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
+import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import Majors from '@core/domain/entities/Majors';
+
+interface ValidatedInput {
+	name: string;
+	headLecturerId?: number;
+}
+@injectable()
+export default class CreateMajorsHandler extends RequestHandler {
+	@inject('MajorsDao') private majorsDao!: IMajorsDao;
+	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	async validate(request: Request): Promise<ValidatedInput> {
+		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
+		const headLecturerId = this.errorCollector.collect('headLecturerId', () =>
+			EntityId.validate({ value: request.body['headLecturerId'], required: false })
+		);
+
+		if (this.errorCollector.hasError()) {
+			throw new ValidationError(this.errorCollector.errors);
+		}
+
+		return {
+			name,
+			headLecturerId,
+		};
+	}
+
+	async handle(request: Request) {
+		const input = await this.validate(request);
+
+		let headLecturer;
+		if (input.headLecturerId) {
+			headLecturer = await this.lecturerDao.findEntityById(input.headLecturerId);
+			if (!headLecturer) throw new NotFoundError('lecturer not found');
+		}
+
+		const isExistName = !!(await this.majorsDao.findByName(input.name));
+		if (isExistName) {
+			throw new Error('name already exists');
+		}
+		let majors = await this.majorsDao.insertEntity(
+			Majors.create({
+				name: input.name,
+				headLecturer: headLecturer,
+			})
+		);
+		if (!majors) throw new Error('Create Majors fail');
+
+		return majors.toJSON;
+	}
+}

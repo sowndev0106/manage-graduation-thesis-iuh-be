@@ -1,8 +1,9 @@
 import Entity from './Entity';
 import lodash from 'lodash';
+import Lecturer from './Lecturer';
 export interface IProps {
 	name: string;
-	headLecturerId: number;
+	headLecturer?: Lecturer;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -17,15 +18,26 @@ export default class Majors extends Entity<IProps> {
 		return this.props.name;
 	}
 	get headLecturerId() {
-		return this.props.headLecturerId;
+		return this.props?.headLecturer?.id;
+	}
+	get headLecturer() {
+		return this.props?.headLecturer;
 	}
 	get createdAt() {
-		return this.props.createdAt;
+		return this.props.createdAt || new Date();
 	}
 	get updatedAt() {
-		return this.props.updatedAt;
+		return this.props.updatedAt || new Date();
+	}
+	updateheadLecturer(headLecturer: Lecturer) {
+		this._props.headLecturer = headLecturer;
 	}
 	get toJSON() {
-		return { id: this.id, ...lodash.cloneDeep(this.props) };
+		// const { headLecturer, ...props } = lodash.cloneDeep(this.props);
+
+		// let headLecturerProps: any = headLecturer?.toJSON;
+
+		// return { id: this.id, ...props };
+		return '';
 	}
 }

@@ -8,7 +8,7 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 	protected abstract convertEntityToPartialModelObject(entity: E): PartialModelObject<M>;
 	protected abstract convertEntityToPartialModelGraph(entity: E): PartialModelGraph<M>;
 
-	async findGraphEEntityById(id: number, grap: string): Promise<E | null> {
+	async findGraphEntityById(id: number, grap: string): Promise<E | null> {
 		if (!id) return null;
 
 		const model = await this.initQuery().withGraphFetched(grap).findById(id).execute();
