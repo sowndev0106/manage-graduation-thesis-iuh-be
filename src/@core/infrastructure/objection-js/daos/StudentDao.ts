@@ -2,10 +2,14 @@ import { injectable } from 'inversify';
 import Dao from './Dao';
 import StudentModel from '@core/infrastructure/objection-js/models/StudentModel';
 import Student from '@core/domain/entities/Student';
-import { GraphParameters, PartialModelGraph, QueryBuilder } from 'objection';
+import { GraphParameters, ModelClass, PartialModelGraph, QueryBuilder } from 'objection';
 
 @injectable()
 export default class StudentDao extends Dao<Student, StudentModel> {
+	protected getModel(): ModelClass<StudentModel> {
+		return StudentModel;
+	}
+
 	protected convertEntityToPartialModelGraph(entity: Student): PartialModelGraph<StudentModel, StudentModel & GraphParameters> {
 		const model = StudentModel.convertEntityToPartialModelGraph(entity);
 

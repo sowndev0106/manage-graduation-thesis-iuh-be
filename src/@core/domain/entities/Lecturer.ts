@@ -40,13 +40,13 @@ export default class Lecturer extends Entity<IProps> {
 		return this.props.updatedAt;
 	}
 	get toJSON() {
-		console.log('--------------------------');
 		const { user, ...props } = lodash.cloneDeep(this.props || {});
 
 		let userProps: any;
 		if (user) {
-			userProps = user?.toJSON;
+			userProps = user?.toJSON();
 			delete userProps['id'];
+			delete userProps['password'];
 		}
 
 		return {

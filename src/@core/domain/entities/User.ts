@@ -53,12 +53,12 @@ export default class User extends Entity<IProps> {
 		return this.props.majorsId;
 	}
 	get createdAt() {
-		return this.props.createdAt;
+		return this.props.createdAt || new Date();
 	}
 	get updatedAt() {
-		return this.props.updatedAt;
+		return this.props.updatedAt || new Date();
 	}
-	get toJSON() {
+	toJSON() {
 		const reponse: Partial<IProps> = lodash.cloneDeep(this.props || {});
 		delete reponse['password'];
 

@@ -1,7 +1,9 @@
 import Student from '@core/domain/entities/Student';
 import StudentDaoCore from '@core/infrastructure/objection-js/daos/StudentDao';
+import StudentModel from '@core/infrastructure/objection-js/models/StudentModel';
 import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 import { injectable } from 'inversify';
+import { transaction } from 'objection';
 
 @injectable()
 export default class StudentDao extends StudentDaoCore implements IStudentDao {

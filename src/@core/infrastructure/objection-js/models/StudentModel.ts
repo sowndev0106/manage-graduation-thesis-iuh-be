@@ -25,6 +25,7 @@ export default class StudentModel extends Model {
 			Number(dbJson['id'])
 		);
 
+		console.log(model);
 		const user = dbJson['user'] && UserModel.convertEntityToPartialModelObject(dbJson['user']);
 
 		if (user) entity.updateUser(user);
@@ -59,7 +60,7 @@ export default class StudentModel extends Model {
 	}
 	static relationMappings = {
 		user: {
-			relation: Model.HasOneRelation,
+			relation: Model.BelongsToOneRelation,
 			modelClass: UserModel,
 			join: {
 				from: 'student.user_id',

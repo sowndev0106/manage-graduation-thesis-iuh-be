@@ -48,15 +48,18 @@ export default class RegisterHandlers extends RequestHandler {
 
 		const passwordEncript = await encriptTextBcrypt(input.password);
 
-		const entity = User.create({ username: input.username, password: passwordEncript, majorsId: 1 });
+		const entityUser = User.create({ username: input.username, password: passwordEncript, majorsId: 1 });
 
-		user = await this.userDao.insertEntity(entity);
+		// user = await this.userDao.insertEntity(entityUser);
 
-		const student = await this.studentDao.insertEntity(
-			Student.create({ user: user, schoolYear: new Date().getFullYear().toString(), typeTraining: TypeTraining.University })
+		// const student = await this.studentDao.insertEntity(
+		// 	Student.create({ user: user, schoolYear: new Date().getFullYear().toString(), typeTraining: TypeTraining.University })
+		// );
+		const student = await this.studentDao.insertGraphEntity(
+			Student.create({ user: entityUser, schoolYear: new Date().getFullYear().toString(), typeTraining: TypeTraining.University })
 		);
 
-		student.updateUser(user);
+		student.updateUser(entityUser);
 
 		return student.toJSON;
 	}

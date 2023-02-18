@@ -34,15 +34,20 @@ export default class Student extends Entity<IProps> {
 		return this.props.user.id;
 	}
 	get createdAt() {
-		return this.props.createdAt;
+		return this.props.createdAt || new Date();
 	}
 	get updatedAt() {
-		return this.props.updatedAt;
+		return this.props.updatedAt || new Date();
 	}
 	get toJSON() {
-		const { user, ...props } = lodash.cloneDeep(this.props);
-		let userProps: any = user?.toJSON;
-		delete userProps['id'];
+		const { user, ...props } = lodash.cloneDeep(this.props || {});
+
+		let userProps: any;
+		if (user) {
+			userProps = user?.toJSON();
+			delete userProps['id'];
+			delete userProps['password'];
+		}
 
 		return {
 			id: this.id,

@@ -10,6 +10,7 @@ export default interface IDao<E extends IEntity> {
 	getGraphAllEntities(grap: string): Promise<E[]>;
 	updateGraphEntity(entity: E): Promise<E>;
 	insertGraphEntity(entity: E): Promise<E>;
+	insertGraphMultipleEntities(entity: E[]): Promise<E[]>;
 
 	insertBulkOfEntities(entities: E[]): Promise<E[]>;
 	deleteBulkOfEntities(entities: E[]): Promise<E[]>;
