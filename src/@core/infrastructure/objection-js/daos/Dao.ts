@@ -173,7 +173,18 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 
 		return entities;
 	}
+	async getGraphAllEntities(grap: string): Promise<E[]> {
+		const entities: Array<E> = [];
 
+		const models = await this.initQuery().withGraphFetched(grap).execute();
+
+		for (const model of models) {
+			if (model) {
+				entities.push(this.convertModelToEntity(model));
+			}
+		}
+		return entities;
+	}
 	async countAllEntities() {
 		const query = this.initQuery();
 

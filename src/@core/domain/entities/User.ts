@@ -60,7 +60,6 @@ export default class User extends Entity<IProps> {
 	}
 	get toJSON() {
 		const reponse: Partial<IProps> = lodash.cloneDeep(this.props || {});
-
 		delete reponse['password'];
 
 		return { id: this.id, ...reponse };

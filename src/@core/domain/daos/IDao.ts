@@ -7,6 +7,7 @@ export default interface IDao<E extends IEntity> {
 	deleteEntity(entity: E): Promise<E>;
 
 	findGraphEntityById(id: number, grap: string): Promise<E | null>;
+	getGraphAllEntities(grap: string): Promise<E[]>;
 	updateGraphEntity(entity: E): Promise<E>;
 	insertGraphEntity(entity: E): Promise<E>;
 

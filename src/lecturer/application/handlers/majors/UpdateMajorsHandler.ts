@@ -45,7 +45,7 @@ export default class UpdateMajorsHandler extends RequestHandler {
 		}
 
 		const majorsByName = await this.majorsDao.findByName(input.name);
-		if (majorsByName?.id != input.id) {
+		if (majorsByName && majorsByName?.id != input.id) {
 			throw new Error('name already exists');
 		}
 
@@ -56,11 +56,14 @@ export default class UpdateMajorsHandler extends RequestHandler {
 		}
 
 		majors = await this.majorsDao.updateEntity(
-			Majors.create({
-				name: input.name,
-				headLecturer: headLecturer,
-				updatedAt: new Date(),
-			})
+			Majors.create(
+				{
+					name: input.name,
+					headLecturer: headLecturer,
+					updatedAt: new Date(),
+				},
+				input.id
+			)
 		);
 
 		if (!majors) throw new Error('Create Majors fail');
