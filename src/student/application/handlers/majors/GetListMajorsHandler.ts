@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
-import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
+import IMajorsDao from '@student/domain/daos/IMajorsDao';
 
 interface ValidatedInput {}
 

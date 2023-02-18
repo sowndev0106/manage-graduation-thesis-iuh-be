@@ -3,7 +3,7 @@ import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
-import IMajorsDao from '@student/domain/daos/IMajorsDao';
+import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 
 interface ValidatedInput {
 	id: number;
