@@ -26,7 +26,7 @@ export default class LecturerModel extends Model {
 			Number(dbJson['id'])
 		);
 
-		const user = dbJson['user'] && UserModel.convertEntityToPartialModelObject(dbJson['user']);
+		const user = dbJson['user'] && UserModel.convertModelToEntity(dbJson['user']);
 
 		if (user) entity.updateUser(user);
 

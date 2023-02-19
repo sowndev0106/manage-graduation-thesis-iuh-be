@@ -14,6 +14,7 @@ import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
 import Lecturer, { TypeDegree } from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import LecturerModel from '@core/infrastructure/objection-js/models/LecturerModel';
+import Majors from '@core/domain/entities/Majors';
 
 interface ValidatedInput {
 	username: string;
@@ -49,7 +50,7 @@ export default class RegisterHandlers extends RequestHandler {
 
 		const passwordEncript = await encriptTextBcrypt(input.password);
 
-		user = User.create({ username: input.username, password: passwordEncript, majorsId: 1 });
+		user = User.create({ username: input.username, password: passwordEncript, majors: Majors.createById(1) });
 
 		user = await this.userDao.insertEntity(user);
 

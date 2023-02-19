@@ -1,5 +1,6 @@
 import Entity from './Entity';
 import lodash from 'lodash';
+import Majors from './Majors';
 export enum TypeRoleUser {
 	Student = 'student',
 	Lecturer = 'lecturer',
@@ -12,7 +13,7 @@ export enum TypeGender {
 export interface IProps {
 	username: string;
 	password: string;
-	majorsId: number;
+	majors: Majors;
 	avatar?: string;
 	phoneNumber?: string;
 	email?: string;
@@ -50,7 +51,10 @@ export default class User extends Entity<IProps> {
 		return this.props.gender;
 	}
 	get majorsId() {
-		return this.props.majorsId;
+		return this.props.majors.id;
+	}
+	get majors() {
+		return this.props.majors.id;
 	}
 	get createdAt() {
 		return this.props.createdAt || new Date();
@@ -58,10 +62,14 @@ export default class User extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
-	toJSON() {
-		const reponse: Partial<IProps> = lodash.cloneDeep(this.props || {});
-		delete reponse['password'];
+	updateMajors(majors: Majors) {
+		this._props.majors = majors;
+	}
+	get toJSON() {
+		const { majors, ...props }: any = lodash.cloneDeep(this.props || {});
+		delete props['password'];
 
-		return { id: this.id, ...reponse };
+		const reponseMajors = { ...majors?.toJSON };
+		return { id: this.id, ...props, majors: reponseMajors };
 	}
 }

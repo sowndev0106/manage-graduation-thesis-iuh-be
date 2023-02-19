@@ -44,7 +44,7 @@ export default class MajorsModel extends Model {
 			},
 			Number(dbJson['id'])
 		);
-		const headLecturer = dbJson['head_lecturer'] && LecturerModel.convertEntityToPartialModelObject(dbJson['head_lecturer']);
+		const headLecturer = dbJson['head_lecturer'] && LecturerModel.convertModelToEntity(dbJson['head_lecturer']);
 
 		if (headLecturer) entity.updateheadLecturer(headLecturer);
 

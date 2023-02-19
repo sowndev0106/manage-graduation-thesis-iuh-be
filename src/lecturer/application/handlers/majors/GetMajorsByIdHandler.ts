@@ -30,8 +30,6 @@ export default class GetTermByIdHandler extends RequestHandler {
 			throw new Error('majors not found');
 		}
 
-		console.log(majors?.toJSON);
-
 		return majors.toJSON;
 	}
 }

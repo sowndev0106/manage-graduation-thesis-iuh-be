@@ -9,7 +9,7 @@ export default function (err: Error, req: Request, res: Response, next: NextFunc
 	// console.log('Body:', req.body);
 	// console.log('Query:', req.query);
 	// console.log('Error: ', err);
-	// console.log('Error stack: ', err.stack);
+	console.log('Error stack: ', err.stack);
 
 	const error: any = {
 		success: false,

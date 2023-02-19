@@ -35,7 +35,7 @@ export default class Majors extends Entity<IProps> {
 	get toJSON() {
 		const { headLecturer, ...props } = lodash.cloneDeep(this._props || {});
 
-		let headLecturerProps = headLecturer?.toJSON();
+		let headLecturerProps = this.headLecturer?.toJSON;
 
 		return { id: this.id, ...props, headLecturer: headLecturerProps };
 	}

@@ -11,6 +11,7 @@ import ForbiddenError from '@core/domain/errors/ForbiddenError';
 import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 import User, { TypeRoleUser } from '@core/domain/entities/User';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 
 interface ValidatedInput {
 	username: string;
@@ -21,6 +22,7 @@ interface ValidatedInput {
 export default class LoginHandlers extends RequestHandler {
 	@inject('UserDao') private userDao!: IUserDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
 		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
@@ -35,12 +37,14 @@ export default class LoginHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		const lecturer = await this.lecturerDao.findByUsername(input.username);
-
 		if (!lecturer) throw new NotFoundError('incorrect username');
 
 		const user = lecturer.user instanceof User ? lecturer.user : await this.userDao.findEntityById(lecturer.id);
 
 		if (!user) throw new Error('Data user missing, please contact admin');
+		const majors = await this.majorsDao.findGraphEntityById(lecturer.user.majorsId!, 'head_lecturer');
+
+		const isHeadLecturer = majors?.headLecturerId ? majors.headLecturerId === lecturer?.id : false;
 
 		const isCorrectPassword = await compareTextBcrypt(input.password, user.password!);
 
@@ -48,6 +52,6 @@ export default class LoginHandlers extends RequestHandler {
 
 		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(lecturer.id!, TypeRoleUser.Lecturer);
 
-		return { accessToken, refreshToken, user: lecturer?.toJSON };
+		return { accessToken, refreshToken, user: { ...lecturer?.toJSON, isHeadLecturer } };
 	}
 }

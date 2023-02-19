@@ -1,5 +1,7 @@
+import Majors from '@core/domain/entities/Majors';
 import UserEntity from '@core/domain/entities/User';
 import Objection, { Model } from 'objection';
+import MajorsModel from './MajorsModel';
 
 export default class UserModel extends Model {
 	static convertModelToEntity(model: UserModel | Objection.Pojo) {
@@ -18,13 +20,12 @@ export default class UserModel extends Model {
 				email: dbJson['email'],
 				name: dbJson['name'],
 				gender: dbJson['gender'],
-				majorsId: dbJson['majors_id'],
+				majors: dbJson['majors_id'] && Majors.createById(dbJson['majors_id']),
 				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
 				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
 			Number(dbJson['id'])
 		);
-
 		return entity;
 	}
 	static convertEntityToPartialModelObject(entity: UserEntity) {
@@ -48,4 +49,14 @@ export default class UserModel extends Model {
 	static get tableName() {
 		return 'user';
 	}
+	// static relationMappings = {
+	// 	majors: {
+	// 		relation: Model.BelongsToOneRelation,
+	// 		modelClass: MajorsModel,
+	// 		join: {
+	// 			from: 'user.majors_id',
+	// 			to: 'majors.id',
+	// 		},
+	// 	},
+	// };
 }

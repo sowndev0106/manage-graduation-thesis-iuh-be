@@ -13,6 +13,7 @@ export default class LecturerDao extends LecturerDaoCore implements ILecturerDao
 		query.where('user.username', username);
 
 		const result = await query.execute();
+
 		return result && result[0] ? this.convertModelToEntity(result[0]) : null;
 	}
 }

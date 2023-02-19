@@ -106,7 +106,7 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 			return Student.create({
 				user: User.create({
 					username: e.username,
-					majorsId,
+					majors,
 					password: passwordEncript,
 					email: e.email,
 					name: e.name,
@@ -120,7 +120,6 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 		const students = await Promise.all(studentsPromise);
 
 		const result = await this.studentDao.insertGraphMultipleEntities(students);
-		console.log(result[0].user);
 		return result.map(e => e.toJSON);
 	}
 }
