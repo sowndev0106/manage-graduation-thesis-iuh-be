@@ -35,7 +35,6 @@ export default class LoginHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		const student = await this.studentDao.findByUsername(input.username);
-
 		if (!student) throw new NotFoundError('username not found');
 
 		const user = student.user instanceof User ? student.user : await this.userDao.findEntityById(student.userId);
