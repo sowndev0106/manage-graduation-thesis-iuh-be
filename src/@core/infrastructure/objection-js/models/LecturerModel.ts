@@ -18,7 +18,7 @@ export default class LecturerModel extends Model {
 		const entity = LecturerEntity.create(
 			{
 				degree: dbJson['degree'],
-				isAdmin: dbJson['isAdmin'] == 1,
+				isAdmin: dbJson['is_admin'] == 1,
 				user: dbJson['user_id'] && UserEntity.createById(Number(dbJson['user_id'])),
 				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
 				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),

@@ -43,6 +43,7 @@ export default class Lecturer extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
+
 	get toJSON() {
 		const { user, ...props } = { ...this.props };
 

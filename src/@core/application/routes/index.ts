@@ -1,4 +1,4 @@
-import logger from '@core/infrastructure/logger/Logger';
+import logger from '@core/infrastructure/logger';
 import { Router } from 'express';
 import ErrorHandler from '@core/application/middlewares/errorHandlerMiddlewares';
 

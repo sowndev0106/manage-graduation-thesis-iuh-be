@@ -17,6 +17,10 @@ class UserController {
 		const data = await Ioc.get(ImportLecturerByExcelHandler).handle(req);
 		return res.status(200).json(data);
 	}
+	async updateMyInfo(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetMyInfoHandlers).handle(req);
+		return res.status(200).json(data);
+	}
 }
 
 export default new UserController();

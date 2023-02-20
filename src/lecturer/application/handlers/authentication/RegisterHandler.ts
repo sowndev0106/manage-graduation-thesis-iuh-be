@@ -7,13 +7,13 @@ import Password from '@core/domain/validate-objects/Password';
 import IUserDao from '@lecturer/domain/daos/IUserDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ConflictError from '@core/domain/errors/ConflictError';
-import User from '@core/domain/entities/User';
+import User, { TypeGender } from '@core/domain/entities/User';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
-import Lecturer, { TypeDegree } from '@core/domain/entities/Lecturer';
+import Lecturer, { RoleLecturer, TypeDegree } from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
-import LecturerModel from '@core/infrastructure/objection-js/models/LecturerModel';
+import { faker } from '@faker-js/faker';
 import Majors from '@core/domain/entities/Majors';
 
 interface ValidatedInput {
@@ -50,7 +50,16 @@ export default class RegisterHandlers extends RequestHandler {
 
 		const passwordEncript = await encriptTextBcrypt(input.password);
 
-		user = User.create({ username: input.username, password: passwordEncript, majors: Majors.createById(1) });
+		user = User.create({
+			username: input.username,
+			password: passwordEncript,
+			majors: Majors.createById(1),
+			avatar: faker.image.avatar(),
+			email: `${input.username}@gmail.com`,
+			gender: TypeGender.Female,
+			name: faker.name.fullName(),
+			phoneNumber: faker.phone.number(),
+		});
 
 		user = await this.userDao.insertEntity(user);
 
@@ -60,6 +69,6 @@ export default class RegisterHandlers extends RequestHandler {
 
 		lecturer.updateUser(user);
 
-		return lecturer.toJSON;
+		return { ...lecturer.toJSON, role: RoleLecturer.Lecturer };
 	}
 }

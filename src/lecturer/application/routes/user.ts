@@ -1,11 +1,13 @@
-import upload from '@core/infrastructure/multer';
+import uploadMulter from '@core/infrastructure/multer';
+import uploadCloudinary from '@core/infrastructure/cloudinary';
 import { Router } from 'express';
 import UserController from '../controllers/UserController';
 
 const router = Router();
 
 router.get('/', UserController.getMyInfo);
-router.post('/import-student', upload.single('file'), UserController.importStudentByExcel);
-router.post('/import-lecturer', upload.single('file'), UserController.importStudentByExcel);
+router.put('/', uploadCloudinary.single('avatar'), UserController.updateMyInfo);
+router.post('/import-student', uploadMulter.single('file'), UserController.importStudentByExcel);
+router.post('/import-lecturer', uploadMulter.single('file'), UserController.importLecturerByExcel);
 
 export default router;
