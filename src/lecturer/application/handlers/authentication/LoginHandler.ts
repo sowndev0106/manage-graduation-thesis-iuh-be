@@ -12,6 +12,7 @@ import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 import User, { TypeRoleUser } from '@core/domain/entities/User';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
+import { RoleLecturer } from '@core/domain/entities/Lecturer';
 
 interface ValidatedInput {
 	username: string;
@@ -53,6 +54,10 @@ export default class LoginHandlers extends RequestHandler {
 
 		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(lecturer.id!, TypeRoleUser.Lecturer);
 
-		return { accessToken, refreshToken, user: { ...lecturer?.toJSON, isHeadLecturer } };
+		const { isAdmin, ...props } = lecturer?.toJSON;
+
+		const role = isAdmin ? RoleLecturer.Admin : isHeadLecturer ? RoleLecturer.headLecturer : RoleLecturer.Lecturer;
+
+		return { accessToken, refreshToken, user: { ...props, role } };
 	}
 }

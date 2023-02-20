@@ -1,7 +1,11 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import User from './User';
-
+export enum RoleLecturer {
+	Admin = 'admin',
+	headLecturer = 'headLecturer',
+	Lecturer = 'Lecturer',
+}
 export enum TypeDegree {
 	Masters = 'masters',
 	Docter = 'doctor',
