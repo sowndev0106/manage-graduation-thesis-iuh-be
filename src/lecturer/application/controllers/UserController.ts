@@ -9,6 +9,10 @@ class UserController {
 		const data = await Ioc.get(GetMyInfoHandlers).handle(req);
 		return res.status(200).json(data);
 	}
+	async listHeadLecturer(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetMyInfoHandlers).handle(req);
+		return res.status(200).json(data);
+	}
 	async importStudentByExcel(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(ImportStudentByExcelHandler).handle(req);
 		return res.status(200).json(data);
