@@ -4,6 +4,7 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
+import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 
 interface ValidatedInput {
 	id: number;
@@ -12,6 +13,7 @@ interface ValidatedInput {
 @injectable()
 export default class GetTermByIdHandler extends RequestHandler {
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
+	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: String(request.params['id']) }));
 
@@ -29,7 +31,8 @@ export default class GetTermByIdHandler extends RequestHandler {
 		if (!majors) {
 			throw new Error('majors not found');
 		}
-
+		const lecturer = await this.lecturerDao.findGraphEntityById(majors.headLecturerId!, 'user');
+		majors.updateheadLecturer(lecturer!);
 		return majors.toJSON;
 	}
 }

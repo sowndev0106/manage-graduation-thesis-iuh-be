@@ -1,24 +1,24 @@
 import { Request, Response, Router } from 'express';
-import authenticationRoute from './authentication';
+import authRoute from './auth';
 import userRoute from './user';
 import adminRoute from './admin';
 import termRoute from './term';
 import majorsRoute from './majors';
-import { adminAuthentication, lecturerAuthentication } from '../middlewares/LecturerAuthentication';
+import { adminAuth, lecturerAuth } from '../middlewares/LecturerAuth';
 const router = Router();
 
 // public api
-router.use('/auth', authenticationRoute);
+router.use('/auth', authRoute);
 
 // authorization api Lecturer
-router.use(lecturerAuthentication);
+router.use(lecturerAuth);
 
 router.use('/user', userRoute);
 router.use('/term', termRoute);
 router.use('/majors', majorsRoute);
 
 // authorization api Admin
-router.use(adminAuthentication);
+router.use(adminAuth);
 
 router.use('/admin', adminRoute);
 

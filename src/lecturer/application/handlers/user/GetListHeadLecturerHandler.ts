@@ -28,7 +28,7 @@ export default class GetListHeadLecturerHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		const lecturers = await this.lecturerDao.findGraphEntityById(input.id, 'user');
+		const lecturers = await this.lecturerDao.getListHeadLecturer();
 
 		// const majors = await this.majorsDao.findGraphEntityById(lecturer!.user.majorsId!, 'head_lecturer');
 
@@ -37,7 +37,7 @@ export default class GetListHeadLecturerHandler extends RequestHandler {
 		// const { isAdmin, ...props } = lecturer?.toJSON;
 
 		// const role = isAdmin ? RoleLecturer.Admin : isHeadLecturer ? RoleLecturer.headLecturer : RoleLecturer.Lecturer;
-
-		return lecturers;
+		console.log(lecturers);
+		return lecturers?.map(e => e.toJSON);
 	}
 }

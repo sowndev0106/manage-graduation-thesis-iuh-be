@@ -3,12 +3,14 @@ import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
+import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 
 interface ValidatedInput {}
 
 @injectable()
 export default class GetListTermHandler extends RequestHandler {
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
+	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
@@ -20,8 +22,14 @@ export default class GetListTermHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		const terms = await this.majorsDao.getGraphAllEntities('head_lecturer');
+		const listMajors = await this.majorsDao.getAllEntities();
+		const resultPromise = listMajors.map(async majors => {
+			const lecturer = await this.lecturerDao.findGraphEntityById(majors.headLecturerId!, 'user');
+			majors.updateheadLecturer(lecturer!);
+			return majors;
+		});
+		const reponse = await Promise.all(resultPromise);
 
-		return terms.map(e => e.toJSON);
+		return reponse.map(e => e.toJSON);
 	}
 }

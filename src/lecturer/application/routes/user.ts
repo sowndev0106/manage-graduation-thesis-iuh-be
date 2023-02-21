@@ -9,5 +9,6 @@ router.get('/', UserController.getMyInfo);
 router.put('/', uploadCloudinary.single('avatar'), UserController.updateMyInfo);
 router.post('/import-student', uploadMulter.single('file'), UserController.importStudentByExcel);
 router.post('/import-lecturer', uploadMulter.single('file'), UserController.importLecturerByExcel);
+router.get('/list-head-lecturer', uploadMulter.single('file'), UserController.listHeadLecturer);
 
 export default router;

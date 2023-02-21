@@ -4,6 +4,7 @@ import Majors from './Majors';
 export enum TypeRoleUser {
 	Student = 'student',
 	Lecturer = 'lecturer',
+	HeadLecturer = 'headLecturer',
 	Admin = 'admin',
 }
 export enum TypeGender {

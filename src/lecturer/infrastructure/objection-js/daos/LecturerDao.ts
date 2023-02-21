@@ -8,8 +8,7 @@ export default class LecturerDao extends LecturerDaoCore implements ILecturerDao
 	async getListHeadLecturer(): Promise<Lecturer[]> {
 		const query = this.initQuery();
 
-		query.withGraphFetched('user');
-		query.join('majors', 'lecturer.head_lecturer_id', '=', 'majors.id');
+		query.join('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
 
 		const result = await query.execute();
 
