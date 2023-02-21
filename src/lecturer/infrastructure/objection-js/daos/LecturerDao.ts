@@ -7,7 +7,7 @@ import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 export default class LecturerDao extends LecturerDaoCore implements ILecturerDao {
 	async getListHeadLecturer(): Promise<Lecturer[]> {
 		const query = this.initQuery();
-
+		query.withGraphFetched('user');
 		query.join('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
 
 		const result = await query.execute();

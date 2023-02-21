@@ -32,7 +32,9 @@ export default class GetTermByIdHandler extends RequestHandler {
 			throw new Error('majors not found');
 		}
 		const lecturer = await this.lecturerDao.findGraphEntityById(majors.headLecturerId!, 'user');
-		majors.updateheadLecturer(lecturer!);
+
+		lecturer && majors.updateheadLecturer(lecturer);
+
 		return majors.toJSON;
 	}
 }
