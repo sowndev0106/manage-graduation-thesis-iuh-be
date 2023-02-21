@@ -7,11 +7,11 @@ import Password from '@core/domain/validate-objects/Password';
 import IUserDao from '@lecturer/domain/daos/IUserDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ConflictError from '@core/domain/errors/ConflictError';
-import User, { TypeGender } from '@core/domain/entities/User';
+import User, { TypeGender, TypeRoleUser } from '@core/domain/entities/User';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
-import Lecturer, { RoleLecturer, TypeDegree } from '@core/domain/entities/Lecturer';
+import Lecturer, { TypeDegree } from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import { faker } from '@faker-js/faker';
 import Majors from '@core/domain/entities/Majors';
@@ -69,6 +69,6 @@ export default class RegisterHandlers extends RequestHandler {
 
 		lecturer.updateUser(user);
 
-		return { ...lecturer.toJSON, role: RoleLecturer.Lecturer };
+		return { ...lecturer.toJSON, role: TypeRoleUser.Lecturer };
 	}
 }

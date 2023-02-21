@@ -5,27 +5,15 @@ import ImportStudentByExcelHandler from '../handlers/user/ImportStudentByExcelHa
 import ImportLecturerByExcelHandler from '../handlers/user/ImportLecturerByExcelHandler';
 import GetListHeadLecturerHandler from '../handlers/user/GetListHeadLecturerHandler';
 
-class UserController {
-	async getMyInfo(req: Request, res: Response, next: NextFunction) {
-		const data = await Ioc.get(GetMyInfoHandlers).handle(req);
-		return res.status(200).json(data);
-	}
+class LecturerController {
 	async listHeadLecturer(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(GetListHeadLecturerHandler).handle(req);
-		return res.status(200).json(data);
-	}
-	async importStudentByExcel(req: Request, res: Response, next: NextFunction) {
-		const data = await Ioc.get(ImportStudentByExcelHandler).handle(req);
 		return res.status(200).json(data);
 	}
 	async importLecturerByExcel(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(ImportLecturerByExcelHandler).handle(req);
 		return res.status(200).json(data);
 	}
-	async updateMyInfo(req: Request, res: Response, next: NextFunction) {
-		const data = await Ioc.get(GetMyInfoHandlers).handle(req);
-		return res.status(200).json(data);
-	}
 }
 
-export default new UserController();
+export default new LecturerController();

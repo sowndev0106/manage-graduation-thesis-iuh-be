@@ -37,7 +37,6 @@ export default class GetListHeadLecturerHandler extends RequestHandler {
 		// const { isAdmin, ...props } = lecturer?.toJSON;
 
 		// const role = isAdmin ? RoleLecturer.Admin : isHeadLecturer ? RoleLecturer.headLecturer : RoleLecturer.Lecturer;
-		console.log(lecturers);
 		return lecturers?.map(e => e.toJSON);
 	}
 }
