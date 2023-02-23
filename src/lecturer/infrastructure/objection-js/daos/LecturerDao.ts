@@ -11,7 +11,8 @@ export default class LecturerDao extends LecturerDaoCore implements ILecturerDao
 		if (isHeadLecturer != undefined) {
 			if (isHeadLecturer == true) query.join('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
 			if (isHeadLecturer == false) {
-				query.join('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
+				query.leftJoin('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
+				query.whereNull('head_lecturer_id');
 			}
 		}
 		if (majorsId) {
