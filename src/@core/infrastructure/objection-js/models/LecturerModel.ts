@@ -25,7 +25,6 @@ export default class LecturerModel extends Model {
 			},
 			Number(dbJson['id'])
 		);
-		console.log({ admin: dbJson['is_admin'] });
 
 		const user = dbJson['user'] && UserModel.convertModelToEntity(dbJson['user']);
 

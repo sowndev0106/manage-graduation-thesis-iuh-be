@@ -5,12 +5,12 @@ import { Request } from 'express';
 import IUserDao from '@student/domain/daos/IUserDao';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
-import { RoleLecturer } from '@core/domain/entities/Lecturer';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import SortText from '@core/domain/validate-objects/SortText';
 import Email from '@core/domain/validate-objects/Email';
 import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import Gender from '@core/domain/validate-objects/Gender';
+import { TypeRoleUser } from '@core/domain/entities/User';
 
 interface ValidatedInput {
 	id: number;
@@ -47,7 +47,7 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 
 		const { isAdmin, ...props } = lecturer?.toJSON;
 
-		const role = isAdmin ? RoleLecturer.Admin : isHeadLecturer ? RoleLecturer.headLecturer : RoleLecturer.Lecturer;
+		const role = isAdmin ? TypeRoleUser.Admin : isHeadLecturer ? TypeRoleUser.HeadLecturer : TypeRoleUser.Lecturer;
 
 		return { ...props, role };
 	}

@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import uploadMulter from '@core/infrastructure/multer';
-import UserController from '../controllers/LecturerController';
+import LecturerController from '../controllers/LecturerController';
 import LecturerAuth from '../middlewares/LecturerAuth';
 const router = Router();
 
-router.get('/head-lecturers', UserController.listHeadLecturer);
+router.get('/', LecturerController.getListLecturer);
+
 // headLecturer role
-router.post('/import-my-lecturer', LecturerAuth.headLecturer, uploadMulter.single('file'), UserController.importLecturerByExcel);
+router.post('/import-my-lecturer', LecturerAuth.headLecturer, uploadMulter.single('file'), LecturerController.importLecturerByExcel);
+
 // admin role
-router.post('/import-lecturer', LecturerAuth.admin, uploadMulter.single('file'), UserController.importLecturerByExcel);
+router.post('/import-lecturer', LecturerAuth.admin, uploadMulter.single('file'), LecturerController.importLecturerByExcel);
 
 export default router;
