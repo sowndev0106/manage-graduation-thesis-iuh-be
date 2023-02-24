@@ -60,7 +60,7 @@ export default class LecturerModel extends Model {
 	}
 	static relationMappings = {
 		user: {
-			relation: Model.HasOneRelation,
+			relation: Model.BelongsToOneRelation,
 			modelClass: User,
 			join: {
 				from: 'lecturer.user_id',
