@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Ioc from '@lecturer/infrastructure/inversify';
-import GetMyInfoHandlers from '../handlers/user/GetMyInfoHandler';
-import UpdateMyInfoHandler from '../handlers/user/UpdateMyInfoHandler';
+import GetMyInfoHandlers from '../handlers/me/GetMyInfoHandler';
+import UpdateMyInfoHandler from '../handlers/me/UpdateMyInfoHandler';
 
 class MeController {
 	async getMyInfo(req: Request, res: Response, next: NextFunction) {

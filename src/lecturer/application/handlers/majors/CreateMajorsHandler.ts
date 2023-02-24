@@ -11,7 +11,7 @@ import Majors from '@core/domain/entities/Majors';
 
 interface ValidatedInput {
 	name: string;
-	headLecturerId?: number;
+	// headLecturerId?: number;
 }
 @injectable()
 export default class CreateMajorsHandler extends RequestHandler {
@@ -19,9 +19,9 @@ export default class CreateMajorsHandler extends RequestHandler {
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
-		const headLecturerId = this.errorCollector.collect('headLecturerId', () =>
-			EntityId.validate({ value: request.body['headLecturerId'], required: false })
-		);
+		// const headLecturerId = this.errorCollector.collect('headLecturerId', () =>
+		// 	EntityId.validate({ value: request.body['headLecturerId'], required: false })
+		// );
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
@@ -29,18 +29,18 @@ export default class CreateMajorsHandler extends RequestHandler {
 
 		return {
 			name,
-			headLecturerId,
+			// headLecturerId,
 		};
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		let headLecturer;
-		if (input.headLecturerId) {
-			headLecturer = await this.lecturerDao.findEntityById(input.headLecturerId);
-			if (!headLecturer) throw new NotFoundError('lecturer not found');
-		}
+		// let headLecturer;
+		// if (input.headLecturerId) {
+		// 	headLecturer = await this.lecturerDao.findEntityById(input.headLecturerId);
+		// 	if (!headLecturer) throw new NotFoundError('lecturer not found');
+		// }
 
 		const isExistName = !!(await this.majorsDao.findByName(input.name));
 		if (isExistName) {
@@ -49,7 +49,7 @@ export default class CreateMajorsHandler extends RequestHandler {
 		let majors = await this.majorsDao.insertEntity(
 			Majors.create({
 				name: input.name,
-				headLecturer: headLecturer,
+				// headLecturer: headLecturer,
 			})
 		);
 		if (!majors) throw new Error('Create Majors fail');

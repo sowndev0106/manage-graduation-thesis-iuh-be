@@ -7,7 +7,7 @@ const router = Router();
 router.get('/', LecturerController.getListLecturer);
 
 // headLecturer role
-router.post('/import-my-lecturer', LecturerAuth.headLecturer, uploadMulter.single('file'), LecturerController.importLecturerByExcel);
+router.post('/import-my-lecturer', LecturerAuth.headLecturer, uploadMulter.single('file'), LecturerController.importMyLecturerByExcel);
 
 // admin role
 router.post('/import-lecturer', LecturerAuth.admin, uploadMulter.single('file'), LecturerController.importLecturerByExcel);
