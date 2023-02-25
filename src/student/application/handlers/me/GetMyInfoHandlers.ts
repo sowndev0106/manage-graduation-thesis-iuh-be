@@ -5,6 +5,7 @@ import { Request } from 'express';
 import IUserDao from '@student/domain/daos/IUserDao';
 import ConflictError from '@core/domain/errors/ConflictError';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
+import IStudentDao from '@student/domain/daos/IStudentDao';
 
 interface ValidatedInput {
 	id: number;
@@ -14,6 +15,7 @@ interface ValidatedInput {
 @injectable()
 export default class GetMyInfoHandlers extends RequestHandler {
 	@inject('UserDao') private userDao!: IUserDao;
+	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const data = request.headers;
@@ -27,10 +29,10 @@ export default class GetMyInfoHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		let user = await this.userDao.findEntityById(input.id);
+		let student = await this.studentDao.findGraphEntityById(input.id, 'user');
 
-		if (!user) throw new ConflictError('student not found');
+		if (!student) throw new ConflictError('student not found');
 
-		return user!.toJSON;
+		return student!.toJSON;
 	}
 }

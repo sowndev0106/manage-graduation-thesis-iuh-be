@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<void> {
 		table.text('require_input');
 		table.text('comment');
 
-		table.enum('status', ['refuse', 'Peding', 'Accept']);
+		table.enum('status', ['refuse', 'peding', 'accept']);
 
 		table.integer('term_id').unsigned().references('id').inTable('term');
 		table.integer('lecturer_id').unsigned().references('id').inTable('lecturer');

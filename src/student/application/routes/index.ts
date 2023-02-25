@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import authenticationRoute from './authentication';
-import userRoute from './user';
+import meRoute from './me';
 import termRoute from './term';
 import majorsRoute from './majors';
 import studentAuthentication from '../middlewares/studentAuthentication';
@@ -12,8 +12,8 @@ router.use('/auth', authenticationRoute);
 // authorization api student
 router.use(studentAuthentication);
 
-router.use('/user', userRoute);
-router.use('/term', termRoute);
+router.use('/me', meRoute);
+router.use('/terms', termRoute);
 router.use('/majors', majorsRoute);
 
 export default router;

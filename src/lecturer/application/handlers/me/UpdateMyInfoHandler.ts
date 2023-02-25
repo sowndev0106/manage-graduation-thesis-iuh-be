@@ -5,14 +5,13 @@ import { Request } from 'express';
 import IUserDao from '@student/domain/daos/IUserDao';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
-import EntityId from '@core/domain/validate-objects/EntityID';
 import SortText from '@core/domain/validate-objects/SortText';
 import Email from '@core/domain/validate-objects/Email';
 import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import Gender from '@core/domain/validate-objects/Gender';
-import User, { TypeGender, TypeRoleUser } from '@core/domain/entities/User';
+import { TypeGender } from '@core/domain/entities/User';
 import Degree from '@core/domain/validate-objects/Degree';
-import Lecturer, { TypeDegree } from '@core/domain/entities/Lecturer';
+import { TypeDegree } from '@core/domain/entities/Lecturer';
 import { deleteFileCloudynary } from '@core/infrastructure/cloudinary';
 
 interface ValidatedInput {
