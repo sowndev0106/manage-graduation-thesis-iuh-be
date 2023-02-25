@@ -15,7 +15,7 @@ const storage = new CloudinaryStorage({
 	params: async (req: any, file: any) => {
 		// async code using `req` and `file`
 		const extension = file.originalname.split('.').pop();
-		const fileName = `${uuidv4()}___${file.originalname.split('.')[0]}`;
+		const fileName = `${uuidv4()}`;
 		logger.info(`Insert successfully file ${fileName} cloundynary`);
 
 		return {
@@ -29,8 +29,10 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
-async function deleteFile(url: string) {
+async function deleteFileCloudynary(url?: string) {
+	if (!url) return;
 	const public_id = cloudinary.v2.url(url, { type: 'upload' });
 }
 
 export default upload;
+export { deleteFileCloudynary };

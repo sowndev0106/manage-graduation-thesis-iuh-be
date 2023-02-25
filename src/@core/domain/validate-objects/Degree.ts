@@ -1,16 +1,19 @@
 import ValidationError from '@core/domain/errors/ValidationError';
 import Joi from 'joi';
-export interface IEmail {
+import { TypeDegree } from '../entities/Lecturer';
+export interface IDegree {
 	value: any;
 	required?: boolean;
 }
 
-export default class Email {
-	public static validate(props: IEmail) {
+export default class Degree {
+	public static validate(props: IDegree) {
 		// allow null
 		if (props.required == false && !props.value) return props.value;
 
-		const schema = Joi.string().email().required().max(255);
+		const schema = Joi.string()
+			.valid(...Object.values(TypeDegree))
+			.required();
 
 		const { error, value } = schema.validate(props.value);
 

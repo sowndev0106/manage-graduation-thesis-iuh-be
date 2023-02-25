@@ -66,6 +66,24 @@ export default class User extends Entity<IProps> {
 	updateMajors(majors: Majors) {
 		this._props.majors = majors;
 	}
+	updateGender(gender: TypeGender) {
+		this._props.gender = gender;
+	}
+	updateUsername(username: string) {
+		this._props.username = username;
+	}
+	updatePhoneNumber(phoneNumber: string) {
+		this._props.phoneNumber = phoneNumber;
+	}
+	updateAvatar(avatar: string) {
+		this._props.avatar = avatar;
+	}
+	updateEmail(email: string) {
+		this._props.email = email;
+	}
+	updateName(name: string) {
+		this._props.name = name;
+	}
 	get toJSON() {
 		const { majors, ...props }: any = lodash.cloneDeep(this.props || {});
 		delete props['password'];

@@ -56,6 +56,9 @@ export default class Lecturer extends Entity<IProps> {
 			...props,
 		};
 	}
+	updateDegree(degree: TypeDegree) {
+		this._props.degree = degree;
+	}
 	updateUser(user: User) {
 		this._props.user = user;
 	}

@@ -10,11 +10,19 @@ import SortText from '@core/domain/validate-objects/SortText';
 import Email from '@core/domain/validate-objects/Email';
 import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import Gender from '@core/domain/validate-objects/Gender';
-import { TypeRoleUser } from '@core/domain/entities/User';
+import User, { TypeGender, TypeRoleUser } from '@core/domain/entities/User';
+import Degree from '@core/domain/validate-objects/Degree';
+import Lecturer, { TypeDegree } from '@core/domain/entities/Lecturer';
+import { deleteFileCloudynary } from '@core/infrastructure/cloudinary';
 
 interface ValidatedInput {
 	id: number;
-	role: string;
+	phoneNumber: string;
+	email: string;
+	name: string;
+	avatar?: string;
+	gender?: TypeGender;
+	degree?: TypeDegree;
 }
 
 @injectable()
@@ -23,32 +31,43 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
-		const phoneNumber = this.errorCollector.collect('majors_id', () => PhoneNumber.validate({ value: request.body['majors_id'] }));
-		const email = this.errorCollector.collect('majors_id', () => Email.validate({ value: request.body['majors_id'] }));
-		const name = this.errorCollector.collect('majors_id', () => SortText.validate({ value: request.body['name'] }));
-		const gender = this.errorCollector.collect('majors_id', () => Gender.validate({ value: request.body['majors_id'] }));
-
-		const { role, id } = request.headers;
+		const phoneNumber = this.errorCollector.collect('phoneNumber', () => PhoneNumber.validate({ value: request.body['phoneNumber'] }));
+		const email = this.errorCollector.collect('email', () => Email.validate({ value: request.body['email'] }));
+		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
+		const gender = this.errorCollector.collect('gender', () => Gender.validate({ value: request.body['gender'], required: false }));
+		const degree = this.errorCollector.collect('degree', () => Degree.validate({ value: request.body['degree'], required: false }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
-		return { id: Number(id), role: String(role) };
+		console.log(request.file);
+		return {
+			id: Number(request.headers['id']),
+			phoneNumber,
+			email,
+			name,
+			gender,
+			degree,
+			avatar: request.file?.path,
+		};
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
+		let lecturer = await this.lecturerDao.findGraphEntityById(input.id, 'user');
 
-		const lecturer = await this.lecturerDao.findGraphEntityById(input.id, 'user');
+		input.degree && lecturer?.updateDegree(input.degree);
+		lecturer?.user.updatePhoneNumber(input.phoneNumber);
+		lecturer?.user.updateEmail(input.email);
+		lecturer?.user.updateName(input.name);
+		input.gender && lecturer?.user.updateGender(input.gender);
+		if (input.avatar) {
+			deleteFileCloudynary(lecturer?.user.avatar).then();
+			lecturer?.user.updateAvatar(input.avatar);
+		}
 
-		const majors = await this.majorsDao.findGraphEntityById(lecturer!.user.majorsId!, 'head_lecturer');
+		lecturer = await this.lecturerDao.updateGraphEntity(lecturer!);
 
-		const isHeadLecturer = majors?.headLecturerId ? majors.headLecturerId === lecturer?.id : false;
-
-		const { isAdmin, ...props } = lecturer?.toJSON;
-
-		const role = isAdmin ? TypeRoleUser.Admin : isHeadLecturer ? TypeRoleUser.HeadLecturer : TypeRoleUser.Lecturer;
-
-		return { ...props, role };
+		return lecturer?.toJSON;
 	}
 }
