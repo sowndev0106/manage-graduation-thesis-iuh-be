@@ -3,19 +3,20 @@ variables:
     IMAGE_TAG: latestnode:latest
 
 stages:
-    - test
+    # - test
     - build
-    - deploy
+    # - deploy
 
-run_tests:
-    stage: test
-    image: node:16.16.0-alpine
-    script:
-        - echo "test"
+# run_tests:
+#     stage: test
+#     image: node:16.16.0-alpine
+#     script:
+#         - echo "test"
 
 build:
     stage: build
     before_script:
+        - echo $SSH_PRIVATE_KEY
         - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
@@ -26,15 +27,14 @@ build:
         - echo "Application successfully deployed."
     only:
         - master
-
-deploy:
-    stage: deploy
-    before_script:
-        - echo $SSH_PRIVATE_KEY
-        - chmod 400 $SSH_PRIVATE_KEY
-    script:
-        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-3-0-102-80.ap-southeast-1.compute.amazonaws.com "
-          ./script.sh"
+# deploy:
+#     stage: deploy
+#     before_script:
+#         - echo $SSH_PRIVATE_KEY
+#         - chmod 400 $SSH_PRIVATE_KEY
+#     script:
+#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-3-0-102-80.ap-southeast-1.compute.amazonaws.com "
+#           ./script.sh"
 # deploy:
 #     stage: deploy
 #     image: alpine
