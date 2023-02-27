@@ -43,46 +43,5 @@ export default class UpdateTopicHandler extends RequestHandler {
 		};
 	}
 
-	async handle(request: Request) {
-		const input = await this.validate(request);
-
-		let topic = await this.topicDao.findEntityById(input.id);
-		if (!topic) throw new Error('Topic not found');
-
-		// check is head lecture this majors of topic
-		const lecturerTopic = await this.lecturerDao.findEntityById(topic.lecturerId);
-
-		if (topic.lecturerId != input.lecturerId) {
-			throw new Error("You doesn't permission to this topic");
-		}
-
-		const term = await this.termDao.findEntityById(input.termId);
-		if (!term) {
-			throw new Error('Term not found');
-		}
-
-		const topicByName = await this.topicDao.findByNameLecturAndTerm(input.name, input.lecturerId, input.termId);
-		if (topicByName?.id && topicByName?.id != input.id) {
-			throw new Error('name already exists');
-		}
-
-		topic.update({
-			name: input.name,
-			quantityGroupMax: input.quantityGroupMax,
-			description: input.description,
-			note: input.note,
-			target: input.target,
-			standradOutput: input.standradOutput,
-			requireInput: input.requireInput,
-			status: TypeStatusTopic.Peding,
-			lecturer: Lecturer.createById(input.lecturerId),
-			term: Term.createById(input.termId),
-		});
-
-		topic = await this.topicDao.updateEntity(topic);
-
-		if (!topic) throw new Error('Create Topic fail');
-
-		return topic.toJSON;
-	}
+	async handle(request: Request) {}
 }
