@@ -4,15 +4,9 @@ variables:
 
 stages:
     # - test
-    - job1
     - build
     # - deploy
 
-job1:
-    variables:
-        JOB_VAR: 'A job variable'
-    script:
-        - echo "Variables are '$EC2_IPADDRESS' and '$SSH_PRIVATE_KEY'"
 # run_tests:
 #     stage: test
 #     image: node:16.16.0-alpine
@@ -22,6 +16,7 @@ job1:
 build:
     stage: build
     before_script:
+        - echo "Variables are '$EC2_IPADDRESS' and '$SSH_PRIVATE_KEY'"
         - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
