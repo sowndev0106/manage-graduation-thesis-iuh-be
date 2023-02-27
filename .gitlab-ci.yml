@@ -1,5 +1,19 @@
+variables:
+    IMAGE_NAME: son162001/manage-graduation-thesis-iuh
+image: node:latest
+
 stages:
+    - test
+    - build
     - deploy
+
+run_tests:
+    stage: test
+    image: python:3.9-slim-buster
+    before_script:
+        - apt-get update && apt-get install make
+    script:
+        - make test
 
 deploy:
     stage: deploy
