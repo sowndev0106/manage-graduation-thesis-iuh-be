@@ -4,6 +4,8 @@ import LecturerAuth from '../middlewares/LecturerAuth';
 
 const router = Router();
 
+router.put('/:id/review', TopicController.reviewTopic);
+
 router.post('/', TopicController.createTopic);
 router.put('/:id', TopicController.updateTopic);
 router.delete('/:id', TopicController.deleteTopic);

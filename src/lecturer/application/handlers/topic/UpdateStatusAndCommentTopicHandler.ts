@@ -18,11 +18,11 @@ import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 interface ValidatedInput {
 	id: number;
 	comment: string;
-	status: string;
+	status: TypeStatusTopic;
 	lecturerId: number;
 }
 @injectable()
-export default class UpdateTopicHandler extends RequestHandler {
+export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 	@inject('TopicDao') private topicDao!: ITopicDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	@inject('TermDao') private termDao!: ITermDao;
@@ -53,38 +53,20 @@ export default class UpdateTopicHandler extends RequestHandler {
 
 		// check is head lecture this majors of topic
 		const lecturerTopic = await this.lecturerDao.findGraphEntityById(topic.lecturerId!, 'user');
-		const majorsTopic = await this.lecturerDao.findEntityById(lecturerTopic?.user.majorsId);
+		const majorsTopic = await this.majorsDao.findEntityById(lecturerTopic?.user.majorsId);
 
-		if (topic.lecturerId != input.lecturerId) {
-			throw new Error("You doesn't permission to this topic");
-		}
-
-		const term = await this.termDao.findEntityById(input.termId);
-		if (!term) {
-			throw new Error('Term not found');
-		}
-
-		const topicByName = await this.topicDao.findByNameLecturAndTerm(input.name, input.lecturerId, input.termId);
-		if (topicByName?.id && topicByName?.id != input.id) {
-			throw new Error('name already exists');
+		if (!lecturerTopic?.isAdmin && majorsTopic?.headLecturerId != lecturerTopic?.id) {
+			throw new Error(`You doesn't permission for majors: ${majorsTopic?.name}`);
 		}
 
 		topic.update({
-			name: input.name,
-			quantityGroupMax: input.quantityGroupMax,
-			description: input.description,
-			note: input.note,
-			target: input.target,
-			standradOutput: input.standradOutput,
-			requireInput: input.requireInput,
-			status: TypeStatusTopic.Peding,
-			lecturer: Lecturer.createById(input.lecturerId),
-			term: Term.createById(input.termId),
+			comment: input.comment,
+			status: input.status,
 		});
 
 		topic = await this.topicDao.updateEntity(topic);
 
-		if (!topic) throw new Error('Create Topic fail');
+		if (!topic) throw new Error('update status Topic fail');
 
 		return topic.toJSON;
 	}

@@ -1,7 +1,7 @@
 import logger from '@core/infrastructure/logger';
 import { Router } from 'express';
-import swaggerUi from 'swagger-ui-express';
-import swaggerJSDoc from 'swagger-jsdoc';
+// import swaggerUi from 'swagger-ui-express';
+// import swaggerJSDoc from 'swagger-jsdoc';
 import ErrorHandler from '@core/application/middlewares/errorHandlerMiddlewares';
 import swaggerDocument from '@core/infrastructure/swagger/swagger.json';
 
@@ -24,7 +24,7 @@ router.get('/logs', (req, res) => {
 	});
 });
 
-router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 router.use(ErrorHandler);
 

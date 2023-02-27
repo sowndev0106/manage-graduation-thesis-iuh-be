@@ -5,6 +5,7 @@ import UpdateTopicHandler from '../handlers/topic/UpdateTopicHandler';
 import GetListTopicHandler from '../handlers/topic/GetListTopicHandler';
 import GetTopicByIdHandler from '../handlers/topic/GetTopicByIdHandler';
 import DeleteTopicHandler from '../handlers/topic/DeleteTopicHandler';
+import UpdateStatusAndCommentTopicHandler from '../handlers/topic/UpdateStatusAndCommentTopicHandler';
 
 class TopicController {
 	async createTopic(req: Request, res: Response, next: NextFunction) {
@@ -25,6 +26,10 @@ class TopicController {
 	}
 	async deleteTopic(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(DeleteTopicHandler).handle(req);
+		return res.status(200).json(data);
+	}
+	async reviewTopic(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(UpdateStatusAndCommentTopicHandler).handle(req);
 		return res.status(200).json(data);
 	}
 }
