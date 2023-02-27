@@ -25,7 +25,7 @@ build:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && (npm start || true)"
         - echo "Application successfully deployed."
     only:
-        - production
+        - master
 # deploy:
 #     stage: deploy
 #     image: alpine
