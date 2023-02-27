@@ -16,7 +16,7 @@ run_tests:
 build:
     stage: build
     before_script:
-        - chmod 400 $SSH_KEY
+        - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
@@ -26,6 +26,14 @@ build:
         - echo "Application successfully deployed."
     only:
         - master
+
+deploy:
+    stage: deploy
+    before_script:
+        - chmod 400 $SSH_PRIVATE_KEY
+    script:
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-3-0-102-80.ap-southeast-1.compute.amazonaws.com "
+          ./script.sh"
 # deploy:
 #     stage: deploy
 #     image: alpine
