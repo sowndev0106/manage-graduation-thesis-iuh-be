@@ -30,6 +30,7 @@ build:
 deploy:
     stage: deploy
     before_script:
+        - echo $SSH_PRIVATE_KEY
         - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-3-0-102-80.ap-southeast-1.compute.amazonaws.com "
