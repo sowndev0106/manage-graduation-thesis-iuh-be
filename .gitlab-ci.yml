@@ -16,7 +16,7 @@ stages:
 build:
     stage: build
     before_script:
-        - echo $SSH_PRIVATE_KEY
+        - cat $SSH_PRIVATE_KEY
         - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
