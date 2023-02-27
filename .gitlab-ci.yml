@@ -1,0 +1,18 @@
+stages:
+    - deploy
+
+deploy:
+    stage: deploy
+    image: alpine
+    before_script:
+        - apk add openssh-client
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+    script:
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && git pull"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && npm i"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && (npm start || true)"
+        - echo "Application successfully deployed."
