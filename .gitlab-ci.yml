@@ -1,7 +1,6 @@
 variables:
     IMAGE_NAME: son162001/manage-graduation-thesis-iuh
     IMAGE_TAG: latestnode:latest
-    SSH_PRIVATE_KEY:$SSH_PRIVATE_KEY
 
 stages:
     # - test
@@ -17,7 +16,7 @@ stages:
 build:
     stage: build
     before_script:
-        - chmod 400 ${SSH_PRIVATE_KEY}
+        - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
