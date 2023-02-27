@@ -6,7 +6,7 @@ import lecturerRoutes from '@lecturer/application/routes';
 
 const router = Router();
 
-router.use('/api', coreRoutes);
+router.use('/', coreRoutes);
 router.use('/api/student', studentRoutes);
 router.use('/api/lecturer', lecturerRoutes);
 

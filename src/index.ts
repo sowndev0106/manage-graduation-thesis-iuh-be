@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
+
 import router from './router';
 // connect database
 import '@core/infrastructure/objection-js';

@@ -26,7 +26,7 @@ export default class GetTopicByIdHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-		const topic = await this.topicDao.findGraphEntityById(input.id, 'head_lecturer');
+		const topic = await this.topicDao.findEntityById(input.id);
 
 		if (!topic) {
 			throw new Error('topic not found');

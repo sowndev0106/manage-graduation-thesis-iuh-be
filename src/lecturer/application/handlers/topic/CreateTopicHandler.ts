@@ -13,6 +13,7 @@ import Text from '@core/domain/validate-objects/Text';
 import Lecturer from '@core/domain/entities/Lecturer';
 import Term from '@core/domain/entities/Term';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
+import StatusTopic from '@core/domain/validate-objects/StatusTopic';
 
 interface ValidatedInput {
 	name: string;
@@ -23,7 +24,6 @@ interface ValidatedInput {
 	standradOutput: string;
 	requireInput: string;
 	comment?: string;
-	status: TypeStatusTopic;
 	termId: number;
 	lecturerId: number;
 }
@@ -41,7 +41,6 @@ export default class CreateTopicHandler extends RequestHandler {
 		const standradOutput = this.errorCollector.collect('standradOutput', () => SortText.validate({ value: request.body['standradOutput'] }));
 		const requireInput = this.errorCollector.collect('requireInput', () => SortText.validate({ value: request.body['requireInput'] }));
 		const comment = this.errorCollector.collect('comment', () => Text.validate({ value: request.body['comment'] }));
-		const status = this.errorCollector.collect('status', () => SortText.validate({ value: request.body['status'] }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const lecturerId = Number(request.headers['id']);
 		if (this.errorCollector.hasError()) {
@@ -58,7 +57,6 @@ export default class CreateTopicHandler extends RequestHandler {
 			standradOutput,
 			requireInput,
 			comment,
-			status,
 			termId,
 		};
 	}
@@ -85,7 +83,7 @@ export default class CreateTopicHandler extends RequestHandler {
 				standradOutput: input.standradOutput,
 				requireInput: input.requireInput,
 				comment: input.comment,
-				status: input.status,
+				status: TypeStatusTopic.Peding,
 				lecturer: Lecturer.createById(input.lecturerId),
 				term: Term.createById(input.termId),
 			})

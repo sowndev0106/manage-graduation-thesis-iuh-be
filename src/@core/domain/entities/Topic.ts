@@ -74,11 +74,22 @@ export default class Topic extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
+
 	updateLecturer(lecturer: Lecturer) {
 		this._props.lecturer = lecturer;
 	}
 	updateTerm(term: Term) {
 		this._props.term = term;
+	}
+
+	update(props: Partial<IProps>) {
+		const updatedProps: IProps = {
+			...this.props,
+			...props,
+			updatedAt: new Date(),
+		};
+		this._props = updatedProps;
+		return this;
 	}
 	get toJSON() {
 		const { lecturer, term, ...props } = lodash.cloneDeep(this._props || {});
@@ -86,6 +97,6 @@ export default class Topic extends Entity<IProps> {
 		let lecturerrProps = lecturer?.toJSON;
 		let termProps = term?.toJSON;
 
-		return { id: this.id, ...props, lecturerr: lecturerrProps, term: termProps };
+		return { id: this.id, ...props, lecturer: lecturerrProps, term: termProps };
 	}
 }

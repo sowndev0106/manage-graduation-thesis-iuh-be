@@ -1,0 +1,1188 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "My Project",
+      "description": "",
+      "version": "1.0.0"
+    },
+    "tags": [
+      {
+        "name": "authentication"
+      },
+      {
+        "name": "Lecturers"
+      },
+      {
+        "name": "me"
+      },
+      {
+        "name": "Student"
+      },
+      {
+        "name": "Term"
+      },
+      {
+        "name": "Majors"
+      } ,
+      {
+        "name": "Topics"
+      }
+    ],
+    "paths": {
+      "/api/lecturer/auth/login": {
+        "post": {
+          "summary": "Login",
+          "x-apidog-folder": "authentication",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "authentication"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "admin001"
+                    },
+                    "password": {
+                      "type": "string",
+                      "example": "123456"
+                    }
+                  },
+                  "required": [
+                    "username",
+                    "password"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636797-run"
+        }
+      },
+      "/api/lecturer/auth/register": {
+        "post": {
+          "summary": "Register (only test)",
+          "x-apidog-folder": "authentication",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "authentication"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "userlecturer{{$randomInt}}"
+                    },
+                    "majorsId": {
+                      "type": "string",
+                      "example": "1"
+                    },
+                    "password": {
+                      "type": "string",
+                      "example": "123456"
+                    }
+                  },
+                  "required": [
+                    "username",
+                    "majorsId",
+                    "password"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636798-run"
+        }
+      },
+      "/api/lecturer/lecturers": {
+        "get": {
+          "summary": "Get Lecturer",
+          "x-apidog-folder": "Lecturers",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Lecturers"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636799-run"
+        }
+      },
+      "/api/lecturer/lecturers/import-my-lecturer": {
+        "post": {
+          "summary": "[HL] Import my lecturer",
+          "x-apidog-folder": "Lecturers",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Lecturers"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "required": [
+                    "file"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636800-run"
+        }
+      },
+      "/api/lecturer/lecturers/import-lecturer": {
+        "post": {
+          "summary": "[AD] Import lecturer",
+          "x-apidog-folder": "Lecturers",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Lecturers"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "majors_id": {
+                      "type": "string",
+                      "example": "1"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "majors_id"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636801-run"
+        }
+      },
+      "/api/lecturer/auth/Refresh-token": {
+        "post": {
+          "summary": "Refresh token",
+          "x-apidog-folder": "authentication",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "authentication"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "refreshToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsInJvbGUiOiJsZWN0dXJlciIsImlhdCI6MTY3NjU1ODc4OSwiZXhwIjoxNzA4MTE2Mzg5fQ.GD3H2070UpjzJS6N5i8AnC0gm35RGOiO5O6n675g9T0"
+                    }
+                  },
+                  "required": [
+                    "refreshToken"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636802-run"
+        }
+      },
+      "/api/lecturer/me": {
+        "put": {
+          "summary": "Update my info",
+          "x-apidog-folder": "me",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "me"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "example": "{{$randomExampleEmail}}"
+                    },
+                    "avatar": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "phoneNumber": {
+                      "type": "string",
+                      "example": "039456641"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Nguyen Thanh Son"
+                    },
+                    "gender": {
+                      "type": "string",
+                      "example": "male"
+                    },
+                    "degree": {
+                      "type": "string",
+                      "example": "doctor"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "avatar",
+                    "phoneNumber",
+                    "name",
+                    "gender",
+                    "degree"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636803-run"
+        },
+        "get": {
+          "summary": "Get my info",
+          "x-apidog-folder": "me",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "me"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636807-run"
+        }
+      },
+      "/api/lecturer/students/import-my-student": {
+        "post": {
+          "summary": "[HL] Import my student",
+          "x-apidog-folder": "Student",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Student"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "required": [
+                    "file"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636804-run"
+        }
+      },
+      "/api/lecturer/students/import-student": {
+        "post": {
+          "summary": "[AD] Import student",
+          "x-apidog-folder": "Student",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Student"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "majors_id": {
+                      "type": "string",
+                      "example": "1"
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "majors_id"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636805-run"
+        }
+      },
+      "/api/lecturer/students": {
+        "get": {
+          "summary": "Get Student",
+          "x-apidog-folder": "Student",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Student"
+          ],
+          "parameters": [
+            {
+              "name": "majorsId",
+              "in": "query",
+              "description": "",
+              "required": true,
+              "example": "1",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636806-run"
+        }
+      },
+      "/api/lecturer/terms": {
+        "post": {
+          "summary": "[HL] Create term",
+          "x-apidog-folder": "Term",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Term"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "HK5"
+                    },
+                    "majorsId": {
+                      "type": "string",
+                      "example": "1"
+                    },
+                    "startDate": {
+                      "type": "string",
+                      "example": "01/01/2021"
+                    },
+                    "endDate": {
+                      "type": "string",
+                      "example": "12/31/2022"
+                    },
+                    "startDateSubmitTopic": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    },
+                    "endDateSubmitTopic": {
+                      "type": "string",
+                      "example": "02/21/2020"
+                    },
+                    "startDateChooseTopic": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    },
+                    "endDateChooseTopic": {
+                      "type": "string",
+                      "example": "02/21/2020"
+                    },
+                    "dateDiscussion": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    },
+                    "dateReport": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "majorsId",
+                    "startDate",
+                    "endDate",
+                    "startDateSubmitTopic",
+                    "endDateSubmitTopic",
+                    "startDateChooseTopic",
+                    "endDateChooseTopic",
+                    "dateDiscussion",
+                    "dateReport"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636808-run"
+        },
+        "get": {
+          "summary": "Get term",
+          "x-apidog-folder": "Term",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Term"
+          ],
+          "parameters": [
+            {
+              "name": "majorsId",
+              "in": "query",
+              "description": "",
+              "required": true,
+              "example": "1",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "fromYear",
+              "in": "query",
+              "description": "",
+              "required": true,
+              "example": "2020",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "toYear",
+              "in": "query",
+              "description": "",
+              "required": true,
+              "example": "2021",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636815-run"
+        }
+      },
+      "/api/lecturer/terms/{id}": {
+        "put": {
+          "summary": "[HL] Update term",
+          "x-apidog-folder": "Term",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Term"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "",
+              "required": true,
+              "example": "2",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "test 31"
+                    },
+                    "majorsId": {
+                      "type": "string",
+                      "example": "1"
+                    },
+                    "startDate": {
+                      "type": "string",
+                      "example": "01/01/2022"
+                    },
+                    "endDate": {
+                      "type": "string",
+                      "example": "12/31/2023"
+                    },
+                    "startDateSubmitTopic": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    },
+                    "endDateSubmitTopic": {
+                      "type": "string",
+                      "example": "02/21/2020"
+                    },
+                    "startDateChooseTopic": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    },
+                    "endDateChooseTopic": {
+                      "type": "string",
+                      "example": "02/21/2020"
+                    },
+                    "dateDiscussion": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    },
+                    "dateReport": {
+                      "type": "string",
+                      "example": "02/20/2020"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "majorsId",
+                    "startDate",
+                    "endDate",
+                    "startDateSubmitTopic",
+                    "endDateSubmitTopic",
+                    "startDateChooseTopic",
+                    "endDateChooseTopic",
+                    "dateDiscussion",
+                    "dateReport"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636809-run"
+        },
+        "get": {
+          "summary": "Get term by Id",
+          "x-apidog-folder": "Term",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Term"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "",
+              "required": true,
+              "example": "1",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636810-run"
+        },
+        "delete": {
+          "summary": "[HL]  Delete  term",
+          "x-apidog-folder": "Term",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Term"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "",
+              "required": true,
+              "example": "4",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636812-run"
+        }
+      },
+      "/api/lecturer/majors": {
+        "post": {
+          "summary": "[AD] Create majors",
+          "x-apidog-folder": "Majors",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Majors"
+          ],
+          "parameters": [],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "CNTT-{{$randomAlphaNumeric}}-{{$randomAlphaNumeric}}"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636811-run"
+        },
+        "get": {
+          "summary": "Get majors",
+          "x-apidog-folder": "Majors",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Majors"
+          ],
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636816-run"
+        }
+      },
+      "/api/lecturer/majors/{majorsId}": {
+        "put": {
+          "summary": "[AD] Update majors",
+          "x-apidog-folder": "Majors",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Majors"
+          ],
+          "parameters": [
+            {
+              "name": "majorsId",
+              "in": "path",
+              "description": "",
+              "required": true,
+              "example": "2",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "KTPM"
+                    },
+                    "headLecturerId": {
+                      "type": "string",
+                      "example": "16"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "headLecturerId"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636813-run"
+        }
+      },
+      "/api/lecturer/majors/{id}": {
+        "get": {
+          "summary": "Get majors by Id",
+          "x-apidog-folder": "Majors",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Majors"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "",
+              "required": true,
+              "example": "1",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636814-run"
+        },
+        "delete": {
+          "summary": "[AD] Delete  majors",
+          "x-apidog-folder": "Majors",
+          "x-apidog-status": "released",
+          "deprecated": false,
+          "description": "",
+          "tags": [
+            "Majors"
+          ],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "",
+              "required": true,
+              "example": "4",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {},
+                    "x-apidog-orders": [],
+                    "x-apidog-ignore-properties": []
+                  }
+                }
+              }
+            }
+          },
+          "x-run-in-apidog'": "https://www.apidog.com/web/project/356010/apis/api-3636817-run"
+        }
+      }
+    },
+    "components": {
+      "schemas": {}
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "local"
+      }
+    ]
+  }

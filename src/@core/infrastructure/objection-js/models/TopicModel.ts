@@ -43,7 +43,9 @@ export default class TopicModel extends Model {
 			comment: entity.comment,
 			status: entity.status,
 			lecturer_id: entity.lecturerId,
-			term: entity.term.id,
+			term_id: entity.term.id,
+			created_at: entity.createdAt,
+			updated_at: entity.updatedAt,
 		});
 
 		return model;
@@ -67,8 +69,10 @@ export default class TopicModel extends Model {
 				requireInput: dbJson['require_input'],
 				comment: dbJson['comment'],
 				status: dbJson['status'],
-				lecturer: Lecturer.createById(dbJson['head_lecturer_id']),
+				lecturer: Lecturer.createById(dbJson['lecturer_id']),
 				term: Term.createById(dbJson['term_id']),
+				createdAt: dbJson['created_at'],
+				updatedAt: dbJson['updated_at'],
 			},
 			Number(dbJson['id'])
 		);

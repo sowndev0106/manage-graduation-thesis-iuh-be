@@ -67,6 +67,6 @@ export default class Term extends Entity<IProps> {
 	get toJSON() {
 		const { majors, ...props } = lodash.cloneDeep(this.props);
 
-		return { id: this.id, ...props, majors: majors.toJSON };
+		return { id: this.id, ...props, majors: majors?.toJSON };
 	}
 }
