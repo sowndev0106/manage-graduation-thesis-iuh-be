@@ -1,6 +1,6 @@
 variables:
     IMAGE_NAME: son162001/manage-graduation-thesis-iuh
-image: node:latest
+    IMAGE_TAG: latestnode:latest
 
 stages:
     - test
@@ -9,24 +9,35 @@ stages:
 
 run_tests:
     stage: test
-    image: python:3.9-slim-buster
-    before_script:
-        - apt-get update && apt-get install make
+    image: node:16.16.0-alpine
     script:
-        - make test
+        - echo "test"
 
-deploy:
-    stage: deploy
-    image: alpine
+build:
+    stage: build
     before_script:
-        - apk add openssh-client
-        - eval $(ssh-agent -s)
-        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-        - mkdir -p ~/.ssh
-        - chmod 700 ~/.ssh
+        - chmod 400 $SSH_KEY
     script:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && git pull"
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && npm i"
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && (npm start || true)"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm i"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm run build"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && (npm start || true)"
         - echo "Application successfully deployed."
+    only:
+        - production
+# deploy:
+#     stage: deploy
+#     image: alpine
+#     before_script:
+#         - apk add openssh-client
+#         - eval $(ssh-agent -s)
+#         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+#         - mkdir -p ~/.ssh
+#         - chmod 700 ~/.ssh
+#     script:
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && git pull"
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && npm i"
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && (npm start || true)"
+#         - echo "Application successfully deployed."
