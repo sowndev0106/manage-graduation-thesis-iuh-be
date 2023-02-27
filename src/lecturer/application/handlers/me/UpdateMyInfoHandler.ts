@@ -39,7 +39,7 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
-		console.log(request.file);
+
 		return {
 			id: Number(request.headers['id']),
 			phoneNumber,
@@ -60,6 +60,7 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 		lecturer?.user.updateEmail(input.email);
 		lecturer?.user.updateName(input.name);
 		input.gender && lecturer?.user.updateGender(input.gender);
+
 		if (input.avatar) {
 			deleteFileCloudynary(lecturer?.user.avatar).then();
 			lecturer?.user.updateAvatar(input.avatar);
