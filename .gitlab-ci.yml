@@ -16,7 +16,6 @@ stages:
 build:
     stage: build
     before_script:
-        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
         - mkdir -p ~/.ssh
         - chmod 700 ~/.ssh
     script:
