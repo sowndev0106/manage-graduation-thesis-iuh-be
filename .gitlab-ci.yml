@@ -3,11 +3,11 @@ variables:
     IMAGE_TAG: latestnode:latest
 
 stages:
-    # - test
+    - test
     - build
     # - deploy
 
-run_tests:
+test:
     stage: test
     image: node:16.16.0-alpine
     script:
