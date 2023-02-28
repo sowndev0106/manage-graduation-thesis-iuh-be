@@ -3,20 +3,20 @@ variables:
     IMAGE_TAG: latestnode:latest
 
 stages:
-    - test
+    # - test
     - build
     # - deploy
 
-test:
-    stage: test
-    image: node:16.16.0-alpine
-    script:
-        - echo "test"
+# test:
+#     stage: test
+#     image: node:16.16.0-alpine
+#     script:
+#         - echo "test"
 
 build:
     stage: build
     before_script:
-        - chmod 400 $SSH_KEY
+        - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd kltn && git pull origin production"
     only:
