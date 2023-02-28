@@ -7,17 +7,16 @@ stages:
     - build
     # - deploy
 
-# run_tests:
-#     stage: test
-#     image: node:16.16.0-alpine
-#     script:
-#         - echo "test"
+run_tests:
+    stage: test
+    image: node:16.16.0-alpine
+    script:
+        - echo "test"
 
 build:
     stage: build
     before_script:
-        - mkdir -p ~/.ssh
-        - chmod 700 ~/.ssh
+        - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
