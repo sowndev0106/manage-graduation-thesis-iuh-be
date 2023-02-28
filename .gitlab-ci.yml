@@ -22,11 +22,11 @@ build:
         - mkdir -p ~/.ssh
         - chmod 700 ~/.ssh
     script:
-        - ssh -o StrictHostKeyChecking=no son@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
-        - ssh -o StrictHostKeyChecking=no son@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
-        - ssh -o StrictHostKeyChecking=no son@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm i"
-        - ssh -o StrictHostKeyChecking=no son@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm run build"
-        - ssh -o StrictHostKeyChecking=no son@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && (npm start || true)"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm i"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm run build"
+        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && (npm start || true)"
         - echo "Application successfully deployed."
     only:
         - master
