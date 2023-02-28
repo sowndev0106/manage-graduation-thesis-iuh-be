@@ -18,7 +18,11 @@ build:
     before_script:
         - chmod 400 $SSH_PRIVATE_KEY
     script:
-        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "ls"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && git pull"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm i"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm run build"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && (npm start || true)"
     only:
         - master
 # build:
