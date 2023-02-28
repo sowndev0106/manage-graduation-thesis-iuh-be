@@ -16,16 +16,24 @@ test:
 build:
     stage: build
     before_script:
-        - chmod 400 $SSH_PRIVATE_KEY
+        - chmod 400 $SSH_KEY
     script:
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm i"
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm run build"
-        - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && (npm start || true)"
-        - echo "Application successfully deployed."
+        - ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd kltn && git pull origin production"
     only:
         - master
+# build:
+#     stage: build
+#     before_script:
+#         - chmod 400 $SSH_PRIVATE_KEY
+#     script:
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm i"
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm run build"
+#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && (npm start || true)"
+#         - echo "Application successfully deployed."
+#     only:
+#         - master
 # deploy:
 #     stage: deploy
 #     before_script:
