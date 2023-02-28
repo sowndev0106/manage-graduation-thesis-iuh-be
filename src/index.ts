@@ -41,5 +41,5 @@ app.use(router);
 // Start the server
 
 app.listen(port, () => {
-	console.log(`Express server started on ${baseURL}`);
+	console.log(`Express server started on ${baseURL} ` + process.env.NODE_ENV);
 });
