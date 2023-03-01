@@ -14,7 +14,7 @@ stages:
 deploy:
     stage: deploy
     before_script:
-        - cat EC2_IPADDRESS '$EC2_IPADDRESS'
+        - echo EC2_IPADDRESS '$EC2_IPADDRESS'
         - chmod 400 $SSH_PRIVATE_KEY
     script:
         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@$EC2_IPADDRESS.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && git pull"
