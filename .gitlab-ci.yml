@@ -3,25 +3,25 @@ variables:
     IMAGE_TAG: latestnode:latest
 
 stages:
-    - test
+    # - test
     # - build
-    # - deploy
-test:
-    stage: test
-    image: node:16.16.0-alpine
-    script:
-        - echo "test"
-# build:
-#     stage: build
-#     before_script:
-#         - chmod 400 $SSH_PRIVATE_KEY
+    - deploy
+# test:
+#     stage: test
+#     image: node:16.16.0-alpine
 #     script:
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && git pull"
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm i"
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm run build"
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && (npm start || true)"
-#     only:
-#         - master
+#         - echo "test"
+deploy:
+    stage: deploy
+    before_script:
+        - chmod 400 $SSH_PRIVATE_KEY
+    script:
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && git pull"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm i"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm run build"
+        - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-18-143-175-208.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && (pm2 restart all  || true)"
+    only:
+        - master
 # build:
 #     stage: build
 #     before_script:
