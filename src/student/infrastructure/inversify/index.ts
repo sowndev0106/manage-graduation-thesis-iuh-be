@@ -10,8 +10,8 @@ import IStudentDao from '@student/domain/daos/IStudentDao';
 import StudentDao from '@student/infrastructure/objection-js/daos/StudentDao';
 import TermDao from '../objection-js/daos/TermDao';
 import ITermDao from '@student/domain/daos/ITermDao';
-import TopicDao from '@lecturer/infrastructure/objection-js/daos/TopicDao';
-import ITopicDao from '@lecturer/domain/daos/ITopicDao';
+import ILecturerDao from '@student/domain/daos/ILecturerDao';
+import LecturerDao from '../objection-js/daos/LecturerDao';
 
 const container = new Container({
 	autoBindInjectable: true,
@@ -29,6 +29,7 @@ container.bind<IUserDao>('UserDao').to(UserDao);
 container.bind<IMajorsDao>('MajorsDao').to(MajorsDao);
 container.bind<IStudentDao>('StudentDao').to(StudentDao);
 container.bind<ITermDao>('TermDao').to(TermDao);
-container.bind<ITopicDao>('TopicDao').to(TopicDao);
+// container.bind<ITopicDao>('TopicDao').to(TopicDao);
+container.bind<ILecturerDao>('LecturerDao').to(LecturerDao);
 
 export default container;

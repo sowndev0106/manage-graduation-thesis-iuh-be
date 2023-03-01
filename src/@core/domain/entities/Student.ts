@@ -58,4 +58,10 @@ export default class Student extends Entity<IProps> {
 	updateUser(user: User) {
 		this._props.user = user;
 	}
+	updateTypeTraining(typeTraining: TypeTraining) {
+		this._props.typeTraining = typeTraining;
+	}
+	updateShoolYear(schoolYear: string) {
+		this._props.schoolYear = schoolYear;
+	}
 }
