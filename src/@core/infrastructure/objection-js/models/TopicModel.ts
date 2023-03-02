@@ -1,4 +1,5 @@
 import Lecturer from '@core/domain/entities/Lecturer';
+import Majors from '@core/domain/entities/Majors';
 import Term from '@core/domain/entities/Term';
 import Topic from '@core/domain/entities/Topic';
 import Objection, { Model } from 'objection';

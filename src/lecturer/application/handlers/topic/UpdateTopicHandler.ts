@@ -92,7 +92,6 @@ export default class UpdateTopicHandler extends RequestHandler {
 			standradOutput: input.standradOutput,
 			requireInput: input.requireInput,
 			status: TypeStatusTopic.Peding,
-			lecturer: Lecturer.createById(input.lecturerId),
 			term: Term.createById(input.termId),
 		});
 

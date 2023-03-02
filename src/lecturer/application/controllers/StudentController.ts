@@ -5,6 +5,7 @@ import ImportStudentByExcelHandler from '../handlers/student/ImportStudentByExce
 import ImportLecturerByExcelHandler from '../handlers/lecturer/ImportLecturerByExcelHandler';
 import GetListStudent from '../handlers/student/GetListStudent';
 import ImportMyStudentByExcelHandler from '../handlers/student/ImportMyStudentByExcelHandler';
+import GetStudentById from '../handlers/student/GetStudentById';
 
 class UserController {
 	async importStudentByExcel(req: Request, res: Response, next: NextFunction) {
@@ -17,6 +18,10 @@ class UserController {
 	}
 	async getStudents(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(GetListStudent).handle(req);
+		return res.status(200).json(data);
+	}
+	async getStudentById(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetStudentById).handle(req);
 		return res.status(200).json(data);
 	}
 }

@@ -16,4 +16,15 @@ export default class StudentDao extends StudentDaoCore implements IStudentDao {
 		const result = await query.execute();
 		return result && result[0] ? this.convertModelToEntity(result[0]) : null;
 	}
+	async findAll(majorsId?: number): Promise<Student[]> {
+		const query = this.initQuery();
+		query.withGraphFetched('user');
+		if (majorsId) {
+			query.join('user', 'student.user_id', '=', 'user.id');
+			query.where('user.majors_id', majorsId);
+		}
+		const result = await query.execute();
+
+		return result && result.map(e => this.convertModelToEntity(e));
+	}
 }

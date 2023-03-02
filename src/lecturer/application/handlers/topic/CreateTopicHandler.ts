@@ -14,6 +14,7 @@ import Lecturer from '@core/domain/entities/Lecturer';
 import Term from '@core/domain/entities/Term';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import StatusTopic from '@core/domain/validate-objects/StatusTopic';
+import Majors from '@core/domain/entities/Majors';
 
 interface ValidatedInput {
 	name: string;

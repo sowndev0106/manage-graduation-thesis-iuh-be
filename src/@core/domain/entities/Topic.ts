@@ -2,6 +2,7 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Lecturer from './Lecturer';
 import Term from './Term';
+import Majors from './Majors';
 export enum TypeStatusTopic {
 	Refuse = 'refuse',
 	Peding = 'peding',
@@ -94,9 +95,9 @@ export default class Topic extends Entity<IProps> {
 	get toJSON() {
 		const { lecturer, term, ...props } = lodash.cloneDeep(this._props || {});
 
-		let lecturerrProps = lecturer?.toJSON;
+		let lecturerProps = lecturer?.toJSON;
 		let termProps = term?.toJSON;
 
-		return { id: this.id, ...props, lecturer: lecturerrProps, term: termProps };
+		return { id: this.id, ...props, lecturer: lecturerProps, term: termProps };
 	}
 }

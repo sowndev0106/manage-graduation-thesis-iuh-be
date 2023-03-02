@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
-import ILecturerDao from '@student/domain/daos/ILecturerDao';
+import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import BooleanValidate from '@core/domain/validate-objects/BooleanValidate';
 
