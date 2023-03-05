@@ -4,7 +4,7 @@ export async function up(knex: Knex): Promise<void> {
 	return knex.schema.createTable('group_member', table => {
 		table.increments('id').primary();
 
-		table.integer('group_id').unsigned().references('id').inTable('group');
+		table.integer('group_id').unsigned().references('id').inTable('group').onDelete('CASCADE');
 		table.integer('student_id').unsigned().references('id').inTable('student');
 
 		table.timestamps();

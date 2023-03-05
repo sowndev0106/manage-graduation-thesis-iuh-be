@@ -2,10 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import Ioc from '@student/infrastructure/inversify';
 import CreateGroupHandler from '../handlers/group/CreateGroupHandler';
 import UpdateTermHandler from '../handlers/group/UpdateTermHandler';
-import DeleteTermHandler from '../handlers/group/DeleteTermHandler';
 import GetMyGroupHandler from '../handlers/group/GetMyGroupHandler';
 import GetGroupByIdHandler from '../handlers/group/GetGroupByIdHandler';
 import GetListGroupHandler from '../handlers/group/GetListGroupHandler';
+import OutGroupHandler from '../handlers/group/OutGroupHandler';
 
 class GroupController {
 	async createGroup(req: Request, res: Response, next: NextFunction) {
@@ -29,8 +29,8 @@ class GroupController {
 		return res.status(200).json(data);
 	}
 
-	async deleteTerm(req: Request, res: Response, next: NextFunction) {
-		const data = await Ioc.get(DeleteTermHandler).handle(req);
+	async outGroup(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(OutGroupHandler).handle(req);
 		return res.status(200).json(data);
 	}
 }
