@@ -1,11 +1,5 @@
-import Lecturer from '@core/domain/entities/Lecturer';
 import Group from '@core/domain/entities/Group';
 import Objection, { Model } from 'objection';
-import LecturerModel from './LecturerModel';
-import Term from '@core/domain/entities/Term';
-import Topic from '@core/domain/entities/Topic';
-import TermModel from './TermModel';
-import TopicModel from './TopicModel';
 import GroupMember from '@core/domain/entities/groupMember';
 import Student from '@core/domain/entities/Student';
 import GroupModel from './GroupModel';
@@ -19,7 +13,7 @@ export default class GroupMemberModel extends Model {
 	static relationMappings = {
 		group: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: GroupModel,
 			join: {
 				from: 'group_member.group_id',
 				to: 'group.id',
@@ -27,10 +21,10 @@ export default class GroupMemberModel extends Model {
 		},
 		student: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: StudentModel,
 			join: {
 				from: 'group_member.student_id',
-				to: 'group.id',
+				to: 'student.id',
 			},
 		},
 	};
@@ -41,6 +35,8 @@ export default class GroupMemberModel extends Model {
 			id: entity.id,
 			group_id: entity.groupId,
 			student_id: entity.studentId,
+			created_at: entity.createdAt,
+			updated_at: entity.updatedAt,
 		});
 
 		return model;

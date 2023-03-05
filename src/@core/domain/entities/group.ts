@@ -1,12 +1,13 @@
 import Entity from './Entity';
 import lodash from 'lodash';
-import Lecturer from './Lecturer';
 import Term from './Term';
 import Topic from './Topic';
+import GroupMember from './groupMember';
 export interface IProps {
-	name?: string;
+	name: string;
 	term: Term;
-	topic: Topic;
+	topic?: Topic;
+	members?: Array<GroupMember>;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -26,6 +27,9 @@ export default class Group extends Entity<IProps> {
 	get term() {
 		return this.props?.term;
 	}
+	get members() {
+		return this.props?.members;
+	}
 	get topicId() {
 		return this.props?.topic?.id;
 	}
@@ -44,12 +48,16 @@ export default class Group extends Entity<IProps> {
 	updateTerm(term: Term) {
 		this._props.term = term;
 	}
+	updateMembers(members: Array<GroupMember>) {
+		this._props.members = members;
+	}
 	get toJSON() {
-		const { term, topic, ...props } = lodash.cloneDeep(this._props || {});
+		const { term, topic, members, ...props } = lodash.cloneDeep(this._props || {});
 
-		let termProps = this.term?.toJSON;
-		let topicProps = this.topic?.toJSON;
+		let termJSON = this.term?.toJSON;
+		let topicJSON = this.topic?.toJSON;
+		let membersJSON = this.members?.map(e => e.toJSON);
 
-		return { id: this.id, ...props, term: termProps, topic: topicProps };
+		return { id: this.id, ...props, term: termJSON, topic: topicJSON, members: membersJSON };
 	}
 }

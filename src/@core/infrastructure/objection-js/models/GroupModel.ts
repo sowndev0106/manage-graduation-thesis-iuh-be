@@ -6,6 +6,8 @@ import Term from '@core/domain/entities/Term';
 import Topic from '@core/domain/entities/Topic';
 import TermModel from './TermModel';
 import TopicModel from './TopicModel';
+import GroupMember from '@core/domain/entities/groupMember';
+import GroupMemberModel from './GroupMemberModel';
 
 export default class GroupModel extends Model {
 	static get tableName() {
@@ -29,6 +31,14 @@ export default class GroupModel extends Model {
 				to: 'topic.id',
 			},
 		},
+		members: {
+			relation: Model.HasManyRelation,
+			modelClass: GroupMemberModel,
+			join: {
+				from: 'group.id',
+				to: 'group_member.group_id',
+			},
+		},
 	};
 
 	static convertEntityToPartialModelObject(entity: Group) {
@@ -38,6 +48,8 @@ export default class GroupModel extends Model {
 			name: entity.name,
 			term_id: entity.termId,
 			topic_id: entity.topicId,
+			created_at: entity.createdAt,
+			updated_at: entity.updatedAt,
 		});
 
 		return model;
@@ -60,9 +72,11 @@ export default class GroupModel extends Model {
 		);
 		const term = dbJson['term'] && TermModel.convertModelToEntity(dbJson['term']);
 		const topic = dbJson['topic'] && TopicModel.convertModelToEntity(dbJson['topic']);
+		const members = dbJson['members'] && dbJson['members'].map((e: any) => GroupMemberModel.convertModelToEntity(e));
 
 		if (term) entity.updateTerm(term);
 		if (topic) entity.updateTopic(topic);
+		if (members) entity.updateMembers(members);
 
 		return entity;
 	}
