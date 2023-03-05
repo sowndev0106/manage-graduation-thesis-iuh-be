@@ -2,7 +2,7 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Topic from './Topic';
 import Student from './Student';
-import Group from './group';
+import Group from './Group';
 export interface IProps {
 	group: Group;
 	student: Student;

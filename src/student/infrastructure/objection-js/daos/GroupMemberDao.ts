@@ -1,4 +1,4 @@
-import GroupMember from '@core/domain/entities/groupMember';
+import GroupMember from '@core/domain/entities/GroupMember';
 import GroupMemberDaoCore from '@core/infrastructure/objection-js/daos/GroupMemberDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import { injectable } from 'inversify';

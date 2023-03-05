@@ -6,7 +6,7 @@ import Term from '@core/domain/entities/Term';
 import Topic from '@core/domain/entities/Topic';
 import TermModel from './TermModel';
 import TopicModel from './TopicModel';
-import GroupMember from '@core/domain/entities/groupMember';
+import GroupMember from '@core/domain/entities/GroupMember';
 import GroupMemberModel from './GroupMemberModel';
 
 export default class GroupModel extends Model {

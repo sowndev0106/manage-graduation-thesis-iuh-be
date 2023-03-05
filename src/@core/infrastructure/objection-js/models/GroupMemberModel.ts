@@ -1,6 +1,6 @@
 import Group from '@core/domain/entities/Group';
 import Objection, { Model } from 'objection';
-import GroupMember from '@core/domain/entities/groupMember';
+import GroupMember from '@core/domain/entities/GroupMember';
 import Student from '@core/domain/entities/Student';
 import GroupModel from './GroupModel';
 import StudentModel from './StudentModel';

@@ -2,7 +2,7 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Term from './Term';
 import Topic from './Topic';
-import GroupMember from './groupMember';
+import GroupMember from './GroupMember';
 export interface IProps {
 	name: string;
 	term: Term;
