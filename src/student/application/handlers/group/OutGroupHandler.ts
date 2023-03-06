@@ -43,6 +43,7 @@ export default class OutGroupHandler extends RequestHandler {
 		if (!group) throw new Error('You not have group');
 
 		const members = await this.groupMemberDao.findByGroupId(group.id!);
+
 		group.updateMembers(members);
 
 		// check if only me in group then delete group
