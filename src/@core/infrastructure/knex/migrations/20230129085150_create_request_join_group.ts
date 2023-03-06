@@ -7,6 +7,7 @@ export async function up(knex: Knex): Promise<void> {
 
 		table.integer('group_id').unsigned().references('id').inTable('group');
 		table.integer('student_id').unsigned().references('id').inTable('student');
+		table.enum('type', ['REQUEST_JOIN', 'REQUEST_INVITE']);
 
 		table.timestamps();
 	});
