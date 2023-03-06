@@ -14,7 +14,7 @@ import ILecturerDao from '@student/domain/daos/ILecturerDao';
 import LecturerDao from '../objection-js/daos/LecturerDao';
 import TopicDao from '../objection-js/daos/TopicDao';
 import ITopicDao from '@student/domain/daos/ITopicDao';
-import IGroupDao from '@lecturer/domain/daos/IGroupDao';
+import IGroupDao from '@student/domain/daos/IGroupDao';
 import GroupDao from '../objection-js/daos/GroupDao';
 import GroupMemberDao from '../objection-js/daos/GroupMemberDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
