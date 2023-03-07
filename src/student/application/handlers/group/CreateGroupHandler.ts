@@ -25,7 +25,7 @@ export default class CreateGroupHandler extends RequestHandler {
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
-		const topicId = this.errorCollector.collect('topicId', () => EntityId.validate({ value: request.body['topicId'] }));
+		const topicId = this.errorCollector.collect('topicId', () => EntityId.validate({ value: request.body['topicId'], required: false }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const studentId = Number(request.headers['id']);
 
