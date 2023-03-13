@@ -6,6 +6,7 @@ import EntityId from '@core/domain/validate-objects/EntityID';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import IGroupDao from '@student/domain/daos/IGroupDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
+import ITopicDao from '@student/domain/daos/ITopicDao';
 
 interface ValidatedInput {
 	studentId: number;
@@ -15,6 +16,7 @@ interface ValidatedInput {
 @injectable()
 export default class GetMyGroupHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
+	@inject('TopicDao') private topicDao!: ITopicDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	async validate(request: Request): Promise<ValidatedInput> {
@@ -39,7 +41,13 @@ export default class GetMyGroupHandler extends RequestHandler {
 		if (!group) return null;
 
 		const members = await this.groupMemberDao.findByGroupId(group.id!);
+
 		group.updateMembers(members);
+
+		if (group.topicId) {
+			const topic = await this.topicDao.findEntityById(group.topicId);
+			topic && group.updateTopic(topic);
+		}
 
 		return group.toJSON;
 	}
