@@ -19,7 +19,7 @@ import GroupDao from '../objection-js/daos/GroupDao';
 import GroupMemberDao from '../objection-js/daos/GroupMemberDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
-import RequestJoinGroupDao from '@core/infrastructure/objection-js/daos/RequestJoinGroupDao';
+import RequestJoinGroupDao from '../objection-js/daos/RequestJoinGroupDao';
 
 const container = new Container({
 	autoBindInjectable: true,

@@ -10,6 +10,8 @@ import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
 import RequestJoinGroup, { TypeRquestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
 import Student from '@core/domain/entities/Student';
 import SortText from '@core/domain/validate-objects/SortText';
+import Group from '@core/domain/entities/Group';
+import GroupMember from '@core/domain/entities/GroupMember';
 
 interface ValidatedInput {
 	groupId: number;
@@ -21,6 +23,7 @@ interface ValidatedInput {
 export default class SendRequestJoinGroupHandler extends RequestHandler {
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('RequestJoinGroupDao') private requestJoinGroupDao!: IRequestJoinGroupDao;
+	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const groupId = this.errorCollector.collect('groupId', () => EntityId.validate({ value: request.params['id'] }));
 		const message = this.errorCollector.collect('message', () => SortText.validate({ value: request.body['message'], required: false }));
@@ -43,15 +46,37 @@ export default class SendRequestJoinGroupHandler extends RequestHandler {
 		const groupExist = await this.groupDao.findOneByTermAndStudent(group.termId!, input.studentId);
 		if (groupExist) throw new Error('You already have a group');
 
-		let requestJoinGroup = RequestJoinGroup.create({
-			group: group,
-			student: Student.createById(input.studentId),
+		const groupStudentInvite = await this.groupDao.findOneByTermAndStudent(group.termId!, input.studentId);
+		if (groupStudentInvite) throw new Error('student already exists group in termId');
+
+		// check exist
+		let requestJoinGroup = await this.requestJoinGroupDao.findByGroupIdAndStudentId(group.id!, input.studentId!);
+		if (requestJoinGroup) {
+			requestJoinGroup = await this.handleExistingRequestJoin(requestJoinGroup, input, group);
+		} else {
+			requestJoinGroup = await this.handleNewRequestJoin(input, group, Student.createById(input.studentId));
+		}
+
+		return requestJoinGroup.toJSON;
+	}
+	private async handleNewRequestJoin(input: ValidatedInput, group: Group, student: Student) {
+		const requestJoinGroup = RequestJoinGroup.create({
+			group,
+			student,
 			message: input.message,
 			type: TypeRquestJoinGroup.REQUEST_JOIN,
 		});
 
-		requestJoinGroup = await this.requestJoinGroupDao.insertEntity(requestJoinGroup);
-
-		return requestJoinGroup.toJSON;
+		return this.requestJoinGroupDao.insertEntity(requestJoinGroup);
+	}
+	private async handleExistingRequestJoin(requestJoinGroup: RequestJoinGroup, input: ValidatedInput, group: Group) {
+		if (requestJoinGroup.type === TypeRquestJoinGroup.REQUEST_INVITE) {
+			await this.requestJoinGroupDao.deleteEntity(requestJoinGroup);
+			await this.groupMemberDao.insertEntity(GroupMember.create({ group, student: requestJoinGroup.student }));
+		} else if (input.message) {
+			requestJoinGroup.updateMessage(input.message);
+			await this.requestJoinGroupDao.updateEntity(requestJoinGroup);
+		}
+		return requestJoinGroup;
 	}
 }

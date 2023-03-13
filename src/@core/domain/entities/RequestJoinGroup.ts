@@ -45,6 +45,10 @@ export default class RequestJoinGroup extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
+	updateMessage(message: string) {
+		this._props.message = message;
+		this._props.updatedAt = new Date();
+	}
 	updateGroup(group: Group) {
 		this._props.group = group;
 	}

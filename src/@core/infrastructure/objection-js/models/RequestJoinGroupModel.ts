@@ -36,6 +36,7 @@ export default class RequestJoinGroupModel extends Model {
 			message: entity.message,
 			group_id: entity.groupId,
 			student_id: entity.studentId,
+			type: entity.type,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});

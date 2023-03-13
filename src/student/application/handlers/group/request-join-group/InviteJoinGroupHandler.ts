@@ -8,6 +8,10 @@ import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
 import RequestJoinGroup, { TypeRquestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
 import SortText from '@core/domain/validate-objects/SortText';
 import IStudentDao from '@student/domain/daos/IStudentDao';
+import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
+import GroupMember from '@core/domain/entities/GroupMember';
+import Group from '@core/domain/entities/Group';
+import Student from '@core/domain/entities/Student';
 
 interface ValidatedInput {
 	termId: number;
@@ -21,6 +25,7 @@ export default class InviteJoinGroupHandler extends RequestHandler {
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('RequestJoinGroupDao') private requestJoinGroupDao!: IRequestJoinGroupDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
+	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const studentInviteId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.body['studentId'] }));
@@ -46,15 +51,34 @@ export default class InviteJoinGroupHandler extends RequestHandler {
 		const groupStudentInvite = await this.groupDao.findOneByTermAndStudent(input.termId, input.studentInviteId);
 		if (groupStudentInvite) throw new Error('student already exists group in termId');
 
-		let requestJoinGroup = RequestJoinGroup.create({
-			group: group,
-			student: student,
+		// check exist
+		let requestJoinGroup = await this.requestJoinGroupDao.findByGroupIdAndStudentId(group.id!, student.id!);
+		if (requestJoinGroup) {
+			requestJoinGroup = await this.handleExistingRequestJoin(requestJoinGroup, input, group);
+		} else {
+			requestJoinGroup = await this.handleNewRequestJoin(input, group, student);
+		}
+
+		return requestJoinGroup?.toJSON;
+	}
+	private async handleNewRequestJoin(input: ValidatedInput, group: Group, student: Student) {
+		const requestJoinGroup = RequestJoinGroup.create({
+			group,
+			student,
 			message: input.message,
 			type: TypeRquestJoinGroup.REQUEST_INVITE,
 		});
 
-		requestJoinGroup = await this.requestJoinGroupDao.insertEntity(requestJoinGroup);
-
-		return requestJoinGroup.toJSON;
+		return this.requestJoinGroupDao.insertEntity(requestJoinGroup);
+	}
+	private async handleExistingRequestJoin(requestJoinGroup: RequestJoinGroup, input: ValidatedInput, group: Group) {
+		if (requestJoinGroup.type === TypeRquestJoinGroup.REQUEST_JOIN) {
+			await this.requestJoinGroupDao.deleteEntity(requestJoinGroup);
+			await this.groupMemberDao.insertEntity(GroupMember.create({ group, student: requestJoinGroup.student }));
+		} else if (input.message) {
+			requestJoinGroup.updateMessage(input.message);
+			await this.requestJoinGroupDao.updateEntity(requestJoinGroup);
+		}
+		return requestJoinGroup;
 	}
 }
