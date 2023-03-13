@@ -23,8 +23,13 @@ class GroupController {
 		const data = await Ioc.get(GetListGroupHandler).handle(req);
 		return res.status(200).json(data);
 	}
-
 	async outGroup(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(OutGroupHandler).handle(req);
+		return res.status(200).json(data);
+	}
+
+	// request
+	async requestJoinGroup(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(OutGroupHandler).handle(req);
 		return res.status(200).json(data);
 	}
