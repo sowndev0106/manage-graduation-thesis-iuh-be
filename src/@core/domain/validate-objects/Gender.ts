@@ -1,6 +1,7 @@
 import ValidationError from '@core/domain/errors/ValidationError';
 import Joi from 'joi';
-import { TypeGender } from '../entities/User';
+import { TypeGender } from '../entities/Lecturer';
+
 export interface IGender {
 	value: any;
 	required?: boolean;

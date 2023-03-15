@@ -1,7 +1,7 @@
 import Objection, { Model } from 'objection';
 import StudentEntity from '@core/domain/entities/Student';
-import UserEntity from '@core/domain/entities/User';
-import UserModel from './UserModel';
+import Majors from '@core/domain/entities/Majors';
+import MajorsModel from './MajorsModel';
 
 export default class StudentModel extends Model {
 	static get tableName() {
@@ -18,16 +18,23 @@ export default class StudentModel extends Model {
 			{
 				typeTraining: dbJson['type_training'],
 				schoolYear: dbJson['school_year'],
-				user: dbJson['user_id'] && UserEntity.createById(Number(dbJson['user_id'])),
+				username: dbJson['username'],
+				avatar: dbJson['avatar'],
+				phoneNumber: dbJson['phone_number'],
+				password: dbJson['password'],
+				email: dbJson['email'],
+				name: dbJson['name'],
+				gender: dbJson['gender'],
+				majors: dbJson['majors_id'] && Majors.createById(dbJson['majors_id']),
 				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
 				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
 			Number(dbJson['id'])
 		);
 
-		const user = dbJson['user'] && UserModel.convertModelToEntity(dbJson['user']);
+		const majors = dbJson['majors'] && MajorsModel.convertModelToEntity(dbJson['majors']);
 
-		if (user) entity.updateUser(user);
+		if (majors) entity.updateMajors(majors);
 
 		return entity;
 	}
@@ -38,7 +45,14 @@ export default class StudentModel extends Model {
 			id: entity.id,
 			type_training: entity.typeTraining,
 			school_year: entity.schoolYear,
-			user_id: entity.userId,
+			username: entity.username,
+			avatar: entity.avatar,
+			phone_number: entity.phoneNumber,
+			password: entity.password,
+			email: entity.email,
+			name: entity.name,
+			gender: entity.gender,
+			majors_id: entity.majorsId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -50,21 +64,19 @@ export default class StudentModel extends Model {
 			id: entity.id,
 			type_training: entity.typeTraining,
 			school_year: entity.schoolYear,
-			user: UserModel.convertEntityToPartialModelObject(entity.user),
+			username: entity.username,
+			avatar: entity.avatar,
+			phone_number: entity.phoneNumber,
+			password: entity.password,
+			email: entity.email,
+			name: entity.name,
+			gender: entity.gender,
+			majors_id: entity.majorsId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		};
 
 		return model;
 	}
-	static relationMappings = {
-		user: {
-			relation: Model.BelongsToOneRelation,
-			modelClass: UserModel,
-			join: {
-				from: 'student.user_id',
-				to: 'user.id',
-			},
-		},
-	};
+	static relationMappings = {};
 }

@@ -2,15 +2,6 @@ import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
-import Username from '@core/domain/validate-objects/Username';
-import Password from '@core/domain/validate-objects/Password';
-import IUserDao from '@student/domain/daos/IUserDao';
-import NotFoundError from '@core/domain/errors/NotFoundError';
-import ConflictError from '@core/domain/errors/ConflictError';
-import User from '@core/domain/entities/User';
-import IMajorsDao from '@student/domain/daos/IMajorsDao';
-import EntityId from '@core/domain/validate-objects/EntityID';
-import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
 import Text from '@core/domain/validate-objects/Text';
 import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 

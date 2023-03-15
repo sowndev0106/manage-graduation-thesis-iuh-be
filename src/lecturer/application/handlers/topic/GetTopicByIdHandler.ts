@@ -31,7 +31,7 @@ export default class GetTopicByIdHandler extends RequestHandler {
 		if (!topic) {
 			throw new Error('topic not found');
 		}
-		const lecturer = await this.lecturerDao.findGraphEntityById(topic.lecturerId!, 'user');
+		const lecturer = await this.lecturerDao.findEntityById(topic.lecturerId!);
 
 		lecturer && topic.updateLecturer(lecturer);
 

@@ -23,13 +23,7 @@ export default class GetListTermHandler extends RequestHandler {
 		const input = await this.validate(request);
 
 		const listMajors = await this.majorsDao.getAllEntities();
-		const resultPromise = listMajors.map(async majors => {
-			const lecturer = await this.lecturerDao.findGraphEntityById(majors.headLecturerId!, 'user');
-			lecturer && majors.updateheadLecturer(lecturer);
-			return majors;
-		});
-		const reponse = await Promise.all(resultPromise);
 
-		return reponse.map(e => e.toJSON);
+		return listMajors.map(e => e.toJSON);
 	}
 }

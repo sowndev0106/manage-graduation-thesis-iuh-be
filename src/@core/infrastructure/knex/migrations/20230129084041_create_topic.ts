@@ -1,3 +1,4 @@
+import { TypeStatusTopic } from '@core/domain/entities/Topic';
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
@@ -12,7 +13,7 @@ export async function up(knex: Knex): Promise<void> {
 		table.text('require_input');
 		table.text('comment');
 
-		table.enum('status', ['refuse', 'peding', 'accept']);
+		table.enum('status', ['ACCEPT', 'PEDING', 'REFUSE']);
 
 		table.integer('term_id').unsigned().references('id').inTable('term');
 		table.integer('lecturer_id').unsigned().references('id').inTable('lecturer');

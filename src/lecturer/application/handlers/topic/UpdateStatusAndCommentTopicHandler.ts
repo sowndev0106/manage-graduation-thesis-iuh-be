@@ -52,10 +52,10 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 		if (!topic) throw new Error('Topic not found');
 
 		// check is head lecture this majors of topic
-		const lecturerTopic = await this.lecturerDao.findGraphEntityById(topic.lecturerId!, 'user');
-		const majorsTopic = await this.majorsDao.findEntityById(lecturerTopic?.user.majorsId);
+		const lecturerTopic = await this.lecturerDao.findEntityById(topic.lecturerId!);
+		const majorsTopic = await this.majorsDao.findEntityById(lecturerTopic?.majorsId);
 
-		if (!lecturerTopic?.isAdmin && majorsTopic?.headLecturerId != lecturerTopic?.id) {
+		if (majorsTopic?.headLecturerId != lecturerTopic?.id) {
 			throw new Error(`You doesn't permission for majors: ${majorsTopic?.name}`);
 		}
 

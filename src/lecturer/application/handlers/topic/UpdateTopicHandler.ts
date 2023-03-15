@@ -91,7 +91,7 @@ export default class UpdateTopicHandler extends RequestHandler {
 			target: input.target,
 			standradOutput: input.standradOutput,
 			requireInput: input.requireInput,
-			status: TypeStatusTopic.Peding,
+			status: TypeStatusTopic.PEDING,
 			term: Term.createById(input.termId),
 		});
 

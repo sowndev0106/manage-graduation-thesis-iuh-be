@@ -1,8 +1,7 @@
 import Objection, { Model } from 'objection';
 import LecturerEntity from '@core/domain/entities/Lecturer';
-import UserEntity from '@core/domain/entities/User';
-import UserModel from './UserModel';
-import User from './UserModel';
+import Majors from '@core/domain/entities/Majors';
+import MajorsModel from './MajorsModel';
 
 export default class LecturerModel extends Model {
 	static get tableName() {
@@ -19,16 +18,24 @@ export default class LecturerModel extends Model {
 			{
 				degree: dbJson['degree'],
 				isAdmin: dbJson['is_admin'] == 1,
-				user: dbJson['user_id'] && UserEntity.createById(Number(dbJson['user_id'])),
+				username: dbJson['username'],
+				avatar: dbJson['avatar'],
+				phoneNumber: dbJson['phone_number'],
+				password: dbJson['password'],
+				email: dbJson['email'],
+				name: dbJson['name'],
+				gender: dbJson['gender'],
+				majors: dbJson['majors_id'] && Majors.createById(dbJson['majors_id']),
+				role: dbJson['role'],
 				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
 				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
 			Number(dbJson['id'])
 		);
 
-		const user = dbJson['user'] && UserModel.convertModelToEntity(dbJson['user']);
+		const majors = dbJson['majors'] && MajorsModel.convertModelToEntity(dbJson['majors']);
 
-		if (user) entity.updateUser(user);
+		if (majors) entity.updateMajors(majors);
 
 		return entity;
 	}
@@ -39,7 +46,15 @@ export default class LecturerModel extends Model {
 			id: entity.id,
 			degree: entity.degree,
 			is_admin: entity.isAdmin,
-			user_id: entity.userId,
+			username: entity.username,
+			avatar: entity.avatar,
+			phone_number: entity.phoneNumber,
+			password: entity.password,
+			email: entity.email,
+			name: entity.name,
+			gender: entity.gender,
+			role: entity.role,
+			majors_id: entity.majorsId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -51,21 +66,20 @@ export default class LecturerModel extends Model {
 			id: entity.id,
 			degree: entity.degree,
 			is_admin: entity.isAdmin,
-			user: UserModel.convertEntityToPartialModelObject(entity.user),
+			username: entity.username,
+			avatar: entity.avatar,
+			phone_number: entity.phoneNumber,
+			password: entity.password,
+			email: entity.email,
+			name: entity.name,
+			gender: entity.gender,
+			role: entity.role,
+			majors_id: entity.majorsId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		};
 
 		return model;
 	}
-	static relationMappings = {
-		user: {
-			relation: Model.BelongsToOneRelation,
-			modelClass: User,
-			join: {
-				from: 'lecturer.user_id',
-				to: 'user.id',
-			},
-		},
-	};
+	static relationMappings = {};
 }

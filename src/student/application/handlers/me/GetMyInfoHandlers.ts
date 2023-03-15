@@ -29,7 +29,7 @@ export default class GetMyInfoHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		let student = await this.studentDao.findGraphEntityById(input.id, 'user');
+		let student = await this.studentDao.findEntityById(input.id);
 
 		if (!student) throw new ConflictError('student not found');
 

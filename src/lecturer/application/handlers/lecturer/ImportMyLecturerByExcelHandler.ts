@@ -9,11 +9,9 @@ import SortText from '@core/domain/validate-objects/SortText';
 import Email from '@core/domain/validate-objects/Email';
 import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import { converExcelBufferToObject } from '@core/infrastructure/xlsx';
-import EntityId from '@core/domain/validate-objects/EntityID';
-import User from '@core/domain/entities/User';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
-import Lecturer, { TypeDegree } from '@core/domain/entities/Lecturer';
+import Lecturer, { TypeDegree, TypeRoleLecturer } from '@core/domain/entities/Lecturer';
 
 interface IValidatedInput {
 	data: Array<{
@@ -44,8 +42,8 @@ export default class ImportMyLecturerByExcelHandler extends RequestHandler {
 			}
 			return result;
 		});
-		const lecturer = await this.lecturerDao.findGraphEntityById(Number(request.headers['id']), 'user');
-		const majorsId = lecturer?.user.majorsId!;
+		const lecturer = await this.lecturerDao.findEntityById(Number(request.headers['id']));
+		const majorsId = lecturer?.majorsId!;
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
@@ -54,9 +52,6 @@ export default class ImportMyLecturerByExcelHandler extends RequestHandler {
 		// check validation once row and column excel
 		const errors: Array<{ row: number; columns: any }> = [];
 
-		const allUsername = (await this.userDao.getAllEntities()).reduce((acc: any, cur: any) => {
-			return { ...acc, [cur.username]: cur.username };
-		}, {});
 		// user
 		const alUsernameExcel: { [key: string]: string } = {};
 
@@ -65,9 +60,7 @@ export default class ImportMyLecturerByExcelHandler extends RequestHandler {
 			const prop = {
 				username: this.errorCollector.collect('username', () => {
 					const username = Username.validate({ value: e['username'] });
-					if (allUsername[username]) {
-						throw new Error('username already exists in database');
-					}
+
 					if (alUsernameExcel[username]) {
 						throw new Error('value is duplicated in file ');
 					}
@@ -101,27 +94,30 @@ export default class ImportMyLecturerByExcelHandler extends RequestHandler {
 			throw new Error('major not found');
 		}
 		const passwordDefault = process.env.PASWSWORD_DEFAULT as string;
-
-		const lecturersPromise = data.map(async e => {
-			const passwordEncript = await encriptTextBcrypt(e.password || passwordDefault);
-			return Lecturer.create({
-				user: User.create({
-					username: e.username,
-					majors,
-					password: passwordEncript,
-					email: e.email,
-					name: e.name,
-					phoneNumber: e.phone,
-				}),
-				isAdmin: false,
-				degree: TypeDegree.Masters,
+		const allUsername = (await this.userDao.getAllEntities()).reduce((acc: any, cur: any) => {
+			return { ...acc, [cur.username]: cur.username };
+		}, {});
+		const lecturersPromise = data
+			.filter(e => !allUsername[e.username])
+			.map(async e => {
+				const passwordEncript = await encriptTextBcrypt(e.password || passwordDefault);
+				return await this.lecturerDao.insertEntity(
+					Lecturer.create({
+						username: e.username,
+						majors,
+						password: passwordEncript,
+						email: e.email,
+						name: e.name,
+						phoneNumber: e.phone,
+						isAdmin: false,
+						degree: TypeDegree.MASTERS,
+						role: TypeRoleLecturer.LECTURER,
+					})
+				);
 			});
-		});
 
 		const lecturers = await Promise.all(lecturersPromise);
 
-		const result = await this.lecturerDao.insertGraphMultipleEntities(lecturers);
-
-		return result.map(e => e.toJSON);
+		return lecturers.map(e => e.toJSON);
 	}
 }

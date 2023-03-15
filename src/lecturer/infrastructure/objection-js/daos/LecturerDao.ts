@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import Lecturer from '@core/domain/entities/Lecturer';
+import Lecturer, { TypeRoleLecturer } from '@core/domain/entities/Lecturer';
 import LecturerDaoCore from '@core/infrastructure/objection-js/daos/LecturerDao';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 
@@ -7,17 +7,12 @@ import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 export default class LecturerDao extends LecturerDaoCore implements ILecturerDao {
 	async findAll(majorsId?: number | undefined, isHeadLecturer?: Boolean): Promise<Lecturer[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('user');
 		if (isHeadLecturer != undefined) {
-			if (isHeadLecturer == true) query.join('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
-			if (isHeadLecturer == false) {
-				query.leftJoin('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
-				query.whereNull('head_lecturer_id');
-			}
+			if (isHeadLecturer == true) query.where('role', '=', TypeRoleLecturer.HEAD_LECTURER);
+			if (isHeadLecturer == false) query.where('role', '!=', TypeRoleLecturer.HEAD_LECTURER);
 		}
 		if (majorsId) {
-			query.join('user', 'lecturer.user_id', '=', 'user.id');
-			query.where('user.majors_id', majorsId);
+			query.where('majors_id', majorsId);
 		}
 		const result = await query.execute();
 
@@ -26,9 +21,7 @@ export default class LecturerDao extends LecturerDaoCore implements ILecturerDao
 	async findByUsername(username: string): Promise<Lecturer | null> {
 		const query = this.initQuery();
 
-		query.withGraphFetched('user');
-		query.join('user', 'lecturer.user_id', '=', 'user.id');
-		query.where('user.username', username);
+		query.where('username', username);
 
 		const result = await query.execute();
 

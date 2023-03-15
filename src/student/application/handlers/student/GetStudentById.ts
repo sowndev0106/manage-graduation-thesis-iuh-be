@@ -26,7 +26,7 @@ export default class GetStudentById extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		const student = await this.studentDao.findGraphEntityById(input.id, 'user');
+		const student = await this.studentDao.findEntityById(input.id);
 
 		return student?.toJSON || {};
 	}

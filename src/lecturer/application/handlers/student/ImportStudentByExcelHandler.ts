@@ -11,7 +11,6 @@ import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import { converExcelBufferToObject } from '@core/infrastructure/xlsx';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import Student, { TypeTraining } from '@core/domain/entities/Student';
-import User from '@core/domain/entities/User';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
 import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 
@@ -53,9 +52,6 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 		// check validation once row and column excel
 		const errors: Array<{ row: number; columns: any }> = [];
 
-		const allUsername = (await this.userDao.getAllEntities()).reduce((acc: any, cur: any) => {
-			return { ...acc, [cur.username]: cur.username };
-		}, {});
 		// user
 		const alUsernameExcel: { [key: string]: string } = {};
 
@@ -64,9 +60,6 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 			const prop = {
 				username: this.errorCollector.collect('username', () => {
 					const username = Username.validate({ value: e['username'] });
-					if (allUsername[username]) {
-						throw new Error('username already exists in database');
-					}
 					if (alUsernameExcel[username]) {
 						throw new Error('value is duplicated in file ');
 					}
@@ -99,23 +92,31 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 		if (!majors) {
 			throw new Error('major not found');
 		}
+		const allUsername = (await this.userDao.getAllEntities()).reduce((acc: any, cur: any) => {
+			return { ...acc, [cur.username]: cur.username };
+		}, {});
+
 		const passwordDefault = process.env.PASWSWORD_DEFAULT as string;
 
-		const studentsPromise = data.map(async e => {
-			const passwordEncript = await encriptTextBcrypt(e.password || passwordDefault);
-			return Student.create({
-				user: User.create({
-					username: e.username,
-					majors,
-					password: passwordEncript,
-					email: e.email,
-					name: e.name,
-					phoneNumber: e.phone,
-				}),
-				typeTraining: TypeTraining.University,
-				schoolYear: new Date().getFullYear().toString(),
+		const studentsPromise = data
+			.filter(e => !allUsername[e.username])
+			.map(async e => {
+				const passwordEncript = await encriptTextBcrypt(e.password || passwordDefault);
+				const student = await this.studentDao.insertEntity(
+					Student.create({
+						username: e.username,
+						majors,
+						password: passwordEncript,
+						email: e.email,
+						name: e.name,
+						phoneNumber: e.phone,
+						typeTraining: TypeTraining.UNIVERSITY,
+						schoolYear: new Date().getFullYear().toString(),
+					})
+				);
+				// insert in term
+				return student;
 			});
-		});
 
 		const students = await Promise.all(studentsPromise);
 

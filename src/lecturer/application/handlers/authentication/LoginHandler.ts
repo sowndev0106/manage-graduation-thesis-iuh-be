@@ -4,12 +4,10 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import Username from '@core/domain/validate-objects/Username';
 import Password from '@core/domain/validate-objects/Password';
-import IUserDao from '@lecturer/domain/daos/IUserDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import { compareTextBcrypt } from '@core/infrastructure/bcrypt';
 import ForbiddenError from '@core/domain/errors/ForbiddenError';
 import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
-import User, { TypeRoleUser } from '@core/domain/entities/User';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 
@@ -20,7 +18,6 @@ interface ValidatedInput {
 
 @injectable()
 export default class LoginHandlers extends RequestHandler {
-	@inject('UserDao') private userDao!: IUserDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {
@@ -40,21 +37,12 @@ export default class LoginHandlers extends RequestHandler {
 
 		if (!lecturer) throw new NotFoundError('incorrect username');
 
-		const user = lecturer.user instanceof User ? lecturer.user : await this.userDao.findEntityById(lecturer.id);
-
-		if (!user) throw new Error('Data user missing, please contact admin');
-		const majors = await this.majorsDao.findGraphEntityById(lecturer.user.majorsId!, 'head_lecturer');
-
-		const isHeadLecturer = majors?.headLecturerId ? majors.headLecturerId === lecturer?.id : false;
-
-		const isCorrectPassword = await compareTextBcrypt(input.password, user.password!);
+		const isCorrectPassword = await compareTextBcrypt(input.password, lecturer.password!);
 
 		if (!isCorrectPassword) throw new ForbiddenError('incorect password');
 
-		const role = lecturer.isAdmin ? TypeRoleUser.Admin : isHeadLecturer ? TypeRoleUser.HeadLecturer : TypeRoleUser.Lecturer;
+		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(lecturer.id!, lecturer.role);
 
-		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(lecturer.id!, role);
-
-		return { accessToken, refreshToken, user: { ...lecturer?.toJSON, role } };
+		return { accessToken, refreshToken, lecturer: { ...lecturer?.toJSON } };
 	}
 }

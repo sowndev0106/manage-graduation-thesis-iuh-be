@@ -84,7 +84,7 @@ export default class CreateTopicHandler extends RequestHandler {
 				standradOutput: input.standradOutput,
 				requireInput: input.requireInput,
 				comment: input.comment,
-				status: TypeStatusTopic.Peding,
+				status: TypeStatusTopic.PEDING,
 				lecturer: Lecturer.createById(input.lecturerId),
 				term: Term.createById(input.termId),
 			})

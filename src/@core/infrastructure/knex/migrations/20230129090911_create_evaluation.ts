@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
 	return knex.schema.createTable('evaluation', table => {
 		table.increments('id').primary();
-		table.enum('type_evaluation', ['mid_term', 'end_term']);
+		table.enum('type_evaluation', ['MID_TERM', 'END_TERM']);
 
 		table.integer('term_id').unsigned().references('id').inTable('term');
 		table.integer('lecturer_id').unsigned().references('id').inTable('lecturer');

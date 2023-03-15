@@ -1,4 +1,4 @@
-import { TypeRoleUser } from '@core/domain/entities/User';
+import { TypeRoleLecturer, TypeRoleUser } from '@core/domain/entities/Lecturer';
 import AuthorizationError from '@core/domain/errors/AuthorizationError';
 import { Request } from 'express';
 import jwt from 'jsonwebtoken';
@@ -6,14 +6,14 @@ const secrectAccessKey = process.env.JWT_SECRECT_ACCESS_TOKEN!;
 const secrectRefreshKey = process.env.JWT_SECRECT_REFRESH_TOKEN!;
 
 class JWTService {
-	signAccessAndRefreshToken(id: number, role: TypeRoleUser) {
-		const accessToken = this.signAccessToken(id, role);
-		const refreshToken = this.signRefreshToken(id, role);
+	signAccessAndRefreshToken(id: number, role: TypeRoleUser | TypeRoleLecturer, isAdmin?: boolean) {
+		const accessToken = this.signAccessToken(id, role, isAdmin);
+		const refreshToken = this.signRefreshToken(id, role, isAdmin);
 
 		return { accessToken, refreshToken };
 	}
-	signAccessToken(id: number, role: TypeRoleUser) {
-		const payload = { id, role };
+	signAccessToken(id: number, role: TypeRoleUser | TypeRoleLecturer, isAdmin?: boolean) {
+		const payload = { id, role, isAdmin: isAdmin ? isAdmin : false };
 		const options = {
 			expiresIn: '1h',
 		};
@@ -21,8 +21,8 @@ class JWTService {
 
 		return token;
 	}
-	signRefreshToken(id: number, role: TypeRoleUser) {
-		const payload = { id, role };
+	signRefreshToken(id: number, role: TypeRoleUser | TypeRoleLecturer, isAdmin?: boolean) {
+		const payload = { id, role, isAdmin: isAdmin ? isAdmin : false };
 		const options = {
 			expiresIn: '1y',
 		};
@@ -30,11 +30,11 @@ class JWTService {
 
 		return token;
 	}
-	verifyAccessToken(token: string): { id: number; role: TypeRoleUser } {
+	verifyAccessToken(token: string): { id: number; role: TypeRoleUser | TypeRoleLecturer; isAdmin: boolean } {
 		var decoded = jwt.verify(token, secrectAccessKey);
 		return decoded as any;
 	}
-	verifyRefrestToken(token: string): { id: number; role: TypeRoleUser } {
+	verifyRefrestToken(token: string): { id: number; role: TypeRoleUser | TypeRoleLecturer; isAdmin: boolean } {
 		var decoded = jwt.verify(token, secrectRefreshKey);
 		return decoded as any;
 	}

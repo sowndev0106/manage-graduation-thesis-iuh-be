@@ -23,4 +23,11 @@ export default class LecturerDao extends LecturerDaoCore implements ILecturerDao
 
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
+	async findByUsername(username: string): Promise<Lecturer | null> {
+		const query = this.initQuery();
+		query.where('username', username);
+
+		const result = await query.execute();
+		return result && result[0] ? this.convertModelToEntity(result[0]) : null;
+	}
 }

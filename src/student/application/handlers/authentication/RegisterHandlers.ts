@@ -7,7 +7,6 @@ import Password from '@core/domain/validate-objects/Password';
 import IUserDao from '@student/domain/daos/IUserDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ConflictError from '@core/domain/errors/ConflictError';
-import User, { TypeGender } from '@core/domain/entities/User';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
@@ -15,6 +14,7 @@ import StudentDao from '@student/infrastructure/objection-js/daos/StudentDao';
 import Student, { TypeTraining } from '@core/domain/entities/Student';
 import Majors from '@core/domain/entities/Majors';
 import { faker } from '@faker-js/faker';
+import { TypeGender } from '@core/domain/entities/Lecturer';
 
 interface ValidatedInput {
 	username: string;
@@ -50,27 +50,20 @@ export default class RegisterHandlers extends RequestHandler {
 
 		const passwordEncript = await encriptTextBcrypt(input.password);
 
-		const entityUser = User.create({
+		let student = Student.create({
 			username: input.username,
 			password: passwordEncript,
 			majors: Majors.createById(1),
 			avatar: faker.image.avatar(),
 			email: `${input.username}@gmail.com`,
-			gender: TypeGender.Female,
+			gender: TypeGender.FEMALE,
 			name: faker.name.fullName(),
 			phoneNumber: faker.phone.number(),
+			schoolYear: new Date().getFullYear().toString(),
+			typeTraining: TypeTraining.UNIVERSITY,
 		});
 
-		// user = await this.userDao.insertEntity(entityUser);
-
-		// const student = await this.studentDao.insertEntity(
-		// 	Student.create({ user: user, schoolYear: new Date().getFullYear().toString(), typeTraining: TypeTraining.University })
-		// );
-		const student = await this.studentDao.insertGraphEntity(
-			Student.create({ user: entityUser, schoolYear: new Date().getFullYear().toString(), typeTraining: TypeTraining.University })
-		);
-
-		student.updateUser(entityUser);
+		student = await this.studentDao.insertEntity(student);
 
 		return student.toJSON;
 	}

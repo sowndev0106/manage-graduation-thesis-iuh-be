@@ -32,7 +32,7 @@ export default class GetListTopicHandler extends RequestHandler {
 		const listTopic = await this.topicDao.findAll(input.termId, input.lecturerId);
 
 		const resultPromise = listTopic.map(async topic => {
-			const lecturer = await this.lecturerDao.findGraphEntityById(topic.lecturerId!, 'user');
+			const lecturer = await this.lecturerDao.findEntityById(topic.lecturerId!);
 			lecturer && topic.updateLecturer(lecturer);
 			return topic;
 		});

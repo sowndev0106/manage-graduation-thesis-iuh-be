@@ -2,11 +2,10 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Lecturer from './Lecturer';
 import Term from './Term';
-import Majors from './Majors';
 export enum TypeStatusTopic {
-	Refuse = 'refuse',
-	Peding = 'peding',
-	Accept = 'accept',
+	REFUSE = 'REFUSE',
+	PEDING = 'PEDING',
+	ACCEPT = 'ACCEPT',
 }
 export interface IProps {
 	name: string;

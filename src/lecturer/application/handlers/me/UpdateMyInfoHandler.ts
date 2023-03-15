@@ -2,16 +2,14 @@ import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
-import IUserDao from '@lecturer/domain/daos/IUserDao';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import SortText from '@core/domain/validate-objects/SortText';
 import Email from '@core/domain/validate-objects/Email';
 import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import Gender from '@core/domain/validate-objects/Gender';
-import { TypeGender } from '@core/domain/entities/User';
 import Degree from '@core/domain/validate-objects/Degree';
-import { TypeDegree } from '@core/domain/entities/Lecturer';
+import { TypeDegree, TypeGender } from '@core/domain/entities/Lecturer';
 import { deleteFileCloudynary } from '@core/infrastructure/cloudinary';
 
 interface ValidatedInput {
@@ -26,7 +24,6 @@ interface ValidatedInput {
 
 @injectable()
 export default class UpdateMyInfoHandler extends RequestHandler {
-	@inject('UserDao') private userDao!: IUserDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
@@ -56,14 +53,14 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 		let lecturer = await this.lecturerDao.findGraphEntityById(input.id, 'user');
 
 		input.degree && lecturer?.updateDegree(input.degree);
-		lecturer?.user.updatePhoneNumber(input.phoneNumber);
-		lecturer?.user.updateEmail(input.email);
-		lecturer?.user.updateName(input.name);
-		input.gender && lecturer?.user.updateGender(input.gender);
+		lecturer?.updatePhoneNumber(input.phoneNumber);
+		lecturer?.updateEmail(input.email);
+		lecturer?.updateName(input.name);
+		input.gender && lecturer?.updateGender(input.gender);
 
 		if (input.avatar) {
-			deleteFileCloudynary(lecturer?.user.avatar).then();
-			lecturer?.user.updateAvatar(input.avatar);
+			deleteFileCloudynary(lecturer?.avatar).then();
+			lecturer?.updateAvatar(input.avatar);
 		}
 
 		lecturer = await this.lecturerDao.updateGraphEntity(lecturer!);

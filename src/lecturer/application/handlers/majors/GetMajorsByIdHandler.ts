@@ -26,14 +26,11 @@ export default class GetTermByIdHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-		const majors = await this.majorsDao.findGraphEntityById(input.id, 'head_lecturer');
+		const majors = await this.majorsDao.findEntityById(input.id);
 
 		if (!majors) {
 			throw new Error('majors not found');
 		}
-		const lecturer = await this.lecturerDao.findGraphEntityById(majors.headLecturerId!, 'user');
-
-		lecturer && majors.updateheadLecturer(lecturer);
 
 		return majors.toJSON;
 	}
