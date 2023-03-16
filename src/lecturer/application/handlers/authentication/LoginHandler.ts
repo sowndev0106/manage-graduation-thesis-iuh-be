@@ -43,6 +43,6 @@ export default class LoginHandlers extends RequestHandler {
 
 		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(lecturer.id!, lecturer.role);
 
-		return { accessToken, refreshToken, lecturer: { ...lecturer?.toJSON } };
+		return { accessToken, refreshToken, user: { ...lecturer?.toJSON } };
 	}
 }
