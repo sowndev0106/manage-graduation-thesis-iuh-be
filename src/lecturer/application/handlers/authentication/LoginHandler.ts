@@ -41,7 +41,7 @@ export default class LoginHandlers extends RequestHandler {
 
 		if (!isCorrectPassword) throw new ForbiddenError('incorect password');
 
-		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(lecturer.id!, lecturer.role);
+		const { accessToken, refreshToken } = JWTService.signAccessAndRefreshToken(lecturer.id!, lecturer.role, lecturer.isAdmin);
 
 		return { accessToken, refreshToken, user: { ...lecturer?.toJSON } };
 	}
