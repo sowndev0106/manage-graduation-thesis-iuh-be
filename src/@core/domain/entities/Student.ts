@@ -100,7 +100,7 @@ export default class Student extends Entity<IProps> {
 
 		return {
 			id: this.id,
-			majors: majors.toJSON,
+			majors: majors?.toJSON,
 			...props,
 		};
 	}

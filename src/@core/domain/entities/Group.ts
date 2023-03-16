@@ -56,7 +56,7 @@ export default class Group extends Entity<IProps> {
 
 		let termJSON = this.term?.toJSON;
 		let topicJSON = this.topic?.toJSON;
-		let membersJSON = this.members?.map(e => e.toJSON);
+		let membersJSON = this.members?.map(e => e?.toJSON);
 
 		return { id: this.id, ...props, term: termJSON, topic: topicJSON, members: membersJSON };
 	}

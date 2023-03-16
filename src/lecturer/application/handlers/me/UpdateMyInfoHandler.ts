@@ -50,7 +50,7 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-		let lecturer = await this.lecturerDao.findGraphEntityById(input.id, 'user');
+		let lecturer = await this.lecturerDao.findEntityById(input.id);
 
 		input.degree && lecturer?.updateDegree(input.degree);
 		lecturer?.updatePhoneNumber(input.phoneNumber);

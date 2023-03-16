@@ -38,6 +38,7 @@ export default class GetMyGroupHandler extends RequestHandler {
 		}
 
 		const group = await this.groupDao.findOneByTermAndStudent(input.termId, input.studentId);
+
 		if (!group) return null;
 
 		const members = await this.groupMemberDao.findByGroupId(group.id!);

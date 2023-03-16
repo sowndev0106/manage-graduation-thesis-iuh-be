@@ -33,7 +33,6 @@ export default class OutGroupHandler extends RequestHandler {
 		const term = await this.termDao.findEntityById(input.termId);
 
 		let result: any;
-		console.log({ term });
 
 		if (!term) {
 			throw new Error('term not found');

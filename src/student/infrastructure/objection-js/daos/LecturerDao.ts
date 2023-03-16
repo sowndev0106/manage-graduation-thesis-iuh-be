@@ -7,7 +7,6 @@ import ILecturerDao from '@student/domain/daos/ILecturerDao';
 export default class LecturerDao extends LecturerDaoCore implements ILecturerDao {
 	async findAll(majorsId?: number | undefined, isHeadLecturer?: Boolean): Promise<Lecturer[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('user');
 		if (isHeadLecturer != undefined) {
 			if (isHeadLecturer == true) query.join('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
 			if (isHeadLecturer == false) {
@@ -16,8 +15,7 @@ export default class LecturerDao extends LecturerDaoCore implements ILecturerDao
 			}
 		}
 		if (majorsId) {
-			query.join('user', 'lecturer.user_id', '=', 'user.id');
-			query.where('user.majors_id', majorsId);
+			query.where('student.majors_id', majorsId);
 		}
 		const result = await query.execute();
 

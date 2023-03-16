@@ -14,10 +14,8 @@ export default class StudentDao extends StudentDaoCore implements IStudentDao {
 	}
 	async findAll(majorsId?: number): Promise<Student[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('user');
 		if (majorsId) {
-			query.join('user', 'student.user_id', '=', 'user.id');
-			query.where('user.majors_id', majorsId);
+			query.where('student.majors_id', majorsId);
 		}
 		const result = await query.execute();
 
