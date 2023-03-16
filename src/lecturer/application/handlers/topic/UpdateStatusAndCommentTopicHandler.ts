@@ -52,12 +52,14 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 		if (!topic) throw new Error('Topic not found');
 
 		// check is head lecture this majors of topic
-		const lecturerTopic = await this.lecturerDao.findEntityById(topic.lecturerId!);
-		const majorsTopic = await this.majorsDao.findEntityById(lecturerTopic?.majorsId);
+		const term = await this.termDao.findEntityById(topic.termId!);
+		const lecturer = await this.lecturerDao.findEntityById(input.lecturerId);
 
-		if (majorsTopic?.headLecturerId != lecturerTopic?.id) {
-			throw new Error(`You doesn't permission for majors: ${majorsTopic?.name}`);
-		}
+		// check headlecturer of majors
+		// head lecturer only handler in my majors
+		// if (lecturer?.headLecturerId != lecturerTopic?.id) {
+		// 	throw new Error(`You doesn't permission for majors: ${majorsTopic?.name}`);
+		// }
 
 		topic.update({
 			comment: input.comment,
