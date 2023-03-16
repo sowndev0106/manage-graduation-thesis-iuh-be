@@ -4,7 +4,6 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import Username from '@core/domain/validate-objects/Username';
 import Password from '@core/domain/validate-objects/Password';
-import IUserDao from '@student/domain/daos/IUserDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import { compareTextBcrypt } from '@core/infrastructure/bcrypt';
 import ForbiddenError from '@core/domain/errors/ForbiddenError';
@@ -19,7 +18,6 @@ interface ValidatedInput {
 
 @injectable()
 export default class LoginHandlers extends RequestHandler {
-	@inject('UserDao') private userDao!: IUserDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));

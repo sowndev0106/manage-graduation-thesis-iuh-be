@@ -2,7 +2,6 @@ import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
-import IUserDao from '@student/domain/daos/IUserDao';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import Username from '@core/domain/validate-objects/Username';
 import SortText from '@core/domain/validate-objects/SortText';
@@ -27,7 +26,6 @@ interface IValidatedInput {
 
 @injectable()
 export default class ImportLecturerByExcelHandler extends RequestHandler {
-	@inject('UserDao') private userDao!: IUserDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 
@@ -94,7 +92,7 @@ export default class ImportLecturerByExcelHandler extends RequestHandler {
 		}
 		const passwordDefault = process.env.PASWSWORD_DEFAULT as string;
 
-		const allUsername = (await this.userDao.getAllEntities()).reduce((acc: any, cur: any) => {
+		const allUsername = (await this.lecturerDao.getAllEntities()).reduce((acc: any, cur: any) => {
 			return { ...acc, [cur.username]: cur.username };
 		}, {});
 		const lecturersPromise = data

@@ -2,7 +2,6 @@ import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
-import IUserDao from '@student/domain/daos/IUserDao';
 import ConflictError from '@core/domain/errors/ConflictError';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
@@ -14,7 +13,6 @@ interface ValidatedInput {
 
 @injectable()
 export default class GetMyInfoHandlers extends RequestHandler {
-	@inject('UserDao') private userDao!: IUserDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {

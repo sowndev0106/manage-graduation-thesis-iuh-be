@@ -4,7 +4,6 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import Username from '@core/domain/validate-objects/Username';
 import Password from '@core/domain/validate-objects/Password';
-import IUserDao from '@student/domain/daos/IUserDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ConflictError from '@core/domain/errors/ConflictError';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
@@ -24,7 +23,6 @@ interface ValidatedInput {
 
 @injectable()
 export default class RegisterHandlers extends RequestHandler {
-	@inject('UserDao') private userDao!: IUserDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('StudentDao') private studentDao!: StudentDao;
 	async validate(request: Request): Promise<ValidatedInput> {
@@ -42,7 +40,7 @@ export default class RegisterHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		let user = await this.userDao.findOneByUsername(input.username);
+		let user = await this.studentDao.findByUsername(input.username);
 		if (user) throw new ConflictError('username already exists');
 
 		let majors = await this.majorsDao.findEntityById(input.majorsId);

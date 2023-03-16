@@ -2,7 +2,6 @@ import { Container } from 'inversify';
 import 'reflect-metadata';
 import ErrorCollector from '@core/infrastructure/utilities/ErrorCollector';
 import Nodemailer from '@core/infrastructure/nodemailer';
-import IUserDao from '@student/domain/daos/IUserDao';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import MajorsDao from '@student/infrastructure/objection-js/daos/MajorsDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
