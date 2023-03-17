@@ -18,6 +18,10 @@ import GroupMemberDao from '../objection-js/daos/GroupMemberDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
 import RequestJoinGroupDao from '../objection-js/daos/RequestJoinGroupDao';
+import LecturerTermDao from '../objection-js/daos/LecturerTermDao';
+import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
+import ILecturerTermDao from '@student/domain/daos/ILecturerTermDao';
+import StudentTermDao from '../objection-js/daos/StudentTermDao';
 
 const container = new Container({
 	autoBindInjectable: true,
@@ -39,5 +43,8 @@ container.bind<ILecturerDao>('LecturerDao').to(LecturerDao);
 container.bind<IGroupDao>('GroupDao').to(GroupDao);
 container.bind<IGroupMemberDao>('GroupMemberDao').to(GroupMemberDao);
 container.bind<IRequestJoinGroupDao>('RequestJoinGroupDao').to(RequestJoinGroupDao);
+
+container.bind<ILecturerTermDao>('LecturerTermDao').to(LecturerTermDao);
+container.bind<IStudentTermDao>('StudentTermDao').to(StudentTermDao);
 
 export default container;

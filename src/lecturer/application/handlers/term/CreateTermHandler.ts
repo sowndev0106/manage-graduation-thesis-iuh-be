@@ -10,6 +10,10 @@ import NotFoundError from '@core/domain/errors/NotFoundError';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import Term from '@core/domain/entities/Term';
 import Majors from '@core/domain/entities/Majors';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import ILecturerDao from '@student/domain/daos/ILecturerDao';
+import { TypeRoleLecturer } from '@core/domain/entities/Lecturer';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 interface ValidatedInput {
 	name: string;
@@ -27,6 +31,10 @@ interface ValidatedInput {
 export default class CreateTermHandler extends RequestHandler {
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('TermDao') private termDao!: ITermDao;
+
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
+	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
@@ -94,7 +102,22 @@ export default class CreateTermHandler extends RequestHandler {
 				endDateChooseTopic: input.endDateChooseTopic,
 			})
 		);
+
 		if (!term) throw new Error('Create term fail');
+		const headlectuers = await this.lecturerDao.findAll(undefined, undefined, TypeRoleLecturer.HEAD_LECTURER);
+		const subHeadlectuers = await this.lecturerDao.findAll(undefined, undefined, TypeRoleLecturer.SUB_HEAD_LECTURER);
+		const lecturers = [...headlectuers, ...subHeadlectuers];
+
+		/// insert head lecturer and sub headlectuer in term
+		lecturers.forEach(async lecturer => {
+			await this.lecturerTermDao.insertEntity(
+				LecturerTerm.create({
+					lecturer,
+					term: term!,
+					role: lecturer.role,
+				})
+			);
+		});
 
 		return term.toJSON;
 	}

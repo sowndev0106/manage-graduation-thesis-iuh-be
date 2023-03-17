@@ -17,7 +17,15 @@ export default abstract class Entity<T> implements IEntity {
 	public get id(): number | undefined {
 		return this._id;
 	}
-
+	update(props: Partial<T>) {
+		const updatedProps: T = {
+			...this.props,
+			...props,
+			updatedAt: new Date(),
+		};
+		this._props = updatedProps;
+		return this;
+	}
 	public get props(): T {
 		return this._props;
 	}

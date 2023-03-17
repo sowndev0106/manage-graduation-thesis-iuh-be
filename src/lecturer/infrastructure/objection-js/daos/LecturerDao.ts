@@ -5,15 +5,20 @@ import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 
 @injectable()
 export default class LecturerDao extends LecturerDaoCore implements ILecturerDao {
-	async findAll(majorsId?: number | undefined, isHeadLecturer?: Boolean): Promise<Lecturer[]> {
+	async findAll(majorsId?: number, termId?: number, role?: TypeRoleLecturer): Promise<Lecturer[]> {
 		const query = this.initQuery();
-		if (isHeadLecturer != undefined) {
-			if (isHeadLecturer == true) query.where('role', '=', TypeRoleLecturer.HEAD_LECTURER);
-			if (isHeadLecturer == false) query.where('role', '!=', TypeRoleLecturer.HEAD_LECTURER);
+
+		const whereClause: Record<string, any> = {};
+
+		if (majorsId) whereClause['lecturer.majors_id'] = majorsId;
+		if (role) whereClause['lecturer.role'] = role;
+
+		if (termId) {
+			query.join('lecturer_term', 'lecturer_term.lecturer_id', '=', 'lecturer.id');
+			query.where('lecturer_term.term_id', '=', termId);
 		}
-		if (majorsId) {
-			query.where('majors_id', majorsId);
-		}
+		query.where(whereClause);
+
 		const result = await query.execute();
 
 		return result && result.map(e => this.convertModelToEntity(e));

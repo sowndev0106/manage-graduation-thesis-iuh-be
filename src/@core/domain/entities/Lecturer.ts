@@ -11,7 +11,7 @@ export enum TypeDegree {
 export enum TypeRoleLecturer {
 	HEAD_LECTURER = 'HEAD_LECTURER',
 	LECTURER = 'LECTURER',
-	SUB_HEAD_LECTURER = 'HEAD_LECTURER',
+	SUB_HEAD_LECTURER = 'SUB_HEAD_LECTURER',
 }
 export enum TypeRoleUser {
 	HEAD_LECTURER = 'HEAD_LECTURER',

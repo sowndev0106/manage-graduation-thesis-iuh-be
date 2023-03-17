@@ -9,29 +9,41 @@ import Email from '@core/domain/validate-objects/Email';
 import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import { converExcelBufferToObject } from '@core/infrastructure/xlsx';
 import EntityId from '@core/domain/validate-objects/EntityID';
-import Student, { TypeTraining } from '@core/domain/entities/Student';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
+import Lecturer, { TypeDegree, TypeGender, TypeRoleLecturer } from '@core/domain/entities/Lecturer';
+import Majors from '@core/domain/entities/Majors';
+import ITermDao from '@lecturer/domain/daos/ITermDao';
+import Term from '@core/domain/entities/Term';
 import IStudentDao from '@lecturer/domain/daos/IStudentDao';
+import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
+import Student, { TypeTraining } from '@core/domain/entities/Student';
+import StudentTerm from '@core/domain/entities/StudentTerm';
 
 interface IValidatedInput {
-	data: Array<{
+	users: Array<{
 		username: string;
 		name?: string;
 		email?: string;
 		phone?: string;
 		password?: string;
 	}>;
-	majorsId: number;
+	majors: Majors;
+	term: Term;
 }
 
 @injectable()
 export default class ImportStudentByExcelHandler extends RequestHandler {
 	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
+	@inject('TermDao') private termDao!: ITermDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
 
 	async validate(request: Request): Promise<IValidatedInput> {
+		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
+		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
+
 		const file = request.file?.buffer;
-		const data = this.errorCollector.collect('file', () => {
+		const users = this.errorCollector.collect('file', () => {
 			if (!file) throw new Error('file is require');
 			const result = converExcelBufferToObject(file);
 			if (!result[0]['username']) {
@@ -41,84 +53,81 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 			}
 			return result;
 		});
-		const majorsId = this.errorCollector.collect('majors_id', () => EntityId.validate({ value: request.body['majors_id'] }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
-
-		// check validation once row and column excel
-		const errors: Array<{ row: number; columns: any }> = [];
+		const usersValidate: Array<any> = [];
 
 		// user
 		const alUsernameExcel: { [key: string]: string } = {};
-
-		// validaion data
-		const dataValidate = data.map((e: any, index: number) => {
+		for (const user of users) {
 			const prop = {
 				username: this.errorCollector.collect('username', () => {
-					const username = Username.validate({ value: e['username'] });
+					const username = Username.validate({ value: user['username'] });
 					if (alUsernameExcel[username]) {
-						throw new Error('value is duplicated in file ');
+						return;
 					}
 					alUsernameExcel[username] = username;
 					return username;
 				}),
-				name: this.errorCollector.collect('name', () => SortText.validate({ value: e['name'], required: false })),
-				email: this.errorCollector.collect('email', () => Email.validate({ value: e['email'], required: false })),
-				phone: this.errorCollector.collect('phone', () => PhoneNumber.validate({ value: e['phone'], required: false })),
-				password: this.errorCollector.collect('password', () => SortText.validate({ value: e['password'], required: false })),
+				name: this.errorCollector.collect('name', () => SortText.validate({ value: user['name'], required: false })),
+				email: this.errorCollector.collect('email', () => Email.validate({ value: user['email'], required: false })),
+				phone: this.errorCollector.collect('phone', () => PhoneNumber.validate({ value: user['phone'], required: false })),
+				password: this.errorCollector.collect('password', () => SortText.validate({ value: user['password'], required: false })),
 			};
-
-			if (this.errorCollector.hasError()) {
-				errors.push({ row: index + 1, columns: this.errorCollector.errors });
-				this.errorCollector.clear();
-			}
-
-			return prop;
-		});
-
-		if (errors.length) {
-			throw new ValidationError(errors);
+			usersValidate.push(prop);
 		}
-		return { data: dataValidate, majorsId };
-	}
-
-	async handle(request: Request) {
-		const { data, majorsId } = await this.validate(request);
 		const majors = await this.majorsDao.findEntityById(majorsId);
 		if (!majors) {
 			throw new Error('major not found');
 		}
-		const allUsername = (await this.studentDao.getAllEntities()).reduce((acc: any, cur: any) => {
-			return { ...acc, [cur.username]: cur.username };
-		}, {});
+		const term = await this.termDao.findEntityById(termId);
+		if (!term) {
+			throw new Error('term not found');
+		}
+
+		return { users: usersValidate, majors, term };
+	}
+
+	async handle(request: Request) {
+		const { users, majors, term } = await this.validate(request);
 
 		const passwordDefault = process.env.PASWSWORD_DEFAULT as string;
 
-		const studentsPromise = data
-			.filter(e => !allUsername[e.username])
-			.map(async e => {
-				const passwordEncript = await encriptTextBcrypt(e.password || passwordDefault);
-				const student = await this.studentDao.insertEntity(
+		const studentsPromise = users.map(async user => {
+			const passwordEncript = await encriptTextBcrypt(user.password || passwordDefault);
+			let student = await this.studentDao.findByUsername(user.username);
+			if (!student) {
+				student = await this.studentDao.insertEntity(
 					Student.create({
-						username: e.username,
+						username: user.username,
 						majors,
 						password: passwordEncript,
-						email: e.email,
-						name: e.name,
-						phoneNumber: e.phone,
+						email: user.email,
+						name: user.name,
+						phoneNumber: user.phone,
 						typeTraining: TypeTraining.UNIVERSITY,
+						gender: TypeGender.MALE,
 						schoolYear: new Date().getFullYear().toString(),
 					})
 				);
-				// insert in term
-				return student;
-			});
+			}
+			let studentterm = await this.studentTermDao.findOne(term.id!, student.id!);
+			if (!studentterm) {
+				// insert to student term
+				await this.studentTermDao.insertEntity(
+					StudentTerm.create({
+						student,
+						term,
+					})
+				);
+			}
+			return student;
+		});
 
 		const students = await Promise.all(studentsPromise);
 
-		const result = await this.studentDao.insertGraphMultipleEntities(students);
-		return result.map(e => e.toJSON);
+		return students.map(e => e.toJSON);
 	}
 }

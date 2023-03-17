@@ -1,22 +1,24 @@
 import { injectable } from 'inversify';
-import Lecturer from '@core/domain/entities/Lecturer';
+import Lecturer, { TypeRoleLecturer } from '@core/domain/entities/Lecturer';
 import LecturerDaoCore from '@core/infrastructure/objection-js/daos/LecturerDao';
 import ILecturerDao from '@student/domain/daos/ILecturerDao';
 
 @injectable()
 export default class LecturerDao extends LecturerDaoCore implements ILecturerDao {
-	async findAll(majorsId?: number | undefined, isHeadLecturer?: Boolean): Promise<Lecturer[]> {
+	async findAll(majorsId?: number, termId?: number, role?: TypeRoleLecturer): Promise<Lecturer[]> {
 		const query = this.initQuery();
-		if (isHeadLecturer != undefined) {
-			if (isHeadLecturer == true) query.join('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
-			if (isHeadLecturer == false) {
-				query.leftJoin('majors', 'majors.head_lecturer_id', '=', 'lecturer.id');
-				query.whereNull('head_lecturer_id');
-			}
+
+		const whereClause: Record<string, any> = {};
+
+		if (majorsId) whereClause['lecturer.majors_id'] = majorsId;
+		if (role) whereClause['lecturer.role'] = role;
+
+		if (termId) {
+			query.join('lecturer_term', 'lecturer_term.lecturer_id', '=', 'lecturer.id');
+			query.where('lecturer_term.term_id', '=', termId);
 		}
-		if (majorsId) {
-			query.where('student.majors_id', majorsId);
-		}
+		query.where(whereClause);
+
 		const result = await query.execute();
 
 		return result && result.map(e => this.convertModelToEntity(e));
