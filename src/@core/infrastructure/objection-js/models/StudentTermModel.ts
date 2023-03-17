@@ -1,10 +1,9 @@
-import term from '@core/domain/entities/term';
 import Objection, { Model } from 'objection';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import Student from '@core/domain/entities/Student';
 import StudentModel from './StudentModel';
 import TermModel from './TermModel';
-import Term from '@core/domain/entities/term';
+import Term from '@core/domain/entities/Term';
 
 export default class StudentTermModel extends Model {
 	static get tableName() {

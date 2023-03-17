@@ -1,9 +1,8 @@
-import term from '@core/domain/entities/term';
 import Objection, { Model } from 'objection';
 import lecturerTerm from '@core/domain/entities/LecturerTerm';
 import TermModel from './TermModel';
-import lecturerModel from './lecturerModel';
-import Term from '@core/domain/entities/term';
+import lecturerModel from './LecturerModel';
+import Term from '@core/domain/entities/Term';
 import Lecturer from '@core/domain/entities/Lecturer';
 
 export default class lecturerTermModel extends Model {
