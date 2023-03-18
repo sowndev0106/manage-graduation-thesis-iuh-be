@@ -1,11 +1,11 @@
-import RequestJoinGroup, { TypeRquestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
+import RequestJoinGroup, { TypeRequestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
 import RequestJoinGroupDaoCore from '@core/infrastructure/objection-js/daos/RequestJoinGroupDao';
 import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
 import { injectable } from 'inversify';
 
 @injectable()
 export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore implements IRequestJoinGroupDao {
-	async findAllByStudentIdAndType(studentId: number, type: TypeRquestJoinGroup): Promise<RequestJoinGroup[]> {
+	async findAllByStudentIdAndType(studentId: number, type: TypeRequestJoinGroup): Promise<RequestJoinGroup[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
@@ -17,9 +17,9 @@ export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore impleme
 		const result = await query.execute();
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
-	async findAllByGroupIdAndType(groupId: number, type: TypeRquestJoinGroup): Promise<RequestJoinGroup[]> {
+	async findAllByGroupIdAndType(groupId: number, type: TypeRequestJoinGroup): Promise<RequestJoinGroup[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('[student, student.user]');
+		query.withGraphFetched('[student]');
 
 		const whereClause: Record<string, any> = {};
 		whereClause.group_id = groupId;

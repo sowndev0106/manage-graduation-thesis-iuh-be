@@ -2,7 +2,7 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Group from './Group';
 import Student from './Student';
-export enum TypeRquestJoinGroup {
+export enum TypeRequestJoinGroup {
 	REQUEST_JOIN = 'REQUEST_JOIN',
 	REQUEST_INVITE = 'REQUEST_INVITE',
 }
@@ -10,7 +10,7 @@ export interface IProps {
 	message?: string;
 	group: Group;
 	student: Student;
-	type: TypeRquestJoinGroup;
+	type: TypeRequestJoinGroup;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -55,7 +55,7 @@ export default class RequestJoinGroup extends Entity<IProps> {
 	updateStudent(student: Student) {
 		this._props.student = student;
 	}
-	updateType(type: TypeRquestJoinGroup) {
+	updateType(type: TypeRequestJoinGroup) {
 		this._props.type = type;
 	}
 

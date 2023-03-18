@@ -5,7 +5,7 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IGroupDao from '@student/domain/daos/IGroupDao';
 import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
-import RequestJoinGroup, { TypeRquestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
+import RequestJoinGroup, { TypeRequestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
 import SortText from '@core/domain/validate-objects/SortText';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
@@ -21,7 +21,7 @@ interface ValidatedInput {
 }
 
 @injectable()
-export default class InviteJoinGroupHandler extends RequestHandler {
+export default class SendInviteJoinGroupHandler extends RequestHandler {
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('RequestJoinGroupDao') private requestJoinGroupDao!: IRequestJoinGroupDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
@@ -66,13 +66,13 @@ export default class InviteJoinGroupHandler extends RequestHandler {
 			group,
 			student,
 			message: input.message,
-			type: TypeRquestJoinGroup.REQUEST_INVITE,
+			type: TypeRequestJoinGroup.REQUEST_INVITE,
 		});
 
 		return this.requestJoinGroupDao.insertEntity(requestJoinGroup);
 	}
 	private async handleExistingRequestJoin(requestJoinGroup: RequestJoinGroup, input: ValidatedInput, group: Group) {
-		if (requestJoinGroup.type === TypeRquestJoinGroup.REQUEST_JOIN) {
+		if (requestJoinGroup.type === TypeRequestJoinGroup.REQUEST_JOIN) {
 			await this.requestJoinGroupDao.deleteEntity(requestJoinGroup);
 			await this.groupMemberDao.insertEntity(GroupMember.create({ group, student: requestJoinGroup.student }));
 		} else if (input.message) {

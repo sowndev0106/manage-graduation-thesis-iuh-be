@@ -7,7 +7,7 @@ import IGroupDao from '@student/domain/daos/IGroupDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import ITermDao from '@student/domain/daos/ITermDao';
 import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
-import RequestJoinGroup, { TypeRquestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
+import RequestJoinGroup, { TypeRequestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
 import Student from '@core/domain/entities/Student';
 import SortText from '@core/domain/validate-objects/SortText';
 import Group from '@core/domain/entities/Group';
@@ -64,13 +64,13 @@ export default class SendRequestJoinGroupHandler extends RequestHandler {
 			group,
 			student,
 			message: input.message,
-			type: TypeRquestJoinGroup.REQUEST_JOIN,
+			type: TypeRequestJoinGroup.REQUEST_JOIN,
 		});
 
 		return this.requestJoinGroupDao.insertEntity(requestJoinGroup);
 	}
 	private async handleExistingRequestJoin(requestJoinGroup: RequestJoinGroup, input: ValidatedInput, group: Group) {
-		if (requestJoinGroup.type === TypeRquestJoinGroup.REQUEST_INVITE) {
+		if (requestJoinGroup.type === TypeRequestJoinGroup.REQUEST_INVITE) {
 			await this.requestJoinGroupDao.deleteEntity(requestJoinGroup);
 			await this.groupMemberDao.insertEntity(GroupMember.create({ group, student: requestJoinGroup.student }));
 		} else if (input.message) {
