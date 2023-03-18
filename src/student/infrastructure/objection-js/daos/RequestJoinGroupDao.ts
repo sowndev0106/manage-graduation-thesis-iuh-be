@@ -5,6 +5,22 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore implements IRequestJoinGroupDao {
+	async deleteByStudent(studentId: number): Promise<any> {
+		const query = this.initQuery();
+		const whereClause: Record<string, any> = {};
+
+		whereClause['student_id'] = studentId;
+
+		query.where(whereClause);
+
+		const result = query.delete().execute();
+
+		if (!result) {
+			throw new Error('Fail to delete entity');
+		}
+
+		return result;
+	}
 	async findAllByStudentIdAndType(studentId: number, type: TypeRequestJoinGroup): Promise<RequestJoinGroup[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};

@@ -11,6 +11,7 @@ import GetAllRequestJoinGroupHandler from '../handlers/group/request-join-group/
 import CancelTopicGroupHandler from '../handlers/group/CancelTopicGroupHandler';
 import ChooseTopicHandler from '../handlers/group/ChooseTopicGroupHandler';
 import RefuseRequestJoinGroupHandler from '../handlers/group/request-join-group/RefuseRequestJoinGroupHandler';
+import accepRequestJoinGroupHandler from '../handlers/group/request-join-group/AccepRequestJoinGroupHandler';
 
 class GroupController {
 	async createGroup(req: Request, res: Response, next: NextFunction) {
@@ -56,6 +57,10 @@ class GroupController {
 	}
 	async refuseRequestJoinGroup(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(RefuseRequestJoinGroupHandler).handle(req);
+		return res.status(200).json(data);
+	}
+	async accepRequestJoinGroup(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(accepRequestJoinGroupHandler).handle(req);
 		return res.status(200).json(data);
 	}
 	async getAllRequestJoinMyGroup(req: Request, res: Response, next: NextFunction) {
