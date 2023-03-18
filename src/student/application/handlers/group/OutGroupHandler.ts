@@ -46,10 +46,11 @@ export default class OutGroupHandler extends RequestHandler {
 		group.updateMembers(members);
 
 		// check if only me in group then delete group
-		if (members.length) {
+		if (members.length == 1) {
+			await this.groupMemberDao.deleteEntity(members[0]);
 			result = await this.groupDao.deleteEntity(group);
 		} else {
-			const myMember = members.find(e => e.id == input.studentId);
+			const myMember = members.find(e => e.studentId == input.studentId);
 			result = myMember && (await this.groupMemberDao.deleteEntity(myMember));
 		}
 

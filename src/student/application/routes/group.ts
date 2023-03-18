@@ -17,7 +17,7 @@ router.delete('/', GroupController.outGroup);
 router.post('/invites/send', GroupController.sendInviteJoinGroup);
 router.post('/:id/requests/send', GroupController.sendRequestJoinGroup);
 
-router.get('/requests/recive', GroupController.getAllRequestJoinMyGroup);
+router.get('/requests', GroupController.getAllRequestJoinMyGroup);
 
 router.delete('/refuse-request/:id', GroupController.refuseRequestJoinGroup);
 
