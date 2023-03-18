@@ -109,11 +109,11 @@ export default class Lecturer extends Entity<IProps> {
 		this._props.name = name;
 	}
 	get toJSON(): any {
-		const { majors, ...props } = { ...this.props };
+		const { majors, password, ...props } = { ...this.props };
 
 		return {
 			id: this.id,
-			majors: majors.toJSON,
+			majors: majors?.toJSON,
 			...props,
 		};
 	}

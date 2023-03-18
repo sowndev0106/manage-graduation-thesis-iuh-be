@@ -47,7 +47,7 @@ export default class GroupModel extends Model {
 			id: entity.id,
 			name: entity.name,
 			term_id: entity.termId,
-			topic_id: entity.topicId,
+			topic_id: entity.topicId || null,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});

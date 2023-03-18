@@ -96,7 +96,7 @@ export default class Student extends Entity<IProps> {
 	}
 
 	get toJSON() {
-		const { majors, ...props } = { ...this.props };
+		const { majors, password, ...props } = { ...this.props };
 
 		return {
 			id: this.id,
