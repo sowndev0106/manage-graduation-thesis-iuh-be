@@ -7,7 +7,8 @@ import GetListGroupHandler from '../handlers/group/GetListGroupHandler';
 import OutGroupHandler from '../handlers/group/OutGroupHandler';
 import SendRequestJoinGroupHandler from '../handlers/group/request-join-group/SendRequestJoinGroupHandler';
 import InviteJoinGroupHandler from '../handlers/group/request-join-group/SendInviteJoinGroupHandler';
-import GetAllRequestJoinGroupHandler from '../handlers/group/request-join-group/GetRequestJoinGroupHandler';
+import GetRequestJoinMyGroupHandler from '../handlers/group/request-join-group/GetRequestJoinMyGroupHandler';
+import GetMyRequestJoinGroupHandler from '../handlers/group/request-join-group/GetMyRequestJoinGroupHandler';
 import CancelTopicGroupHandler from '../handlers/group/CancelTopicGroupHandler';
 import ChooseTopicHandler from '../handlers/group/ChooseTopicGroupHandler';
 import RefuseRequestJoinGroupHandler from '../handlers/group/request-join-group/RefuseRequestJoinGroupHandler';
@@ -63,8 +64,12 @@ class GroupController {
 		const data = await Ioc.get(accepRequestJoinGroupHandler).handle(req);
 		return res.status(200).json(data);
 	}
-	async getAllRequestJoinMyGroup(req: Request, res: Response, next: NextFunction) {
-		const data = await Ioc.get(GetAllRequestJoinGroupHandler).handle(req);
+	async getRequestJoinMyGroup(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetRequestJoinMyGroupHandler).handle(req);
+		return res.status(200).json(data);
+	}
+	async getMyRequestJoinGroup(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetMyRequestJoinGroupHandler).handle(req);
 		return res.status(200).json(data);
 	}
 }

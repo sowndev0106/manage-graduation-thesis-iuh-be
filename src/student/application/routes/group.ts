@@ -6,20 +6,21 @@ const router = Router();
 router.post('/topic', GroupController.chooseTopicGroup);
 router.delete('/topic', GroupController.cancelTopicGroup);
 
+// invite join
+router.get('/group-requests', GroupController.getRequestJoinMyGroup);
+router.get('/my-requests', GroupController.getMyRequestJoinGroup);
+
+router.post('/group-invites', GroupController.sendInviteJoinGroup);
+router.post('/:id/my-requests', GroupController.sendRequestJoinGroup);
+
+router.delete('/refuse-request/:id', GroupController.refuseRequestJoinGroup);
+router.post('/accep-request/:id', GroupController.refuseRequestJoinGroup);
+
 // group
 router.post('/', GroupController.createGroup);
 router.get('/', GroupController.getListGroup);
 router.get('/me', GroupController.getMyGroup);
 router.get('/:id', GroupController.getGroupById);
 router.delete('/', GroupController.outGroup);
-
-// invite join
-router.post('/invites/send', GroupController.sendInviteJoinGroup);
-router.post('/:id/requests/send', GroupController.sendRequestJoinGroup);
-
-router.get('/requests', GroupController.getAllRequestJoinMyGroup);
-
-router.delete('/refuse-request/:id', GroupController.refuseRequestJoinGroup);
-router.post('/accep-request/:id', GroupController.refuseRequestJoinGroup);
 
 export default router;
