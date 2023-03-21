@@ -11,6 +11,7 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import Group from '@core/domain/entities/Group';
 import GroupMember from '@core/domain/entities/GroupMember';
 import Student from '@core/domain/entities/Student';
+import IStudentDao from '@student/domain/daos/IStudentDao';
 
 interface ValidatedInput {
 	name: string;
@@ -23,6 +24,7 @@ export default class CreateGroupHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
+	@inject('StudentDao') private studentDao!: IStudentDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const topicId = this.errorCollector.collect('topicId', () => EntityId.validate({ value: request.body['topicId'], required: false }));
@@ -56,9 +58,10 @@ export default class CreateGroupHandler extends RequestHandler {
 				name: input.name,
 			})
 		);
-
+		const student = await this.studentDao.findEntityById(input.studentId);
 		// add member is yoursefl
-		const member = await this.groupMemberDao.insertEntity(GroupMember.create({ group: group, student: Student.createById(input.studentId) }));
+		const member = GroupMember.create({ group: Group.createById(group.id), student: student! });
+		await this.groupMemberDao.insertEntity(member);
 
 		group.updateMembers([member]);
 
