@@ -10,7 +10,6 @@ import ITermDao from '@student/domain/daos/ITermDao';
 import ValidationError from '@core/domain/errors/ValidationError';
 import Group from '@core/domain/entities/Group';
 import GroupMember from '@core/domain/entities/GroupMember';
-import Student from '@core/domain/entities/Student';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 
 interface ValidatedInput {

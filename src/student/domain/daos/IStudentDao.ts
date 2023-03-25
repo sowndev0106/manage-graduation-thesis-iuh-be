@@ -4,5 +4,5 @@ import { injectable } from 'inversify';
 
 export default interface IStudentDao extends IDao<Student> {
 	findByUsername(username: string): Promise<Student | null>;
-	findAll(majorsId?: number): Promise<Student[]>;
+	findAll(termId?: number, groupExists?: boolean): Promise<Student[]>;
 }

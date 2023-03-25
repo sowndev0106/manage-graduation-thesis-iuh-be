@@ -2,6 +2,7 @@ import { Router } from 'express';
 import GroupController from '../controllers/GroupController';
 
 const router = Router();
+
 // topic
 router.post('/topic', GroupController.chooseTopicGroup);
 router.delete('/topic', GroupController.cancelTopicGroup);

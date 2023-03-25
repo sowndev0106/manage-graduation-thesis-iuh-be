@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
 import authenticationRoute from './authentication';
 import meRoute from './me';
 import termRoute from './term';
