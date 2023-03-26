@@ -7,6 +7,9 @@ import IRequestJoinGroupDao from '@student/domain/daos/IRequestJoinGroupDao';
 import RequestJoinGroup, { TypeRequestJoinGroup } from '@core/domain/entities/RequestJoinGroup';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
+import GroupMember from '@core/domain/entities/GroupMember';
+import Student from '@core/domain/entities/Student';
+import IGroupDao from '@student/domain/daos/IGroupDao';
 
 interface ValidatedInput {
 	studentId: number;
@@ -17,6 +20,7 @@ interface ValidatedInput {
 export default class accepRequestJoinGroupHandler extends RequestHandler {
 	@inject('RequestJoinGroupDao') private requestJoinGroupDao!: IRequestJoinGroupDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
+	@inject('GroupDao') private groupDao!: IGroupDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
@@ -32,13 +36,29 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 	}
 	async handle(request: Request) {
 		const input = await this.validate(request);
-
+		let response: any;
 		if (input.requestJoinGroup.type === TypeRequestJoinGroup.REQUEST_INVITE) {
-			return await this.accepInviteHandler(input);
+			await this.accepInviteHandler(input);
 		} else {
 			// REQUEST_JOIN
-			return await this.accepRequestJoinHandler(input);
+			await this.accepRequestJoinHandler(input);
 		}
+		await this.requestJoinGroupDao.deleteByStudent(input.studentId);
+
+		const group = await this.groupDao.findEntityById(input.requestJoinGroup.groupId);
+		if (!group) {
+			throw new Error('Group have been deleted');
+		}
+		let groupMember = GroupMember.create({
+			student: Student.createById(input.studentId),
+			group: group,
+		});
+
+		groupMember = await this.groupMemberDao.insertEntity(groupMember);
+
+		group.members?.push(groupMember);
+
+		return groupMember.toJSON;
 	}
 	private async accepRequestJoinHandler(input: ValidatedInput) {
 		// check valid
@@ -47,13 +67,11 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 		if (!me) {
 			throw new Error("Can't accep because You are not member in group");
 		}
-		return await this.requestJoinGroupDao.deleteByStudent(input.studentId);
 	}
 	private async accepInviteHandler(input: ValidatedInput) {
 		// check authorization
 		if (input.studentId != input.requestJoinGroup.studentId) {
 			throw new Error("Can't accep because You are not invited");
 		}
-		return await this.requestJoinGroupDao.deleteByStudent(input.studentId);
 	}
 }

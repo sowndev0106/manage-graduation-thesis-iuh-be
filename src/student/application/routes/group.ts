@@ -11,11 +11,11 @@ router.delete('/topic', GroupController.cancelTopicGroup);
 router.get('/group-requests', GroupController.getRequestJoinMyGroup);
 router.get('/my-requests', GroupController.getMyRequestJoinGroup);
 
-router.post('/group-invites', GroupController.sendInviteJoinGroup);
+router.post('/group-requests', GroupController.sendInviteJoinGroup);
 router.post('/:id/my-requests', GroupController.sendRequestJoinGroup);
 
 router.delete('/refuse-request/:id', GroupController.refuseRequestJoinGroup);
-router.post('/accep-request/:id', GroupController.refuseRequestJoinGroup);
+router.post('/accep-request/:id', GroupController.accepRequestJoinGroup);
 
 // group
 router.post('/', GroupController.createGroup);
