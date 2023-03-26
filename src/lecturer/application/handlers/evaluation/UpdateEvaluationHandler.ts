@@ -48,7 +48,7 @@ export default class UpdateEvaluationHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		let evaluationExist = await this.evaluationDao.findOne(input.term.id!, input.type);
-		if (evaluationExist?.id != input.evaluation.id) {
+		if (evaluationExist && evaluationExist?.id != input.evaluation.id) {
 			throw new Error(`Evaluation type ${input.type} already exists in term ${input.term.name}`);
 		}
 		input.evaluation.update({

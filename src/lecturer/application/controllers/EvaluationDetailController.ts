@@ -11,7 +11,7 @@ import GetListEvaluationDetailHandler from '../handlers/evaluation/evaluation-de
 import GetEvaluationDetailByIdHandler from '../handlers/evaluation/evaluation-detail/GetEvaluationByIdHandler';
 import DeleteEvaluationDetailHandler from '../handlers/evaluation/evaluation-detail/DeleteEvaluationDetailHandler';
 
-class EvaluationController {
+class EvaluationDetailController {
 	async createEvaluation(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(CreateEvaluationHandler).handle(req);
 		return res.status(200).json(data);
@@ -56,4 +56,4 @@ class EvaluationController {
 	}
 }
 
-export default new EvaluationController();
+export default new EvaluationDetailController();

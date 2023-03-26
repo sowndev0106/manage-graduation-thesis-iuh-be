@@ -8,8 +8,6 @@ export default class EvaluationDetailDao extends EvaluationDetailDaoCore impleme
 	async findAll(evaluationId?: number): Promise<EvaluationDetail[]> {
 		const query = this.initQuery();
 
-		query.withGraphFetched('evaluation_detail');
-
 		const whereClause: Record<string, any> = {};
 
 		if (evaluationId) whereClause['evaluation_id'] = evaluationId;

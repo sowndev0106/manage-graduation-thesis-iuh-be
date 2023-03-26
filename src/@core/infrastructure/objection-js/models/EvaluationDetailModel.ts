@@ -45,7 +45,7 @@ export default class EvaluationDetailModel extends Model {
 		const entity = EvaluationDetail.create(
 			{
 				name: dbJson['name'],
-				gradeMax: dbJson['gradeMax'],
+				gradeMax: dbJson['grade_max'],
 				evaluation: Evaluation.createById(dbJson['evaluation_id']),
 			},
 			Number(dbJson['id'])

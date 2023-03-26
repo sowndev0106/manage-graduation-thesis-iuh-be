@@ -40,7 +40,10 @@ export default class Evaluation extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
-
+	get sumGradeMax() {
+		const sum = this.details?.reduce((sum, detail) => sum + detail.gradeMax, 0);
+		return sum || 0;
+	}
 	get toJSON() {
 		const { term, details, ...props } = lodash.cloneDeep(this._props || {});
 
