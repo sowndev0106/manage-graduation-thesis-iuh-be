@@ -5,7 +5,10 @@ import LecturerAuth from '../middlewares/LecturerAuth';
 const router = Router();
 
 router.get('/', LecturerController.getListLecturer);
+
 router.get('/:id', LecturerController.getListLecturerById);
+
+router.put('/:id/role', LecturerAuth.admin, LecturerController.changeRoleLecturer);
 
 router.post('/import-lecturer', LecturerAuth.headLecturer, uploadMulter.single('file'), LecturerController.importLecturerByExcel);
 
