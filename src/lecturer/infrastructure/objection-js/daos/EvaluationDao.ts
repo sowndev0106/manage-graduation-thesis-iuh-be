@@ -5,13 +5,14 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class EvaluationDao extends EvaluationDaoCore implements IEvaluationDao {
-	async findOne(termId: number, type: TypeEvaluation): Promise<Evaluation | null> {
+	async findOne(termId: number, type: TypeEvaluation, name: string): Promise<Evaluation | null> {
 		const query = this.initQuery();
 
 		const whereClause: Record<string, any> = {};
 
 		if (termId) whereClause['term_id'] = termId;
 		if (type) whereClause['type'] = type;
+		if (name) whereClause['name'] = name;
 
 		const result = await query.findOne(whereClause);
 

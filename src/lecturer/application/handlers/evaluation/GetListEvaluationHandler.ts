@@ -4,7 +4,6 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
-import IEvaluationDetailDao from '@lecturer/domain/daos/IEvaluationDetailDao';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
@@ -18,7 +17,6 @@ interface ValidatedInput {
 export default class GetEvaluationByIdHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('EvaluationDao') private evaluationDao!: IEvaluationDao;
-	@inject('EvaluationDetailDao') private evaluationDetailDao!: IEvaluationDetailDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const type = this.errorCollector.collect('type', () => TypeEvaluationValidate.validate({ value: request.query['type'], required: false }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.query['termId'], required: true }));

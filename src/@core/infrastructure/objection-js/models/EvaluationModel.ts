@@ -3,7 +3,6 @@ import Objection, { Model } from 'objection';
 import LecturerModel from './LecturerModel';
 import Term from '@core/domain/entities/Term';
 import TermModel from './TermModel';
-import EvaluationDetailModel from './EvaluationDetailModel';
 
 export default class EvaluationModel extends Model {
 	static get tableName() {
@@ -19,14 +18,6 @@ export default class EvaluationModel extends Model {
 				to: 'term.id',
 			},
 		},
-		details: {
-			relation: Model.HasManyRelation,
-			modelClass: EvaluationDetailModel,
-			join: {
-				from: 'evaluation.id',
-				to: 'evaluation_detail.evaluation_id',
-			},
-		},
 	};
 
 	static convertEntityToPartialModelObject(entity: Evaluation) {
@@ -35,6 +26,9 @@ export default class EvaluationModel extends Model {
 			id: entity.id,
 			type: entity.type,
 			term_id: entity.termId,
+			name: entity.name,
+			grade_max: entity.gradeMax,
+			description: entity.description,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -51,16 +45,17 @@ export default class EvaluationModel extends Model {
 		}
 		const entity = Evaluation.create(
 			{
+				name: dbJson['name'],
+				gradeMax: dbJson['grade_max'],
+				description: dbJson['description'],
 				type: dbJson['type'],
 				term: Term.createById(dbJson['term_id']),
 			},
 			Number(dbJson['id'])
 		);
 		const term = dbJson['term'] && TermModel.convertModelToEntity(dbJson['term']);
-		const details = dbJson['details'] && dbJson['details'].map((e: any) => EvaluationDetailModel.convertModelToEntity(e));
 
 		if (term) entity.update({ term });
-		if (details) entity.update({ details });
 
 		return entity;
 	}

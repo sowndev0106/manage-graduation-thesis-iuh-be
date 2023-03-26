@@ -1,7 +1,6 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import Term from './Term';
-import EvaluationDetail from './EvaluationDetail';
 export enum TypeEvaluation {
 	ADVISOR = 'ADVISOR',
 	REVIEWER = 'REVIEWER',
@@ -10,7 +9,9 @@ export enum TypeEvaluation {
 export interface IProps {
 	type: TypeEvaluation;
 	term: Term;
-	details?: Array<EvaluationDetail>;
+	name: string;
+	description?: string;
+	gradeMax: number;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -27,8 +28,14 @@ export default class Evaluation extends Entity<IProps> {
 	get term() {
 		return this.props?.term;
 	}
-	get details() {
-		return this.props?.details;
+	get gradeMax() {
+		return this.props?.gradeMax;
+	}
+	get name() {
+		return this.props?.name;
+	}
+	get description() {
+		return this.props?.description;
 	}
 
 	get type() {
@@ -40,16 +47,12 @@ export default class Evaluation extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
-	get sumGradeMax() {
-		const sum = this.details?.reduce((sum, detail) => sum + detail.gradeMax, 0);
-		return sum || 0;
-	}
+
 	get toJSON() {
-		const { term, details, ...props } = lodash.cloneDeep(this._props || {});
+		const { term, ...props } = lodash.cloneDeep(this._props || {});
 
 		let termJSON = this.term?.toJSON;
-		let detailsJSON = this.details?.map(e => e?.toJSON);
 
-		return { id: this.id, ...props, term: termJSON, details: detailsJSON };
+		return { id: this.id, ...props, term: termJSON };
 	}
 }

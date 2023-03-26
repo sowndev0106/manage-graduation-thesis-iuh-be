@@ -1,11 +1,8 @@
 import { Router } from 'express';
 import EvaluationController from '../controllers/EvaluationController';
 import LecturerAuth from '../middlewares/LecturerAuth';
-import evaluationDetailRoute from './evaluationDetail';
 
 const router = Router();
-
-router.use('/details', evaluationDetailRoute);
 
 router.post('/', EvaluationController.createEvaluation);
 router.get('/', EvaluationController.getListEvaluation);
