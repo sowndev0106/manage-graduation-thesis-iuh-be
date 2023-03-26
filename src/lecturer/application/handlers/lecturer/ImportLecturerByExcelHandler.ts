@@ -120,7 +120,7 @@ export default class ImportLecturerByExcelHandler extends RequestHandler {
 					LecturerTerm.create({
 						lecturer,
 						term,
-						role: TypeRoleLecturer.LECTURER,
+						role: lecturer.role,
 					})
 				);
 			}
