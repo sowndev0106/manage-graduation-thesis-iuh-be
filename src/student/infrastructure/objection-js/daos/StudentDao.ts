@@ -17,14 +17,17 @@ export default class StudentDao extends StudentDaoCore implements IStudentDao {
 		const query = this.initQuery();
 
 		query.join('student_term', 'student_term.student_id', 'student.id').where({ 'student_term.term_id': termId });
+		query.leftJoin('group_member', 'group_member.student_id', 'student.id');
+		query.leftJoin('group', 'group_member.group_id', 'group.id');
 
 		if (groupExists != undefined) {
 			if (groupExists) {
 				// get student have group
-				query.join('group_member', 'group_member.student_id', 'student.id');
+				query.andWhere({ 'group.term_id': termId });
 			} else {
 				// get student don't have group
-				query.leftJoin('group_member', 'group_member.student_id', 'student.id').whereNull('group_id');
+
+				query.andWhereRaw('(`group`.`term_id` != ' + termId + ' or  `group`.`term_id` is null)');
 			}
 		}
 		const result = await query.execute();

@@ -1,11 +1,11 @@
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-	return knex.schema.createTable('transcript_detail', table => {
+	return knex.schema.createTable('transcript', table => {
 		table.increments('id').primary();
 		table.float('grade').notNullable();
 		table.integer('student_id').unsigned().references('id').inTable('student');
-		table.integer('transcript_id').unsigned().references('id').inTable('transcript');
+		table.integer('assign_id').unsigned().references('id').inTable('assign');
 		table.integer('evaluation_id').unsigned().references('id').inTable('evaluation');
 
 		table.timestamps();
@@ -13,5 +13,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-	return knex.schema.dropTable('transcript_detail');
+	return knex.schema.dropTable('transcript');
 }
