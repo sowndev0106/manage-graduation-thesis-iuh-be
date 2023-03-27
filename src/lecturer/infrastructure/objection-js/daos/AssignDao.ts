@@ -31,7 +31,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 		if (groupId) whereClause['group_id'] = groupId;
 
 		if (termId) {
-			query.join('group', 'group.term_id', '=', 'term.id').where({ 'group.term_id': termId });
+			query.join('group', 'group.id', '=', 'assign.group_id').where({ 'group.term_id': termId });
 		}
 		query.where(whereClause);
 

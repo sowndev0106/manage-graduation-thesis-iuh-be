@@ -34,7 +34,6 @@ export default class UpdateAssignHandler extends RequestHandler {
 	@inject('AssignDao') private assignDao!: IAssignDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const typeEvaluation = this.errorCollector.collect('typeEvaluation', () => TypeEvaluationValidate.validate({ value: request.body['typeEvaluation'] }));
-		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const lecturerId = this.errorCollector.collect('lecturerId', () => EntityId.validate({ value: request.body['lecturerId'] }));
 		const groupId = this.errorCollector.collect('groupId', () => EntityId.validate({ value: request.body['groupId'] }));
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
@@ -45,9 +44,6 @@ export default class UpdateAssignHandler extends RequestHandler {
 
 		let assign = await this.assignDao.findEntityById(id);
 		if (!assign) throw new NotFoundError('assign not found');
-
-		let term = await this.termDao.findEntityById(termId);
-		if (!term) throw new NotFoundError('term not found');
 
 		let group = await this.groupDao.findEntityById(groupId);
 		if (!group) throw new NotFoundError(' group not found');
