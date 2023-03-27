@@ -35,6 +35,6 @@ export default class GetListTermHandler extends RequestHandler {
 
 		const terms = await this.termDao.findByYearAndMajors(input.majorsId, input.fromYear, input.toYear);
 
-		return terms.map(e => e.toJSON).reverse();
+		return terms.map(e => e.toJSON).sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
 	}
 }
