@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
 		table.float('grade').notNullable();
 		table.integer('student_id').unsigned().references('id').inTable('student');
 		table.integer('transcript_id').unsigned().references('id').inTable('transcript');
-		table.integer('evaluation_detail_id').unsigned().references('id').inTable('evaluation_detail');
+		table.integer('evaluation_id').unsigned().references('id').inTable('evaluation');
 
 		table.timestamps();
 	});
