@@ -1,7 +1,7 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import Evaluation from './Evaluation';
-import Assign from './Asisign';
+import Assign from './Assign';
 import Student from './Student';
 export interface IProps {
 	grade: number;

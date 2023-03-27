@@ -1,11 +1,10 @@
 import Entity from './Entity';
 import lodash from 'lodash';
-import GroupMember from './GroupMember';
-import Evaluation from './Evaluation';
+import Evaluation, { TypeEvaluation } from './Evaluation';
 import Group from './Group';
 import Lecturer from './Lecturer';
 export interface IProps {
-	typeEvaluation: Evaluation;
+	typeEvaluation: TypeEvaluation;
 	group: Group;
 	lecturer: Lecturer;
 	createdAt?: Date;

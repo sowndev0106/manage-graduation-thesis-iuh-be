@@ -7,7 +7,9 @@ import meRoute from './me';
 import lecturerRoute from './lecturer';
 import studentRoute from './student';
 import evaluationRoute from './evaluation';
+import assignRoute from './assign';
 import LecturerAuth from '../middlewares/LecturerAuth';
+
 const router = Router();
 
 // public api
@@ -21,6 +23,7 @@ router.use('/topics', topicRoute);
 router.use('/lecturers', lecturerRoute);
 router.use('/students', studentRoute);
 router.use('/evaluations', evaluationRoute);
+router.use('/assigns', assignRoute);
 router.use('/me', meRoute);
 
 export default router;

@@ -22,11 +22,10 @@ export default class StudentDao extends StudentDaoCore implements IStudentDao {
 
 		if (groupExists != undefined) {
 			if (groupExists) {
-				// get student have group
+				// get student have group in term
 				query.andWhere({ 'group.term_id': termId });
 			} else {
-				// get student don't have group
-
+				// get student don't have group  in term
 				query.andWhereRaw('(`group`.`term_id` != ' + termId + ' or  `group`.`term_id` is null)');
 			}
 		}

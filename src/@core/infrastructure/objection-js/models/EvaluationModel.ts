@@ -12,7 +12,7 @@ export default class EvaluationModel extends Model {
 	static relationMappings = {
 		term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: TermModel,
 			join: {
 				from: 'evaluation.term_id',
 				to: 'term.id',
