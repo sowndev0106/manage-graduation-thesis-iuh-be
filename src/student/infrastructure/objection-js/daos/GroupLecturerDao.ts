@@ -1,6 +1,6 @@
 import Group from '@core/domain/entities/Group';
 import GroupDaoCore from '@core/infrastructure/objection-js/daos/GroupDao';
-import IGroupDao from '@lecturer/domain/daos/IGroupDao';
+import IGroupDao from '@student/domain/daos/IGroupDao';
 import { injectable } from 'inversify';
 
 @injectable()
