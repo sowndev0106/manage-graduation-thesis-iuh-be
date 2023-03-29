@@ -23,7 +23,6 @@ export default class LoginHandlers extends RequestHandler {
 	async validate(request: Request): Promise<ValidatedInput> {
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
 		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
-
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
