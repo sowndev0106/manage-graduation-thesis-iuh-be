@@ -8,6 +8,7 @@ import lecturerRoute from './lecturer';
 import studentRoute from './student';
 import evaluationRoute from './evaluation';
 import assignRoute from './assign';
+import groupLecturerRoute from './groupLecturer';
 import LecturerAuth from '../middlewares/LecturerAuth';
 
 const router = Router();
@@ -24,6 +25,7 @@ router.use('/lecturers', lecturerRoute);
 router.use('/students', studentRoute);
 router.use('/evaluations', evaluationRoute);
 router.use('/assigns', assignRoute);
+router.use('/group-lecturer', groupLecturerRoute);
 router.use('/me', meRoute);
 
 export default router;

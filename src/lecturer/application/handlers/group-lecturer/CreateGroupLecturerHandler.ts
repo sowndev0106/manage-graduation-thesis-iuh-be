@@ -55,21 +55,26 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 	async handle(request: Request) {
 		const { name, term, lecturers } = await this.validate(request);
 
-		let group = await this.groupLecturerDao.findOne(term.id!, name);
-		if (group) throw new Error(`group name ${name}  already exists in student`);
+		let groupLecturer = await this.groupLecturerDao.findOne(term.id!, name);
+		if (groupLecturer) throw new Error(`group name ${name}  already exists in student`);
 
-		group = await this.groupLecturerDao.insertEntity(
+		groupLecturer = await this.groupLecturerDao.insertEntity(
 			GroupLecturer.create({
 				term: term,
 				name: name,
 			})
 		);
-		const membersPromise = lecturers.map(async () => {
-			return await this.groupMemberDao.insertEntity(GroupLecturerMember.create());
+		const membersPromise = lecturers.map(async lecturer => {
+			return await this.groupMemberDao.insertEntity(
+				GroupLecturerMember.create({
+					groupLecturer: groupLecturer!,
+					lecturer,
+				})
+			);
 		});
 
-		group.update({ members: await Promise.all(membersPromise) });
+		groupLecturer.update({ members: await Promise.all(membersPromise) });
 
-		return group?.toJSON;
+		return groupLecturer?.toJSON;
 	}
 }

@@ -6,29 +6,32 @@ import EntityId from '@core/domain/validate-objects/EntityID';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 
 interface ValidatedInput {
-	termId: number;
+	id: number;
 }
 
 @injectable()
-export default class GetListGroupLecturerHandler extends RequestHandler {
+export default class DeleteGroupLecturerHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
-		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.query['termId'] }));
+		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 
-		return { termId };
+		return { id };
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
+		const groupLecturer = await this.groupLecturerDao.findEntityById(input.id);
 
-		// const term = await this.termDao.findEntityById(input.termId);
+		if (!groupLecturer) {
+			throw new Error('groupLecturer not found');
+		}
 
-		const groupLecturers = await this.groupLecturerDao.findAll(input.termId);
+		const result = await this.groupLecturerDao.deleteEntity(groupLecturer);
 
-		return groupLecturers.map(e => e.toJSON);
+		return result ? 'delete success' : 'delete fail';
 	}
 }

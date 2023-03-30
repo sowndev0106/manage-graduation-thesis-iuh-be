@@ -9,10 +9,10 @@ export default class GroupLecturerMemberDao extends GroupLecturerMemberDaoCore i
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
+		query.withGraphFetched('lecturer');
+
 		whereClause['group_lecturer_id'] = groupLecturerId;
 		whereClause['lecturer_id'] = lecturerId;
-
-		query.joinRelated('members');
 
 		const result = await query.findOne(whereClause);
 
@@ -21,7 +21,7 @@ export default class GroupLecturerMemberDao extends GroupLecturerMemberDaoCore i
 	async findAll(groupLecturerId: number): Promise<GroupLecturerMember[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
-
+		query.withGraphFetched('lecturer');
 		// if (termId) whereClause['term_id'] = termId;
 		whereClause['group_lecturer_id'] = groupLecturerId;
 		// whereClause['lecturer_id'] = lecturerId;

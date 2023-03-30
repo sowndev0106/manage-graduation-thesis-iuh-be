@@ -12,7 +12,7 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 		whereClause['term_id'] = termId;
 		whereClause['name'] = name;
 
-		query.joinRelated('members');
+		query.withGraphFetched('[members, members.lecturer]');
 
 		const result = await query.findOne(whereClause);
 
@@ -26,6 +26,8 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 		if (name) whereClause['name'] = name;
 
 		query.where(whereClause);
+
+		query.withGraphFetched('[members, members.lecturer]');
 
 		const result = await query.execute();
 
