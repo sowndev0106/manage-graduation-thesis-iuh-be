@@ -13,21 +13,23 @@ import Lecturer from '@core/domain/entities/Lecturer';
 import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import IGroupDao from '@lecturer/domain/daos/IGroupDao';
+import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
+import GroupLecturer from '@core/domain/entities/GroupLecturer';
 
 interface ValidatedInput {
 	typeEvaluation: TypeEvaluation;
 	group: Group;
-	lecturer: Lecturer;
+	groupLecturer: GroupLecturer;
 }
 @injectable()
 export default class CreateAssignHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
-	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('AssignDao') private assignDao!: IAssignDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const typeEvaluation = this.errorCollector.collect('typeEvaluation', () => TypeEvaluationValidate.validate({ value: request.body['typeEvaluation'] }));
-		const lecturerId = this.errorCollector.collect('lecturerId', () => EntityId.validate({ value: request.body['lecturerId'] }));
+		const groupLecturerId = this.errorCollector.collect('groupLecturerId', () => EntityId.validate({ value: request.body['groupLecturerId'] }));
 		const groupId = this.errorCollector.collect('groupId', () => EntityId.validate({ value: request.body['groupId'] }));
 
 		if (this.errorCollector.hasError()) {
@@ -37,26 +39,26 @@ export default class CreateAssignHandler extends RequestHandler {
 		let group = await this.groupDao.findEntityById(groupId);
 		if (!group) throw new NotFoundError(' group not found');
 
-		let lecturer = await this.lecturerDao.findEntityById(lecturerId);
-		if (!lecturer) throw new NotFoundError('lecturer not found');
+		let groupLecturer = await this.groupLecturerDao.findEntityById(groupLecturerId);
+		if (!groupLecturer) throw new NotFoundError('groupLecturer not found');
 
 		return {
 			typeEvaluation,
 			group,
-			lecturer,
+			groupLecturer,
 		};
 	}
 
 	async handle(request: Request) {
-		const { typeEvaluation, group, lecturer } = await this.validate(request);
-		let assign = await this.assignDao.findOne(lecturer.id!, typeEvaluation, group.id);
+		const { typeEvaluation, group, groupLecturer } = await this.validate(request);
+		let assign = await this.assignDao.findOne(groupLecturer.id!, typeEvaluation, group.id);
 		if (assign) return assign.toJSON;
 
 		assign = await this.assignDao.insertEntity(
 			Assign.create({
 				typeEvaluation: typeEvaluation,
 				group: group,
-				lecturer: lecturer,
+				groupLecturer: groupLecturer,
 			})
 		);
 

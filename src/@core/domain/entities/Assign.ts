@@ -1,12 +1,12 @@
 import Entity from './Entity';
 import lodash from 'lodash';
-import Evaluation, { TypeEvaluation } from './Evaluation';
+import { TypeEvaluation } from './Evaluation';
 import Group from './Group';
-import Lecturer from './Lecturer';
+import GroupLecturer from './GroupLecturer';
 export interface IProps {
 	typeEvaluation: TypeEvaluation;
 	group: Group;
-	lecturer: Lecturer;
+	groupLecturer: GroupLecturer;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -26,11 +26,11 @@ export default class Assign extends Entity<IProps> {
 	get group() {
 		return this.props?.group;
 	}
-	get lecturerId() {
-		return this.props?.lecturer?.id;
+	get groupLecturerId() {
+		return this.props?.groupLecturer?.id;
 	}
-	get lecturer() {
-		return this.props?.lecturer;
+	get groupLecturer() {
+		return this.props?.groupLecturer;
 	}
 	get createdAt() {
 		return this.props.createdAt || new Date();
@@ -39,10 +39,10 @@ export default class Assign extends Entity<IProps> {
 		return this.props.updatedAt || new Date();
 	}
 	get toJSON() {
-		const { group, lecturer, ...props } = lodash.cloneDeep(this._props || {});
+		const { group, groupLecturer, ...props } = lodash.cloneDeep(this._props || {});
 		let groupJSON = this.group?.toJSON;
-		let lecturerJSON = this.lecturer?.toJSON;
+		let groupLecturerJSON = this.groupLecturer?.toJSON;
 
-		return { id: this.id, ...props, group: groupJSON, lecturer: lecturerJSON };
+		return { id: this.id, ...props, group: groupJSON, groupLecturer: groupLecturerJSON };
 	}
 }

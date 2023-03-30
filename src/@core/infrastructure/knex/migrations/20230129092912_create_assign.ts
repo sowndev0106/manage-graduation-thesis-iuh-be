@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
 		table.increments('id').primary();
 		table.enum('type_evaluation', ['ADVISOR', 'REVIEWER', 'SESSION_HOST']);
 		table.integer('group_id').unsigned().references('id').inTable('group');
-		table.integer('lecturer_id').unsigned().references('id').inTable('lecturer');
+		table.integer('group_lecturer_id').unsigned().references('id').inTable('group_lecturer');
 		table.timestamps();
 	});
 }

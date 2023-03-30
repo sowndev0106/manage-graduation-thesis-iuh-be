@@ -6,12 +6,12 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class AssignDao extends AssignDaoCore implements IAssignDao {
-	async findOne(lecturerId: number, type: TypeEvaluation, groupId: number): Promise<Assign | null> {
+	async findOne(groupLecturerId: number, type: TypeEvaluation, groupId: number): Promise<Assign | null> {
 		const query = this.initQuery();
 
 		const whereClause: Record<string, any> = {};
 
-		whereClause['lecturer_id'] = lecturerId;
+		whereClause['group_lecturer_id'] = groupLecturerId;
 		whereClause['type_evaluation'] = type;
 		whereClause['group_id'] = groupId;
 
@@ -21,12 +21,12 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(lecturerId: number, termId?: number, type?: TypeEvaluation, groupId?: number): Promise<Assign[]> {
+	async findAll(groupLecturerId: number, termId?: number, type?: TypeEvaluation, groupId?: number): Promise<Assign[]> {
 		const query = this.initQuery();
 
 		const whereClause: Record<string, any> = {};
 
-		if (lecturerId) whereClause['lecturer_id'] = lecturerId;
+		if (groupLecturerId) whereClause['group_lecturer_id'] = groupLecturerId;
 		if (type) whereClause['type_evaluation'] = type;
 		if (groupId) whereClause['group_id'] = groupId;
 

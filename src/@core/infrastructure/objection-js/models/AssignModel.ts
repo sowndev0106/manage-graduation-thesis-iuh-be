@@ -6,6 +6,8 @@ import TermModel from './TermModel';
 import Group from '@core/domain/entities/Group';
 import GroupModel from './GroupModel';
 import Lecturer from '@core/domain/entities/Lecturer';
+import GroupLecturer from '@core/domain/entities/GroupLecturer';
+import GroupLecturerModel from './GroupLecturerModel';
 
 export default class AssignModel extends Model {
 	static get tableName() {
@@ -21,9 +23,9 @@ export default class AssignModel extends Model {
 				to: 'group.id',
 			},
 		},
-		lecturer: {
+		group_lecturer: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: GroupLecturerModel,
 			join: {
 				from: 'assign.lecturer_id',
 				to: 'lecturer.id',
@@ -37,7 +39,7 @@ export default class AssignModel extends Model {
 			id: entity.id,
 			type_evaluation: entity.typeEvaluation,
 			group_id: entity.groupId,
-			lecturer_id: entity.lecturerId,
+			groupLecturer_id: entity.groupLecturerId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -55,16 +57,16 @@ export default class AssignModel extends Model {
 		const entity = Assign.create(
 			{
 				typeEvaluation: dbJson['type_evaluation'],
-				lecturer: Lecturer.createById(dbJson['lecturer_id']),
+				groupLecturer: GroupLecturer.createById(dbJson['group_lecturer_id']),
 				group: Group.createById(dbJson['group_id']),
 			},
 			Number(dbJson['id'])
 		);
 
-		const lecturer = dbJson['lecturer'] && LecturerModel.convertModelToEntity(dbJson['lecturer']);
+		const groupLecturer = dbJson['group_ecturer'] && LecturerModel.convertModelToEntity(dbJson['group_lecturer']);
 		const group = dbJson['group'] && GroupModel.convertModelToEntity(dbJson['group']);
 
-		if (lecturer) entity.update({ lecturer });
+		if (groupLecturer) entity.update({ groupLecturer });
 		if (group) entity.update({ group });
 
 		return entity;
