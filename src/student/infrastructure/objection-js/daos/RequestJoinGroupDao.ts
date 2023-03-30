@@ -24,7 +24,7 @@ export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore impleme
 	async findAllByStudentIdAndType(studentId: number, type: TypeRequestJoinGroup): Promise<RequestJoinGroup[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
-		query.withGraphFetched('student');
+		query.withGraphFetched('[student,group]');
 		whereClause['type'] = type;
 		whereClause['student_id'] = studentId;
 
@@ -35,7 +35,7 @@ export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore impleme
 	}
 	async findAllByGroupIdAndType(groupId: number, type: TypeRequestJoinGroup): Promise<RequestJoinGroup[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('student');
+		query.withGraphFetched('[student,group]');
 
 		const whereClause: Record<string, any> = {};
 		whereClause.group_id = groupId;
@@ -49,8 +49,9 @@ export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore impleme
 
 	async findByGroupIdAndStudentId(groupId: number, studentId: number): Promise<RequestJoinGroup | null> {
 		const query = this.initQuery();
+		query.withGraphFetched('[student,group]');
 		const whereClause: Record<string, number> = {};
-		query.withGraphFetched('student');
+
 		whereClause['group_id'] = groupId;
 		whereClause['student_id'] = studentId;
 
