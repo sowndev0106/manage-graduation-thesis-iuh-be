@@ -17,9 +17,6 @@ interface ValidatedInput {
 @injectable()
 export default class GetListGroupHandler extends RequestHandler {
 	@inject('GroupDao') private groupDao!: IGroupDao;
-	@inject('TermDao') private termDao!: ITermDao;
-	@inject('TopicDao') private topicDao!: ITopicDao;
-	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const topicId = this.errorCollector.collect('topicId', () => EntityId.validate({ value: request.query['topicId'], required: false }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.query['termId'], required: false }));

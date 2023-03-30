@@ -46,12 +46,16 @@ export default class RefuseRequestJoinGroupHandler extends RequestHandler {
 		}
 	}
 	private async refuseRequestJoinHandler(input: ValidatedInput) {
-		// check valid
-		const members = await this.groupMemberDao.findByGroupId(input.requestJoinGroup.groupId!);
-		const me = members.find(e => e.studentId === input.studentId);
-		if (!me) {
-			throw new Error("Can't refuse because You are not member in group");
+		// check user delete my request send group
+		if (input.studentId != input.requestJoinGroup.studentId) {
+			// member group delete request join group
+			const members = await this.groupMemberDao.findByGroupId(input.requestJoinGroup.groupId!);
+			const me = members.find(e => e.studentId === input.studentId);
+			if (!me) {
+				throw new Error("Can't refuse because You are not member in group");
+			}
 		}
+
 		return await this.requestJoinGroupDao.deleteEntity(input.requestJoinGroup);
 	}
 	private async refuseInviteHandler(input: ValidatedInput) {

@@ -18,13 +18,13 @@ export default class GroupLecturerMemberDao extends GroupLecturerMemberDaoCore i
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(termId: number, groupLecturerId: number, lecturerId: number): Promise<GroupLecturerMember[]> {
+	async findAll(groupLecturerId: number): Promise<GroupLecturerMember[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
-		if (termId) whereClause['term_id'] = termId;
+		// if (termId) whereClause['term_id'] = termId;
 		whereClause['group_lecturer_id'] = groupLecturerId;
-		whereClause['lecturer_id'] = lecturerId;
+		// whereClause['lecturer_id'] = lecturerId;
 
 		query.where(whereClause);
 

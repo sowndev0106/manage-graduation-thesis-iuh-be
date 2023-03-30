@@ -3,5 +3,5 @@ import GroupLecturerMember from '@core/domain/entities/GroupLecturerMember';
 
 export default interface IGroupLecturerMemberDao extends IDao<GroupLecturerMember> {
 	findOne(groupLecturerId: number, lecturerId: number): Promise<GroupLecturerMember | null>;
-	findAll(termId: number, groupLecturerId: number, lecturerId: number): Promise<GroupLecturerMember[]>;
+	findAll(groupLecturerId: number): Promise<GroupLecturerMember[]>;
 }
