@@ -43,7 +43,7 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 			// REQUEST_JOIN
 			await this.accepRequestJoinHandler(input);
 		}
-		await this.requestJoinGroupDao.deleteByStudent(input.studentId);
+		await this.requestJoinGroupDao.deleteByStudent(input.requestJoinGroup.studentId!);
 
 		const group = await this.groupDao.findEntityById(input.requestJoinGroup.groupId);
 		if (!group) {
