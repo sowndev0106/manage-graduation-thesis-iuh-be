@@ -37,32 +37,15 @@ export default class RefuseRequestJoinGroupHandler extends RequestHandler {
 	}
 	async handle(request: Request) {
 		const input = await this.validate(request);
-
-		if (input.requestJoinGroup.type === TypeRequestJoinGroup.REQUEST_INVITE) {
-			return await this.refuseInviteHandler(input);
-		} else {
-			// REQUEST_JOIN
-			return await this.refuseRequestJoinHandler(input);
-		}
-	}
-	private async refuseRequestJoinHandler(input: ValidatedInput) {
-		// check user delete my request send group
 		if (input.studentId != input.requestJoinGroup.studentId) {
 			// member group delete request join group
 			const members = await this.groupMemberDao.findByGroupId(input.requestJoinGroup.groupId!);
 			const me = members.find(e => e.studentId === input.studentId);
 			if (!me) {
-				throw new Error("Can't refuse because You are not member in group");
+				throw new Error("Can't refuse");
 			}
 		}
 
-		return await this.requestJoinGroupDao.deleteEntity(input.requestJoinGroup);
-	}
-	private async refuseInviteHandler(input: ValidatedInput) {
-		// check authorization
-		if (input.studentId != input.requestJoinGroup.studentId) {
-			throw new Error("Can't refuse because You are not invited");
-		}
 		return await this.requestJoinGroupDao.deleteEntity(input.requestJoinGroup);
 	}
 }
