@@ -10,7 +10,7 @@ import Evaluation from '@core/domain/entities/Evaluation';
 
 export default class TranscriptModel extends Model {
 	static get tableName() {
-		return 'assign';
+		return 'transcript';
 	}
 
 	static relationMappings = {
@@ -18,7 +18,7 @@ export default class TranscriptModel extends Model {
 			relation: Model.BelongsToOneRelation,
 			modelClass: StudentModel,
 			join: {
-				from: 'assign.student_id',
+				from: 'transcript.student_id',
 				to: 'student.id',
 			},
 		},
@@ -26,7 +26,7 @@ export default class TranscriptModel extends Model {
 			relation: Model.BelongsToOneRelation,
 			modelClass: AssignModel,
 			join: {
-				from: 'assign.assign_id',
+				from: 'transcript.assign_id',
 				to: 'assign.id',
 			},
 		},
@@ -34,7 +34,7 @@ export default class TranscriptModel extends Model {
 			relation: Model.BelongsToOneRelation,
 			modelClass: EvaluationModel,
 			join: {
-				from: 'assign.evaluation_id',
+				from: 'transcript.evaluation_id',
 				to: 'evaluation.id',
 			},
 		},

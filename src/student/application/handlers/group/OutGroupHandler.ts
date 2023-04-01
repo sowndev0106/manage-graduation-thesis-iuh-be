@@ -51,7 +51,9 @@ export default class OutGroupHandler extends RequestHandler {
 			result = await this.groupDao.deleteEntity(group);
 		} else {
 			const myMember = members.find(e => e.studentId == input.studentId);
-			result = myMember && (await this.groupMemberDao.deleteEntity(myMember));
+			if (myMember) {
+				result = await this.groupMemberDao.deleteEntity(myMember);
+			}
 		}
 
 		return result ? 'out group success' : 'out group fail';
