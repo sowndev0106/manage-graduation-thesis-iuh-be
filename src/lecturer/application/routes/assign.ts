@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/', AssignController.createAssign);
 router.get('/', AssignController.getListAssign);
+router.get('/lecturers/:lecturerId', AssignController.getListAssignByLecturer);
 router.get('/:id', AssignController.getAssignById);
 router.put('/:id', LecturerAuth.headLecturer, AssignController.updateAssign);
 router.delete('/:id', LecturerAuth.headLecturer, AssignController.deleteAssign);

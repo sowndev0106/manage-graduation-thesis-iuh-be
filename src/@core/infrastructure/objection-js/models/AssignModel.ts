@@ -27,8 +27,8 @@ export default class AssignModel extends Model {
 			relation: Model.BelongsToOneRelation,
 			modelClass: GroupLecturerModel,
 			join: {
-				from: 'assign.lecturer_id',
-				to: 'lecturer.id',
+				from: 'assign.group_lecturer_id',
+				to: 'group_lecturer.id',
 			},
 		},
 	};
@@ -39,7 +39,7 @@ export default class AssignModel extends Model {
 			id: entity.id,
 			type_evaluation: entity.typeEvaluation,
 			group_id: entity.groupId,
-			groupLecturer_id: entity.groupLecturerId,
+			group_lecturer_id: entity.groupLecturerId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});

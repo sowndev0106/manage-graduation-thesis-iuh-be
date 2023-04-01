@@ -5,6 +5,7 @@ import UpdateAssignHandler from '../handlers/assign/UpdateAssignHandler';
 import GetListAssignHandler from '../handlers/assign/GetListAssignHandler';
 import GetAssignByIdHandler from '../handlers/assign/GetAssignByIdHandler';
 import DeleteAssignHandler from '../handlers/assign/DeleteAssignHandler';
+import GetListAssignByLecturerHandler from '../handlers/assign/GetListAssignByLecturerHandler';
 
 class AssignController {
 	async createAssign(req: Request, res: Response, next: NextFunction) {
@@ -17,6 +18,10 @@ class AssignController {
 	}
 	async getListAssign(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(GetListAssignHandler).handle(req);
+		return res.status(200).json(data);
+	}
+	async getListAssignByLecturer(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetListAssignByLecturerHandler).handle(req);
 		return res.status(200).json(data);
 	}
 	async getAssignById(req: Request, res: Response, next: NextFunction) {

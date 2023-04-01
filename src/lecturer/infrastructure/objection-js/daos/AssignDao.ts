@@ -6,9 +6,22 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class AssignDao extends AssignDaoCore implements IAssignDao {
+	async findByLecturer(termId: number, lecturerId: number): Promise<Assign[]> {
+		const query = this.initQuery();
+		query.withGraphFetched('[group_lecturer, group]');
+		query.join('group_lecturer', 'group_lecturer.id', '=', 'assign.group_lecturer_id').where({ 'group_lecturer.term_id': termId });
+
+		query
+			.join('group_lecturer_member', 'group_lecturer_member.group_lecturer_id', '=', 'group_lecturer.id')
+			.where({ 'group_lecturer_member.lecturer_id': lecturerId });
+
+		const result = await query.execute();
+
+		return result && result.map(e => this.convertModelToEntity(e));
+	}
 	async findOne(groupLecturerId: number, type: TypeEvaluation, groupId: number): Promise<Assign | null> {
 		const query = this.initQuery();
-
+		query.withGraphFetched('[group_lecturer, group]');
 		const whereClause: Record<string, any> = {};
 
 		whereClause['group_lecturer_id'] = groupLecturerId;
@@ -23,6 +36,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 	}
 	async findAll(groupLecturerId: number, termId?: number, type?: TypeEvaluation, groupId?: number): Promise<Assign[]> {
 		const query = this.initQuery();
+		query.withGraphFetched('[group_lecturer, group]');
 
 		const whereClause: Record<string, any> = {};
 
@@ -31,7 +45,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 		if (groupId) whereClause['group_id'] = groupId;
 
 		if (termId) {
-			query.join('group', 'group.id', '=', 'assign.group_id').where({ 'group.term_id': termId });
+			query.join('group_lecturer', 'group_lecturer.id', '=', 'assign.group_lecturer_id').where({ 'group_lecturer.term_id': termId });
 		}
 		query.where(whereClause);
 
