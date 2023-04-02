@@ -21,26 +21,28 @@ import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 
 interface ValidatedInput {
 	assign: Assign;
-	transcriptDetails: ITranscriptDetail[];
 	lecturer: Lecturer;
 	student: Student;
 }
 @injectable()
-export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
+export default class GetListTranscriptByStudentHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	@inject('GroupLecturerMemberDao') private groupLecturerMemberDao!: IGroupLecturerMemberDao;
 	@inject('AssignDao') private assignDao!: IAssignDao;
-	@inject('EvaluationDao') private evaluationDao!: IEvaluationDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('EvaluationDao') private evaluationDao!: IEvaluationDao;
 	@inject('TranscriptDao') private transcriptDao!: ITranscriptDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
-		const assignId = this.errorCollector.collect('assignId', () => EntityId.validate({ value: request.body['assignId'] }));
-		const studentId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.body['studentId'] }));
-		const lecturerId = Number(request.headers['id']);
-		const transcriptDetails = this.errorCollector.collect('transcripts', () => TranscriptDetails.validate({ value: request.body['transcripts'] }));
+		const assignId = this.errorCollector.collect('assignId', () => EntityId.validate({ value: request.query['assignId'] }));
+		const studentId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.query['studentId'] }));
+		let lecturerId = this.errorCollector.collect('lecturerId', () => EntityId.validate({ value: request.query['lecturerId'] }));
+
+		if (!lecturerId) {
+			lecturerId = Number(request.headers['id']);
+		}
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
@@ -67,7 +69,6 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 		}
 
 		return {
-			transcriptDetails,
 			assign,
 			lecturer,
 			student,
@@ -75,44 +76,18 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 	}
 
 	async handle(request: Request) {
-		const { transcriptDetails, assign, lecturer, student } = await this.validate(request);
+		const { assign, lecturer, student } = await this.validate(request);
 		const groupLecturer = await this.groupLecturerDao.findEntityById(assign.groupLecturerId);
 		const evaluations = await this.evaluationDao.findAll(groupLecturer?.termId, assign.typeEvaluation);
+
 		const evaluationMap = new Map<number, Evaluation>();
 		evaluations.forEach(evaluation => {
 			evaluationMap.set(evaluation.id!, evaluation);
 		});
-		const transcripts = [];
-		for (const transcriptDetail of transcriptDetails) {
-			// check evaluation correct
-			const evaluation = evaluationMap.get(transcriptDetail.idEvaluation);
-			if (!evaluation || transcriptDetail.grade > evaluation.gradeMax) {
-				continue;
-			}
-
-			let transcript = await this.transcriptDao.findOne({
-				lecturerId: lecturer.id!,
-				evaluationId: evaluation.id!,
-				studentId: student.id!,
-			});
-
-			if (transcript) {
-				// update grade
-				transcript.update({ grade: transcriptDetail.grade });
-				transcript = await this.transcriptDao.updateEntity(transcript);
-			} else {
-				// insert grade
-				transcript = await this.transcriptDao.insertEntity(
-					Transcript.create({
-						lecturer,
-						evaluation,
-						grade: transcriptDetail.grade,
-						student: student,
-					})
-				);
-			}
-			transcripts.push(transcript);
-		}
+		let transcripts = await this.transcriptDao.findAll({
+			lecturerId: lecturer.id!,
+			studentId: student.id!,
+		});
 		return transcripts.map(e => e.toJSON);
 	}
 }

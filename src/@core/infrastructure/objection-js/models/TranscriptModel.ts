@@ -1,11 +1,10 @@
 import Transcript from '@core/domain/entities/Transcript';
 import Objection, { Model } from 'objection';
-import LecturerModel from './LecturerModel';
 import StudentModel from './StudentModel';
 import EvaluationModel from './EvaluationModel';
-import AssignModel from './AssignModel';
+import LecturerModel from './LecturerModel';
 import Student from '@core/domain/entities/Student';
-import Assign from '@core/domain/entities/Assign';
+import Lecturer from '@core/domain/entities/Lecturer';
 import Evaluation from '@core/domain/entities/Evaluation';
 
 export default class TranscriptModel extends Model {
@@ -22,12 +21,12 @@ export default class TranscriptModel extends Model {
 				to: 'student.id',
 			},
 		},
-		assign: {
+		lecturer: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: AssignModel,
+			modelClass: LecturerModel,
 			join: {
-				from: 'transcript.assign_id',
-				to: 'assign.id',
+				from: 'transcript.lecturer_id',
+				to: 'lecturer.id',
 			},
 		},
 		evaluation: {
@@ -46,7 +45,7 @@ export default class TranscriptModel extends Model {
 			id: entity.id,
 			grade: entity.grade,
 			student_id: entity.studentId,
-			assign_id: entity.assignId,
+			lecturer_id: entity.lecturerId,
 			evaluation_id: entity.evaluationId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
@@ -66,18 +65,18 @@ export default class TranscriptModel extends Model {
 			{
 				grade: dbJson['grade'],
 				student: Student.createById(dbJson['student_id']),
-				assign: Assign.createById(dbJson['assign_id']),
+				lecturer: Lecturer.createById(dbJson['lecturer_id']),
 				evaluation: Evaluation.createById(dbJson['evaluation_id']),
 			},
 			Number(dbJson['id'])
 		);
 
 		const student = dbJson['student'] && StudentModel.convertModelToEntity(dbJson['student']);
-		const assign = dbJson['assign'] && AssignModel.convertModelToEntity(dbJson['assign']);
+		const lecturer = dbJson['lecturer'] && LecturerModel.convertModelToEntity(dbJson['lecturer']);
 		const evaluation = dbJson['evaluation'] && EvaluationModel.convertModelToEntity(dbJson['evaluation']);
 
 		if (student) entity.update({ student });
-		if (assign) entity.update({ assign });
+		if (lecturer) entity.update({ lecturer });
 		if (evaluation) entity.update({ evaluation });
 
 		return entity;

@@ -3,10 +3,11 @@ import lodash from 'lodash';
 import Evaluation from './Evaluation';
 import Assign from './Assign';
 import Student from './Student';
+import Lecturer from './Lecturer';
 export interface IProps {
 	grade: number;
 	student: Student;
-	assign: Assign;
+	lecturer: Lecturer;
 	evaluation: Evaluation;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -27,11 +28,11 @@ export default class Transcript extends Entity<IProps> {
 	get student() {
 		return this.props?.student;
 	}
-	get assignId() {
-		return this.props?.assign?.id;
+	get lecturerId() {
+		return this.props?.lecturer?.id;
 	}
-	get assign() {
-		return this.props?.assign;
+	get lecturer() {
+		return this.props?.lecturer;
 	}
 	get evaluationId() {
 		return this.props?.evaluation?.id;
@@ -46,11 +47,11 @@ export default class Transcript extends Entity<IProps> {
 		return this.props.updatedAt || new Date();
 	}
 	get toJSON() {
-		const { student, assign, ...props } = lodash.cloneDeep(this._props || {});
+		const { student, lecturer, ...props } = lodash.cloneDeep(this._props || {});
 		let studentJSON = this.student?.toJSON;
-		let assignJSON = this.assign?.toJSON;
+		let lecturerJSON = this.lecturer?.toJSON;
 		let evaluationJSON = this.evaluation?.toJSON;
 
-		return { id: this.id, ...props, student: studentJSON, assign: assignJSON, evaluation: evaluationJSON };
+		return { id: this.id, ...props, student: studentJSON, lecturer: lecturerJSON, evaluation: evaluationJSON };
 	}
 }

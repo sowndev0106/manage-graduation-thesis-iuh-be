@@ -10,6 +10,7 @@ export interface IProps {
 	createdAt?: Date;
 	updatedAt?: Date;
 }
+
 export default class Assign extends Entity<IProps> {
 	static create(props?: IProps, id?: number) {
 		return new Assign(props, id);
