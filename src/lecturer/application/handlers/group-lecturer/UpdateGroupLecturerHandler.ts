@@ -61,7 +61,7 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		let groupLecturer = await this.groupLecturerDao.findOne(input.term.id!, input.name);
+		let groupLecturer = await this.groupLecturerDao.findOne({ termId: input.term.id!, name: input.name });
 		if (groupLecturer && groupLecturer.id != input.groupLecturer.id) throw new Error(`group name ${input.name}  already exists in student`);
 
 		if (groupLecturer == null) {

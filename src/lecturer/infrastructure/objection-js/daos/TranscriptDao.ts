@@ -19,7 +19,7 @@ export default class TranscriptDao extends TranscriptDaoCore implements ITranscr
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(props: { lecturerId: number; studentId: number }): Promise<Transcript[]> {
+	async findAll(props: { termId: number; lecturerId: number; studentId: number }): Promise<Transcript[]> {
 		const query = this.initQuery();
 
 		const whereClause: Record<string, any> = {};

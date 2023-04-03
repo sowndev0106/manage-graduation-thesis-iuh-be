@@ -57,9 +57,9 @@ export default class CreateEvaluationHandler extends RequestHandler {
 			throw new Error(`Evaluation type '${input.type}' and name '${input.name}' already exists in term ${input.term.name}`);
 		}
 
-		const sumGrade = evaluations.reduce((sum, evaluation) => sum + evaluation.gradeMax, 0);
+		const sumGrade = evaluations.reduce((sum, evaluation) => sum + evaluation.gradeMax, 0) + input.gradeMax;
 
-		if (sumGrade >= sumGradeMax) {
+		if (sumGrade > sumGradeMax) {
 			throw new Error(`sum all grade max in deatail can\'t > ${sumGradeMax}`);
 		}
 

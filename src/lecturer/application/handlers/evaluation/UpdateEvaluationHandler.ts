@@ -73,8 +73,9 @@ export default class UpdateEvaluationHandler extends RequestHandler {
 			if (evaluation.name == input.name && evaluation.id != input.evaluation.id) {
 				throw new Error(`Duplicate Name: ${evaluation.name} in evaluation: ${evaluation.id}`);
 			}
-			if (evaluation.id == evaluation.id) {
-				evaluation.update({ ...evaluation });
+			if (evaluation.id == input.evaluation.id) {
+				console.log('update -------------------------- ');
+				evaluation.update({ ...input.evaluation.props });
 				evaluationExist = true;
 			}
 		}
@@ -85,7 +86,7 @@ export default class UpdateEvaluationHandler extends RequestHandler {
 
 		const sumGrade = evaluations.reduce((sum, evaluation) => sum + evaluation.gradeMax, 0);
 
-		if (sumGrade >= sumGradeMax) {
+		if (sumGrade > sumGradeMax) {
 			throw new Error(`sum all grade max in deatail can\'t > ${sumGradeMax}`);
 		}
 

@@ -1,3 +1,4 @@
+import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import GroupLecturerDaoCore from '@core/infrastructure/objection-js/daos/GroupLecturerDao';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
@@ -5,12 +6,12 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class GroupLecturerDao extends GroupLecturerDaoCore implements IGroupLecturerDao {
-	async findOne(termId: number, name: string): Promise<GroupLecturer | null> {
+	async findOne(props: { termId: number; name?: string; typeEvaluation?: TypeEvaluation; groupId?: number }): Promise<GroupLecturer | null> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
-		whereClause['term_id'] = termId;
-		whereClause['name'] = name;
+		whereClause['term_id'] = props.termId;
+		if (props.termId) whereClause['name'] = props.termId;
 
 		query.withGraphFetched('[members, members.lecturer]');
 

@@ -5,6 +5,6 @@ const router = Router();
 
 router.post('/', TranscriptController.createOrUpdateTranscript);
 router.get('/groups', TranscriptController.getListTranscriptByGroup);
-router.get('/students', TranscriptController.getListTranscriptByStudent);
+router.get('/students/:studentId', TranscriptController.getListTranscriptByStudent);
 
 export default router;
