@@ -11,7 +11,8 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 		const whereClause: Record<string, any> = {};
 
 		whereClause['term_id'] = props.termId;
-		if (props.termId) whereClause['name'] = props.termId;
+		if (props.termId) whereClause['term_id'] = props.termId;
+		if (props.name) whereClause['name'] = props.termId;
 
 		query.withGraphFetched('[members, members.lecturer]');
 
