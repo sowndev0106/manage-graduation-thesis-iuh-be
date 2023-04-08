@@ -50,16 +50,16 @@ export default class Nodemailer {
 		}
 	}
 
-	async sendHtmlMail({ from, to, cc, bcc, subject, html, headers }: any) {
+	async sendHtmlMail(props: { from: string; to: string; cc?: string; bcc?: string; subject: string; html: string; headers?: any }) {
 		try {
 			return await this._transporter.sendMail({
-				from,
-				to,
-				cc,
-				bcc,
-				subject,
-				headers: Lodash.merge(headers, { 'x-from': 'subscription-manager' }),
-				html,
+				from: props.from,
+				to: props.to,
+				cc: props.cc,
+				bcc: props.bcc,
+				subject: props.subject,
+				headers: Lodash.merge(props.headers, { 'x-from': 'subscription-manager' }),
+				html: props.html,
 			});
 		} catch (e: any) {
 			throw new Error(`Send mail error: ${e.message}`);

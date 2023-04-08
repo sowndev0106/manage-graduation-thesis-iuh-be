@@ -52,6 +52,11 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
+
+		const studentByEmail = await this.studentDao.findOneByEmail(input.email);
+
+		if (studentByEmail && studentByEmail.id != input.id) throw new Error('Email already exists');
+
 		let student = await this.studentDao.findEntityById(input.id);
 
 		input.typeTraining && student?.updateTypeTraining(input.typeTraining);

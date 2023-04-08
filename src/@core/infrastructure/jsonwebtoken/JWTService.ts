@@ -4,6 +4,7 @@ import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 const secrectAccessKey = process.env.JWT_SECRECT_ACCESS_TOKEN!;
 const secrectRefreshKey = process.env.JWT_SECRECT_REFRESH_TOKEN!;
+const secrectResetPasswordKey = process.env.JWT_SECRECT_RESET_PASSWORD_TOKEN!;
 
 class JWTService {
 	signAccessAndRefreshToken(id: number, role: TypeRoleUser | TypeRoleLecturer, isAdmin?: boolean) {
@@ -50,6 +51,22 @@ class JWTService {
 		} catch (error: any) {
 			throw new AuthorizationError(error.message);
 		}
+	}
+	signTokenResetPassword(id: number, type: 'student' | 'lecturer') {
+		const payload = { id, type };
+		const options = {
+			expiresIn: '15m',
+		};
+		const token = jwt.sign(payload, secrectResetPasswordKey, options);
+
+		return token;
+	}
+	verifyTokenResetPassword(token: string) {
+		var decoded = jwt.verify(token, secrectRefreshKey);
+		return decoded as {
+			id: number;
+			type: 'student' | 'lecturer';
+		};
 	}
 }
 

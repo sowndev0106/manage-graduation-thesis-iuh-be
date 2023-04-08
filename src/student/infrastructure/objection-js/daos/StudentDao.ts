@@ -6,6 +6,12 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class StudentDao extends StudentDaoCore implements IStudentDao {
+	async findOneByEmail(email: string): Promise<Student | null> {
+		const query = this.initQuery();
+
+		const result = await query.findOne({ email: email });
+		return result ? this.convertModelToEntity(result) : null;
+	}
 	async findByUsername(username: string): Promise<Student | null> {
 		const query = this.initQuery();
 		query.where('username', username);
