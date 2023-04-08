@@ -58,5 +58,6 @@ container.bind<IGroupDao>('GroupDao').to(GroupDao);
 container.bind<IGroupMemberDao>('GroupMemberDao').to(GroupMemberDao);
 container.bind<IGroupLecturerDao>('GroupLecturerDao').to(GroupLecturerDao);
 container.bind<IGroupLecturerMemberDao>('GroupLecturerMemberDao').to(GroupLecturerMemberDao);
+container.bind('NodeMailer').to(Nodemailer);
 
 export default container;

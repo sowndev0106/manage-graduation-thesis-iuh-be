@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import ValidationError from '@core/domain/errors/ValidationError';
-import { Request } from 'express';
+import { Request, text } from 'express';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import Username from '@core/domain/validate-objects/Username';
 import SortText from '@core/domain/validate-objects/SortText';
@@ -17,6 +17,7 @@ import ITermDao from '@lecturer/domain/daos/ITermDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import Term from '@core/domain/entities/Term';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import Nodemailer from '@core/infrastructure/nodemailer';
 
 interface IValidatedInput {
 	users: Array<{
@@ -36,6 +37,7 @@ export default class ImportLecturerByExcelHandler extends RequestHandler {
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('LecturerTermDao') private LecturertermDao!: ILecturerTermDao;
+	@inject('NodeMailer') private nodeMailer!: Nodemailer;
 
 	async validate(request: Request): Promise<IValidatedInput> {
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
@@ -129,6 +131,20 @@ export default class ImportLecturerByExcelHandler extends RequestHandler {
 
 		const lecturers = await Promise.all(lecturersPromise);
 
+		const result = await this.sendMailNotification();
+		console.log(result);
 		return lecturers.map(e => e.toJSON);
+	}
+	private async sendMailNotification() {
+		const from = 'graduation-thesis-iuh';
+		const to = 'nguyenthanhson162001@gmail.com';
+		const subject = 'Notification ';
+		const content = 'helo';
+		await this.nodeMailer.sendTextMail({
+			from,
+			to,
+			subject,
+			text: content,
+		});
 	}
 }

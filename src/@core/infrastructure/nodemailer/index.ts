@@ -15,7 +15,11 @@ export default class Nodemailer {
 			port: +process.env.NODEMAILER_TRANSPORT_PORT!,
 			secure: process.env.NODEMAILER_TRANSPORT_SECURE === 'true',
 			tls: {
-				rejectUnauthorized: process.env.NODE_ENV === 'production',
+				rejectUnauthorized: process.env.NODEMAILER_TRANSPORT_TLS === 'true',
+			},
+			auth: {
+				pass: process.env.SMTP_PASSWORD,
+				user: process.env.SMTP_USERNAME,
 			},
 		};
 
@@ -30,18 +34,18 @@ export default class Nodemailer {
 		this._transporter = transporter;
 	}
 
-	async sendTextMail({ from, to, subject, text, cc, bcc, headers }: any) {
+	async sendTextMail(props: { from: string; to: string; subject: string; text: string; cc?: string; bcc?: string; headers?: any }) {
 		try {
 			return await this._transporter.sendMail({
-				from,
-				to,
-				cc,
-				bcc,
-				subject,
-				headers: Lodash.merge(headers, { 'x-from': 'subscription-manager' }),
-				text,
+				from: props.from,
+				to: props.to,
+				cc: props.cc,
+				bcc: props.bcc,
+				subject: props.subject,
+				headers: Lodash.merge(props.headers, { 'x-from': 'subscription-manager' }),
+				text: props.text,
 			});
-		} catch (e:any) {
+		} catch (e: any) {
 			throw new Error(`Send mail error: ${e.message}`);
 		}
 	}
@@ -57,7 +61,7 @@ export default class Nodemailer {
 				headers: Lodash.merge(headers, { 'x-from': 'subscription-manager' }),
 				html,
 			});
-		} catch (e:any) {
+		} catch (e: any) {
 			throw new Error(`Send mail error: ${e.message}`);
 		}
 	}
