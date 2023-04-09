@@ -3,7 +3,9 @@ import Ioc from '@student/infrastructure/inversify';
 import LoginHandlers from '../handlers/authentication/LoginHandlers';
 import RegisterHandlers from '../handlers/authentication/RegisterHandlers';
 import RefreshTokenHandlers from '../handlers/authentication/RefreshTokenHandlers';
-import SendEmailResetPasswordHandler from '../handlers/authentication/SendEmailResetPasswordHandler';
+import SendEmailResetPasswordHandler from '../handlers/authentication/SendEmailForgotPasswordHandler';
+import ResetPasswordHandler from '../handlers/authentication/UpdatePasswordHandler';
+import UpdatePasswordHandler from '../handlers/authentication/UpdatePasswordHandler';
 
 class AuthenticationController {
 	async login(req: Request, res: Response, next: NextFunction) {
@@ -18,8 +20,12 @@ class AuthenticationController {
 		const data = await Ioc.get(RefreshTokenHandlers).handle(req);
 		return res.status(200).json(data);
 	}
-	async sendEmailResetPassword(req: Request, res: Response, next: NextFunction) {
+	async sendEmailForgotPassword(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(SendEmailResetPasswordHandler).handle(req);
+		return res.status(200).json(data);
+	}
+	async udatePassword(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(UpdatePasswordHandler).handle(req);
 		return res.status(200).json(data);
 	}
 }

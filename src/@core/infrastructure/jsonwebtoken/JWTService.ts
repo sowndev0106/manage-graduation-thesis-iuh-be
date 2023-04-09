@@ -52,8 +52,8 @@ class JWTService {
 			throw new AuthorizationError(error.message);
 		}
 	}
-	signTokenResetPassword(id: number, type: 'student' | 'lecturer') {
-		const payload = { id, type };
+	signTokenResetPassword(username: string, type: 'student' | 'lecturer') {
+		const payload = { username, type };
 		const options = {
 			expiresIn: '15m',
 		};
@@ -62,9 +62,9 @@ class JWTService {
 		return token;
 	}
 	verifyTokenResetPassword(token: string) {
-		var decoded = jwt.verify(token, secrectRefreshKey);
+		var decoded = jwt.verify(token, secrectResetPasswordKey);
 		return decoded as {
-			id: number;
+			username: string;
 			type: 'student' | 'lecturer';
 		};
 	}
