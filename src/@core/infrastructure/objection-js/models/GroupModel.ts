@@ -17,7 +17,7 @@ export default class GroupModel extends Model {
 	static relationMappings = {
 		term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: TermModel,
 			join: {
 				from: 'group.term_id',
 				to: 'term.id',
@@ -73,7 +73,7 @@ export default class GroupModel extends Model {
 		const term = dbJson['term'] && TermModel.convertModelToEntity(dbJson['term']);
 		const topic = dbJson['topic'] && TopicModel.convertModelToEntity(dbJson['topic']);
 		const members = dbJson['members'] && dbJson['members'].map((e: any) => GroupMemberModel.convertModelToEntity(e));
-
+		console.log({ term, topic, members });
 		if (term) entity.updateTerm(term);
 		if (topic) entity.updateTopic(topic);
 		if (members) entity.updateMembers(members);
