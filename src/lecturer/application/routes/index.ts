@@ -10,6 +10,7 @@ import evaluationRoute from './evaluation';
 import assignRoute from './assign';
 import groupLecturerRoute from './groupLecturer';
 import transcriptRoute from './transcript';
+import groupRoute from './group';
 import LecturerAuth from '../middlewares/LecturerAuth';
 
 const router = Router();
@@ -28,6 +29,7 @@ router.use('/evaluations', evaluationRoute);
 router.use('/assigns', assignRoute);
 router.use('/group-lecturer', groupLecturerRoute);
 router.use('/transcripts', transcriptRoute);
+router.use('/groups', groupRoute);
 router.use('/me', meRoute);
 
 export default router;
