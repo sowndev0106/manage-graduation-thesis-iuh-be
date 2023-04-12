@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/', EvaluationController.createEvaluation);
 router.get('/', EvaluationController.getListEvaluation);
+router.get('/pdf/download', EvaluationController.generateEvaluation);
 router.get('/:id', EvaluationController.getEvaluationById);
 router.put('/:id', LecturerAuth.headLecturer, EvaluationController.updateEvaluation);
 router.delete('/:id', LecturerAuth.headLecturer, EvaluationController.deleteEvaluation);

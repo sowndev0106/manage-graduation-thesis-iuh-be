@@ -5,6 +5,10 @@ import UpdateEvaluationHandler from '../handlers/evaluation/UpdateEvaluationHand
 import GetListEvaluationHandler from '../handlers/evaluation/GetListEvaluationHandler';
 import GetEvaluationByIdHandler from '../handlers/evaluation/GetEvaluationByIdHandler';
 import DeleteEvaluationHandler from '../handlers/evaluation/DeleteEvaluationHandler';
+import GenerateEvaluationHandler from '../handlers/evaluation/GenerateEvaluationHandler';
+import blobStream from 'blob-stream';
+import fs from 'fs';
+import data from 'pdfkit/js/data';
 
 class EvaluationController {
 	async createEvaluation(req: Request, res: Response, next: NextFunction) {
@@ -27,6 +31,11 @@ class EvaluationController {
 	async deleteEvaluation(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(DeleteEvaluationHandler).handle(req);
 		return res.status(200).json(data);
+	}
+	async generateEvaluation(req: Request, res: Response, next: NextFunction) {
+		const doc = await Ioc.get(GenerateEvaluationHandler).handle(req);
+		const stream = doc.pipe(blobStream());
+		doc.pipe(res);
 	}
 }
 
