@@ -23,7 +23,9 @@ export default class GroupDao extends GroupDaoCore implements IGroupDao {
 	}
 	async findOneByTermAndStudent(termId: number, studentId: number): Promise<Group | null> {
 		const query = this.initQuery();
+
 		query.withGraphFetched('[members, members.student, topic]');
+
 		const whereClause: Record<string, number> = {};
 
 		whereClause['term_id'] = termId;

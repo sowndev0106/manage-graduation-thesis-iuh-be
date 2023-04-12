@@ -25,7 +25,7 @@ export default class GroupModel extends Model {
 		},
 		topic: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: TopicModel,
 			join: {
 				from: 'group.topic_id',
 				to: 'topic.id',
