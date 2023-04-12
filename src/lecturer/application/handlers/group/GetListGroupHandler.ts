@@ -33,14 +33,6 @@ export default class GetListGroupHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		// const term = await this.termDao.findEntityById(input.termId);
-
-		// if (!term) throw new NotFoundError('term not found');
-
-		// const topic = await this.topicDao.findEntityById(input.topicId);
-
-		// if (!topic) throw new NotFoundError('topic not found');
-
 		const groups = await this.groupDao.findAll(input.termId, input.topicId);
 
 		return groups.map(e => e.toJSON);

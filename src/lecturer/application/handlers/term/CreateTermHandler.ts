@@ -24,8 +24,10 @@ interface ValidatedInput {
 	endDateSubmitTopic: Date;
 	startDateChooseTopic: Date;
 	endDateChooseTopic: Date;
-	dateDiscussion: Date;
-	dateReport: Date;
+	startDateDiscussion: Date;
+	endDateDiscussion: Date;
+	startDateReport: Date;
+	endDateReport: Date;
 }
 @injectable()
 export default class CreateTermHandler extends RequestHandler {
@@ -52,16 +54,23 @@ export default class CreateTermHandler extends RequestHandler {
 		const endDateChooseTopic: Date = this.errorCollector.collect('endDateChooseTopic', () =>
 			DateValidate.validate({ value: request.body['endDateChooseTopic'] })
 		);
-
-		const dateDiscussion = this.errorCollector.collect('dateDiscussion', () => DateValidate.validate({ value: request.body['dateDiscussion'] }));
-		const dateReport = this.errorCollector.collect('dateReport', () => DateValidate.validate({ value: request.body['dateReport'] }));
+		const endDateDiscussion: Date = this.errorCollector.collect('endDateDiscussion', () =>
+			DateValidate.validate({ value: request.body['endDateDiscussion'] })
+		);
+		const startDateDiscussion: Date = this.errorCollector.collect('startDateDiscussion', () =>
+			DateValidate.validate({ value: request.body['startDateDiscussion'] })
+		);
+		const endDateReport: Date = this.errorCollector.collect('endDateReport', () => DateValidate.validate({ value: request.body['endDateReport'] }));
+		const startDateReport: Date = this.errorCollector.collect('startDateReport', () => DateValidate.validate({ value: request.body['startDateReport'] }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 		if (startDate >= endDate) throw new Error('startDate must be better endDate');
-		if (startDateSubmitTopic >= endDateSubmitTopic) throw new Error('startDateSubmitTopic must be better endDateSubmitTopic');
-		if (startDateChooseTopic >= endDateChooseTopic) throw new Error('startDateChooseTopic must be better endDateChooseTopic');
+		if (startDateSubmitTopic > endDateSubmitTopic) throw new Error('startDateSubmitTopic must be better endDateSubmitTopic');
+		if (startDateChooseTopic > endDateChooseTopic) throw new Error('startDateChooseTopic must be better endDateChooseTopic');
+		if (startDateDiscussion > endDateDiscussion) throw new Error('startDateDiscussion must be better endDateDiscussion');
+		if (startDateReport > endDateReport) throw new Error('startDateReport must be better endDateReport');
 
 		return {
 			name,
@@ -70,8 +79,10 @@ export default class CreateTermHandler extends RequestHandler {
 			endDate,
 			startDateSubmitTopic,
 			endDateSubmitTopic,
-			dateDiscussion,
-			dateReport,
+			startDateDiscussion,
+			endDateDiscussion,
+			startDateReport,
+			endDateReport,
 			startDateChooseTopic,
 			endDateChooseTopic,
 		};
@@ -96,14 +107,18 @@ export default class CreateTermHandler extends RequestHandler {
 				endDate: input.endDate,
 				startDateSubmitTopic: input.startDateSubmitTopic,
 				endDateSubmitTopic: input.endDateSubmitTopic,
-				dateDiscussion: input.dateDiscussion,
-				dateReport: input.dateReport,
+				startDateDiscussion: input.startDateDiscussion,
+				endDateDiscussion: input.endDateDiscussion,
+				startDateReport: input.startDateReport,
+				endDateReport: input.endDateReport,
 				startDateChooseTopic: input.startDateChooseTopic,
 				endDateChooseTopic: input.endDateChooseTopic,
+				isPublicResult: false,
 			})
 		);
 
 		if (!term) throw new Error('Create term fail');
+
 		const headlectuers = await this.lecturerDao.findAll(undefined, undefined, TypeRoleLecturer.HEAD_LECTURER);
 		const subHeadlectuers = await this.lecturerDao.findAll(undefined, undefined, TypeRoleLecturer.SUB_HEAD_LECTURER);
 		const lecturers = [...headlectuers, ...subHeadlectuers];

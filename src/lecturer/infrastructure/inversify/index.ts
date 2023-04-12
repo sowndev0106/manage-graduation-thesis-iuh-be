@@ -28,7 +28,7 @@ import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 import IGroupLecturerMemberDao from '@lecturer/domain/daos/IGroupLecturerMemberDao';
 import GroupLecturerDao from '../objection-js/daos/GroupLecturerDao';
 import GroupLecturerMemberDao from '../objection-js/daos/GroupLecturerMemberDao';
-import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
+import IGroupMemberDao from '@lecturer/domain/daos/IGroupMemberDao';
 import GroupMemberDao from '../objection-js/daos/GroupMemberDao';
 
 const container = new Container({

@@ -11,8 +11,11 @@ export async function up(knex: Knex): Promise<void> {
 		table.date('end_date_submit_topic').notNullable();
 		table.date('start_date_choose_topic').notNullable();
 		table.date('end_date_choose_topic').notNullable();
-		table.date('date_discussion').notNullable();
-		table.date('date_report').notNullable();
+		table.date('start_date_discussion').notNullable();
+		table.date('end_date_discussion').notNullable();
+		table.date('start_date_report').notNullable();
+		table.date('end_date_report').notNullable();
+		table.boolean('is_public_result').defaultTo(false);
 		table.timestamps();
 	});
 }

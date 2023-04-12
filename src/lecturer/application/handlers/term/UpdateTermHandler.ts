@@ -10,6 +10,7 @@ import NotFoundError from '@core/domain/errors/NotFoundError';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import Term from '@core/domain/entities/Term';
 import Majors from '@core/domain/entities/Majors';
+import BooleanValidate from '@core/domain/validate-objects/BooleanValidate';
 
 interface ValidatedInput {
 	id: number;
@@ -21,8 +22,11 @@ interface ValidatedInput {
 	endDateSubmitTopic: Date;
 	startDateChooseTopic: Date;
 	endDateChooseTopic: Date;
-	dateDiscussion: Date;
-	dateReport: Date;
+	startDateDiscussion: Date;
+	endDateDiscussion: Date;
+	startDateReport: Date;
+	endDateReport: Date;
+	isPublicDate: boolean;
 }
 @injectable()
 export default class UpdateTermHandler extends RequestHandler {
@@ -32,8 +36,10 @@ export default class UpdateTermHandler extends RequestHandler {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: String(request.params['id']) }));
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
+		const isPublicDate = this.errorCollector.collect('isPublicDate', () => BooleanValidate.validate({ value: request.body['isPublicDate'] }));
 		const startDate: Date = this.errorCollector.collect('startDate', () => DateValidate.validate({ value: request.body['startDate'] }));
 		const endDate: Date = this.errorCollector.collect('endDate', () => DateValidate.validate({ value: request.body['endDate'] }));
+
 		const startDateSubmitTopic: Date = this.errorCollector.collect('startDateSubmitTopic', () =>
 			DateValidate.validate({ value: request.body['startDateSubmitTopic'] })
 		);
@@ -43,12 +49,18 @@ export default class UpdateTermHandler extends RequestHandler {
 		const startDateChooseTopic: Date = this.errorCollector.collect('startDateChooseTopic', () =>
 			DateValidate.validate({ value: request.body['startDateChooseTopic'] })
 		);
+
 		const endDateChooseTopic: Date = this.errorCollector.collect('endDateChooseTopic', () =>
 			DateValidate.validate({ value: request.body['endDateChooseTopic'] })
 		);
-
-		const dateDiscussion = this.errorCollector.collect('dateDiscussion', () => DateValidate.validate({ value: request.body['dateDiscussion'] }));
-		const dateReport = this.errorCollector.collect('dateReport', () => DateValidate.validate({ value: request.body['dateReport'] }));
+		const endDateDiscussion: Date = this.errorCollector.collect('endDateDiscussion', () =>
+			DateValidate.validate({ value: request.body['endDateDiscussion'] })
+		);
+		const startDateDiscussion: Date = this.errorCollector.collect('startDateDiscussion', () =>
+			DateValidate.validate({ value: request.body['startDateDiscussion'] })
+		);
+		const endDateReport: Date = this.errorCollector.collect('endDateReport', () => DateValidate.validate({ value: request.body['endDateReport'] }));
+		const startDateReport: Date = this.errorCollector.collect('startDateReport', () => DateValidate.validate({ value: request.body['startDateReport'] }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
@@ -65,10 +77,13 @@ export default class UpdateTermHandler extends RequestHandler {
 			endDate,
 			startDateSubmitTopic,
 			endDateSubmitTopic,
-			dateDiscussion,
-			dateReport,
+			startDateDiscussion,
+			endDateDiscussion,
+			startDateReport,
+			endDateReport,
 			startDateChooseTopic,
 			endDateChooseTopic,
+			isPublicDate,
 		};
 	}
 
@@ -97,11 +112,13 @@ export default class UpdateTermHandler extends RequestHandler {
 					endDate: input.endDate,
 					startDateSubmitTopic: input.startDateSubmitTopic,
 					endDateSubmitTopic: input.endDateSubmitTopic,
-					dateDiscussion: input.dateDiscussion,
-					dateReport: input.dateReport,
+					startDateDiscussion: input.startDateDiscussion,
+					endDateDiscussion: input.endDateDiscussion,
+					startDateReport: input.startDateReport,
+					endDateReport: input.endDateReport,
 					startDateChooseTopic: input.startDateChooseTopic,
 					endDateChooseTopic: input.endDateChooseTopic,
-					updatedAt: new Date(),
+					isPublicResult: false,
 				},
 				input.id
 			)

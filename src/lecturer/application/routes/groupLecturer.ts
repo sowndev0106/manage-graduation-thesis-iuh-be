@@ -4,7 +4,7 @@ import LecturerAuth from '../middlewares/LecturerAuth';
 
 const router = Router();
 
-router.post('/', GroupLecturerController.createGroupLecturer);
+router.post('/', LecturerAuth.headLecturer, GroupLecturerController.createGroupLecturer);
 router.get('/', GroupLecturerController.getListGroupLecturer);
 router.get('/:id', GroupLecturerController.getGroupLecturerById);
 router.put('/:id', LecturerAuth.headLecturer, GroupLecturerController.updateGroupLecturer);

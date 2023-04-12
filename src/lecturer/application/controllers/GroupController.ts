@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import Ioc from '@student/infrastructure/inversify';
+import Ioc from '@lecturer/infrastructure/inversify';
 import GetGroupByIdHandler from '../handlers/group/GetGroupByIdHandler';
 import GetListGroupHandler from '../handlers/group/GetListGroupHandler';
 

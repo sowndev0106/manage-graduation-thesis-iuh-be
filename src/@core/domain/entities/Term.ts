@@ -10,8 +10,11 @@ export interface IProps {
 	endDateSubmitTopic: Date;
 	startDateChooseTopic: Date;
 	endDateChooseTopic: Date;
-	dateDiscussion: Date;
-	dateReport: Date;
+	startDateDiscussion: Date;
+	endDateDiscussion: Date;
+	startDateReport: Date;
+	endDateReport: Date;
+	isPublicResult: boolean;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -49,11 +52,20 @@ export default class Term extends Entity<IProps> {
 	get endDateChooseTopic() {
 		return this.props.endDateChooseTopic;
 	}
-	get dateDiscussion() {
-		return this.props.dateDiscussion;
+	get startDateDiscussion() {
+		return this.props.startDateDiscussion;
 	}
-	get dateReport() {
-		return this.props.dateReport;
+	get endDateDiscussion() {
+		return this.props.endDateDiscussion;
+	}
+	get startDateReport() {
+		return this.props.startDateReport;
+	}
+	get endDateReport() {
+		return this.props.endDateReport;
+	}
+	get isPublicResult() {
+		return this.props.isPublicResult;
 	}
 	get createdAt() {
 		return this.props.createdAt || new Date();
