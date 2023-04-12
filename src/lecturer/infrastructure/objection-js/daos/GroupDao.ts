@@ -7,6 +7,9 @@ import { injectable } from 'inversify';
 export default class GroupDao extends GroupDaoCore implements IGroupDao {
 	async findAll(termId?: number, topicId?: number): Promise<Group[]> {
 		const query = this.initQuery();
+
+		query.withGraphFetched('[members, members.student, topic]');
+
 		const whereClause: Record<string, number> = {};
 
 		if (termId) whereClause['term_id'] = termId;
@@ -20,6 +23,7 @@ export default class GroupDao extends GroupDaoCore implements IGroupDao {
 	}
 	async findOneByTermAndStudent(termId: number, studentId: number): Promise<Group | null> {
 		const query = this.initQuery();
+		query.withGraphFetched('[members, members.student, topic]');
 		const whereClause: Record<string, number> = {};
 
 		whereClause['term_id'] = termId;
