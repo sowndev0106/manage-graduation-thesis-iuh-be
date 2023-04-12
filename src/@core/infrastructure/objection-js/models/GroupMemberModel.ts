@@ -29,6 +29,24 @@ export default class GroupMemberModel extends Model {
 		},
 	};
 
+	static relationMappings = {
+		term: {
+			relation: Model.BelongsToOneRelation,
+			modelClass: LecturerModel,
+			join: {
+				from: 'group_lecturer.term_id',
+				to: 'term.id',
+			},
+		},
+		members: {
+			relation: Model.HasManyRelation,
+			modelClass: GroupLecturerMemberModel,
+			join: {
+				from: 'group_lecturer.id',
+				to: 'group_lecturer_member.group_lecturer_id',
+			},
+		},
+	};
 	static convertEntityToPartialModelObject(entity: GroupMember) {
 		const model = new GroupMemberModel();
 		model.$set({

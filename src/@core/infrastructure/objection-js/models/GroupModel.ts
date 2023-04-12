@@ -17,7 +17,7 @@ export default class GroupModel extends Model {
 	static relationMappings = {
 		term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: TermModel,
 			join: {
 				from: 'group.term_id',
 				to: 'term.id',
