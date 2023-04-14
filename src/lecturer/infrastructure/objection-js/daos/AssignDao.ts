@@ -8,7 +8,7 @@ import { injectable } from 'inversify';
 export default class AssignDao extends AssignDaoCore implements IAssignDao {
 	async findOneExtends(props: { termId: number; lecturerId: number; studentId: number; typeEvaluation: TypeEvaluation }): Promise<Assign | null> {
 		const query = this.initQuery();
-		query.withGraphFetched('[group_lecturer, group]');
+		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
 		query.join('group_lecturer', 'group_lecturer.id', '=', 'assign.group_lecturer_id');
 		query.join('group_lecturer_member', 'group_lecturer_member.group_lecturer_id', '=', 'group_lecturer.id');
 
@@ -28,7 +28,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 	}
 	async findByLecturer(termId: number, lecturerId: number): Promise<Assign[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('[group_lecturer, group]');
+		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
 		query.join('group_lecturer', 'group_lecturer.id', '=', 'assign.group_lecturer_id').where({ 'group_lecturer.term_id': termId });
 
 		query
@@ -41,7 +41,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 	}
 	async findOne(groupLecturerId: number, type: TypeEvaluation, groupId: number): Promise<Assign | null> {
 		const query = this.initQuery();
-		query.withGraphFetched('[group_lecturer, group]');
+		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
 		const whereClause: Record<string, any> = {};
 
 		whereClause['group_lecturer_id'] = groupLecturerId;
@@ -56,7 +56,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 	}
 	async findAll(groupLecturerId: number, termId?: number, type?: TypeEvaluation, groupId?: number): Promise<Assign[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('[group_lecturer, group]');
+		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
 
 		const whereClause: Record<string, any> = {};
 
