@@ -20,12 +20,25 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(termId: number, name?: string): Promise<GroupLecturer[]> {
+	async findAll(props: {
+		termId: number;
+		name?: string;
+		assign: {
+			groupStudentId: number;
+			typeEvaluation: TypeEvaluation;
+		};
+	}): Promise<GroupLecturer[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
-		if (termId) whereClause['term_id'] = termId;
-		if (name) whereClause['name'] = name;
+		if (props.termId) whereClause['term_id'] = props.termId;
+		if (props.name) whereClause['name'] = props.name;
+
+		if (props.assign.groupStudentId) {
+			query.rightJoin('assign', 'assign.group_lecturer_id', '=', 'group_lecturer.id');
+			query.where('assign.group_id', '=', props.assign.groupStudentId);
+			query.where('assign.type_evaluation', '=', props.assign.typeEvaluation);
+		}
 
 		query.where(whereClause);
 
