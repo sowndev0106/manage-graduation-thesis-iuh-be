@@ -54,7 +54,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 		if (typeEvaluation) {
 			whereClause['type_evaluation'] = typeEvaluation;
 		}
-
+		query.where(whereClause);
 		const result = await query.execute();
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
