@@ -70,6 +70,10 @@ export default class CreateAssignHandler extends RequestHandler {
 					groupLecturer: groupLecturer,
 				})
 			);
+			assign = await this.assignDao.findOne({
+				type: typeEvaluation,
+				groupId: group.id!,
+			});
 		}
 
 		return assign?.toJSON;
