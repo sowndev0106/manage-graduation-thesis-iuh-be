@@ -6,6 +6,21 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class AssignDao extends AssignDaoCore implements IAssignDao {
+	async findOne(props: { groupLecturerId?: number; type?: TypeEvaluation; groupId?: number }): Promise<Assign | null> {
+		const query = this.initQuery();
+		query.withGraphFetched('[group_lecturer, group]');
+		const whereClause: Record<string, any> = {};
+
+		whereClause['group_lecturer_id'] = props.groupLecturerId;
+		whereClause['type_evaluation'] = props.type;
+		whereClause['group_id'] = props.groupId;
+
+		query.where(whereClause);
+
+		const result = await query.findOne(whereClause);
+
+		return result ? this.convertModelToEntity(result) : null;
+	}
 	async findOneExtends(props: { termId: number; lecturerId: number; studentId: number; typeEvaluation: TypeEvaluation }): Promise<Assign | null> {
 		const query = this.initQuery();
 
@@ -39,21 +54,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
-	async findOne(groupLecturerId: number, type: TypeEvaluation, groupId: number): Promise<Assign | null> {
-		const query = this.initQuery();
-		query.withGraphFetched('[group_lecturer, group]');
-		const whereClause: Record<string, any> = {};
 
-		whereClause['group_lecturer_id'] = groupLecturerId;
-		whereClause['type_evaluation'] = type;
-		whereClause['group_id'] = groupId;
-
-		query.where(whereClause);
-
-		const result = await query.findOne(whereClause);
-
-		return result ? this.convertModelToEntity(result) : null;
-	}
 	async findAll(groupLecturerId: number, termId?: number, type?: TypeEvaluation, groupId?: number): Promise<Assign[]> {
 		const query = this.initQuery();
 		query.withGraphFetched('[group_lecturer, group]');

@@ -15,6 +15,7 @@ import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import IGroupDao from '@lecturer/domain/daos/IGroupDao';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
+import Term from '@core/domain/entities/Term';
 
 interface ValidatedInput {
 	typeEvaluation: TypeEvaluation;
@@ -51,16 +52,25 @@ export default class CreateAssignHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { typeEvaluation, group, groupLecturer } = await this.validate(request);
-		let assign = await this.assignDao.findOne(groupLecturer.id!, typeEvaluation, group.id);
-		if (assign) return assign.toJSON;
-
-		assign = await this.assignDao.insertEntity(
-			Assign.create({
-				typeEvaluation: typeEvaluation,
-				group: group,
+		let assign = await this.assignDao.findOne({
+			type: typeEvaluation,
+			groupId: group.id!,
+		});
+		if (assign) {
+			// update assign
+			assign.update({
 				groupLecturer: groupLecturer,
-			})
-		);
+			});
+			await this.assignDao.updateEntity(assign);
+		} else {
+			await this.assignDao.insertEntity(
+				Assign.create({
+					typeEvaluation: typeEvaluation,
+					group: group,
+					groupLecturer: groupLecturer,
+				})
+			);
+		}
 
 		return assign?.toJSON;
 	}
