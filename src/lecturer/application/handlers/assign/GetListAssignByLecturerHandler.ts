@@ -29,7 +29,6 @@ export default class GetListAssignByLecturerHandler extends RequestHandler {
 	async handle(request: Request) {
 		const { lecturerId, termId } = await this.validate(request);
 		const assigns = await this.assignDao.findByLecturer(termId, lecturerId);
-
 		return assigns.map(e => e.toJSON);
 	}
 }
