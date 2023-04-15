@@ -41,17 +41,21 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findByLecturer(termId: number, lecturerId: number): Promise<Assign[]> {
+	async findByLecturer(termId: number, lecturerId: number, typeEvaluation?: TypeEvaluation): Promise<Assign[]> {
 		const query = this.initQuery();
 		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
 		query.join('group_lecturer', 'group_lecturer.id', '=', 'assign.group_lecturer_id').where({ 'group_lecturer.term_id': termId });
+		query.join('group_lecturer_member', 'group_lecturer_member.group_lecturer_id', '=', 'group_lecturer.id');
 
-		query
-			.join('group_lecturer_member', 'group_lecturer_member.group_lecturer_id', '=', 'group_lecturer.id')
-			.where({ 'group_lecturer_member.lecturer_id': lecturerId });
+		const whereClause: Record<string, any> = {};
+
+		whereClause['group_lecturer_member.lecturer_id'] = lecturerId;
+
+		if (typeEvaluation) {
+			whereClause['type_evaluation'] = typeEvaluation;
+		}
 
 		const result = await query.execute();
-
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
 
