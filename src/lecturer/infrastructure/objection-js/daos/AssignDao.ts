@@ -11,9 +11,9 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 		query.withGraphFetched('[group_lecturer, group]');
 		const whereClause: Record<string, any> = {};
 
-		whereClause['group_lecturer_id'] = props.groupLecturerId;
-		whereClause['type_evaluation'] = props.type;
-		whereClause['group_id'] = props.groupId;
+		if (props.groupLecturerId) whereClause['group_lecturer_id'] = props.groupLecturerId;
+		if (props.type) whereClause['type_evaluation'] = props.type;
+		if (props.groupId) whereClause['group_id'] = props.groupId;
 
 		query.where(whereClause);
 
