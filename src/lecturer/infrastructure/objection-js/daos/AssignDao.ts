@@ -6,6 +6,21 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class AssignDao extends AssignDaoCore implements IAssignDao {
+	async findOne(props: { groupLecturerId?: number; type?: TypeEvaluation; groupId?: number }): Promise<Assign | null> {
+		const query = this.initQuery();
+		query.withGraphFetched('[group_lecturer, group]');
+		const whereClause: Record<string, any> = {};
+
+		if (props.groupLecturerId) whereClause['group_lecturer_id'] = props.groupLecturerId;
+		if (props.type) whereClause['type_evaluation'] = props.type;
+		if (props.groupId) whereClause['group_id'] = props.groupId;
+
+		query.where(whereClause);
+
+		const result = await query.findOne(whereClause);
+
+		return result ? this.convertModelToEntity(result) : null;
+	}
 	async findOneExtends(props: { termId: number; lecturerId: number; studentId: number; typeEvaluation: TypeEvaluation }): Promise<Assign | null> {
 		const query = this.initQuery();
 		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
@@ -26,34 +41,24 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findByLecturer(termId: number, lecturerId: number): Promise<Assign[]> {
+	async findByLecturer(termId: number, lecturerId: number, typeEvaluation?: TypeEvaluation): Promise<Assign[]> {
 		const query = this.initQuery();
 		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
 		query.join('group_lecturer', 'group_lecturer.id', '=', 'assign.group_lecturer_id').where({ 'group_lecturer.term_id': termId });
+		query.join('group_lecturer_member', 'group_lecturer_member.group_lecturer_id', '=', 'group_lecturer.id');
 
-		query
-			.join('group_lecturer_member', 'group_lecturer_member.group_lecturer_id', '=', 'group_lecturer.id')
-			.where({ 'group_lecturer_member.lecturer_id': lecturerId });
-
-		const result = await query.execute();
-
-		return result && result.map(e => this.convertModelToEntity(e));
-	}
-	async findOne(groupLecturerId: number, type: TypeEvaluation, groupId: number): Promise<Assign | null> {
-		const query = this.initQuery();
-		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
 		const whereClause: Record<string, any> = {};
 
-		whereClause['group_lecturer_id'] = groupLecturerId;
-		whereClause['type_evaluation'] = type;
-		whereClause['group_id'] = groupId;
+		whereClause['group_lecturer_member.lecturer_id'] = lecturerId;
 
+		if (typeEvaluation) {
+			whereClause['type_evaluation'] = typeEvaluation;
+		}
 		query.where(whereClause);
-
-		const result = await query.findOne(whereClause);
-
-		return result ? this.convertModelToEntity(result) : null;
+		const result = await query.execute();
+		return result && result.map(e => this.convertModelToEntity(e));
 	}
+
 	async findAll(groupLecturerId: number, termId?: number, type?: TypeEvaluation, groupId?: number): Promise<Assign[]> {
 		const query = this.initQuery();
 		query.withGraphFetched('[group_lecturer, group_lecturer.members, group, group.members]');
