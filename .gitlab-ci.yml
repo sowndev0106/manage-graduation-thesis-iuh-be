@@ -1,61 +1,70 @@
-variables:
-    IMAGE_NAME: son162001/manage-graduation-thesis-iuh
-    IMAGE_TAG: latestnode:latest
+image: docker:19
+
+services:
+    - docker:dind
 
 stages:
+    - build
     - test
-    # - build
-    # - deploy
-test:
-    stage: test
-    image: node:16.16.0-alpine
+    - release
+
+before_script:
+    - docker version
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build:
+    stage: build
     script:
-        - echo "test"
-# deploy:
-#     stage: deploy
-#     before_script:
-#         - echo EC2_IPADDRESS $EC2_IPADDRESS
-#         - chmod 400 $SSH_PRIVATE_KEY
-#     script:
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-13-229-54-80.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && git pull"
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-13-229-54-80.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm i"
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-13-229-54-80.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && npm run build"
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-13-229-54-80.ap-southeast-1.compute.amazonaws.com "cd manage-graduation-thesis-iuh-be && (pm2 restart all  || true)"
-#     only:
-#         - master
-# build:
-#     stage: build
-#     before_script:
-#         - chmod 400 $SSH_PRIVATE_KEY
-#     script:
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && git pull"
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm i"
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && npm run build"
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd manage-graduation-thesis-iuh-be && (npm start || true)"
-#         - echo "Application successfully deployed."
-#     only:
-#         - master
-# deploy:
-#     stage: deploy
-#     before_script:
-#         - echo $SSH_PRIVATE_KEY
-#         - chmod 400 $SSH_PRIVATE_KEY
-#     script:
-#         - ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY ubuntu@ec2-3-0-102-80.ap-southeast-1.compute.amazonaws.com "
-#           ./script.sh"
-# deploy:
-#     stage: deploy
-#     image: alpine
-#     before_script:
-#         - apk add openssh-client
-#         - eval $(ssh-agent -s)
-#         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-#         - mkdir -p ~/.ssh
-#         - chmod 700 ~/.ssh
-#     script:
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "git@gitlab.com:nguyenthanhson162001/manage-graduation-thesis-iuh-be.git || true"
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && git pull"
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && npm i"
-#         - ssh -o StrictHostKeyChecking=no ubuntu@$EC2_IPADDRESS "cd demo-cicd && (npm start || true)"
-#         - echo "Application successfully deployed."
+        - docker pull $CI_REGISTRY_IMAGE:latest || true
+        - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+.tests:
+    stage: test
+    before_script:
+        - apk add --no-cache py3-pip py3-setuptools python3 python3-dev libffi-dev openssl-dev gcc libc-dev make
+        - pip install docker-compose
+        - docker-compose version
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+
+linting:
+    extends: .tests
+    script:
+        - docker-compose up -d
+        - sleep 15
+        - docker-compose exec -T app npm run lint
+
+jest:
+    extends: .tests
+    script:
+        - docker-compose up -d
+        - sleep 15
+        - docker-compose exec -T app npm run test
+    coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+    artifacts:
+        paths:
+            - coverage/
+
+release-tag:
+    variables:
+        GIT_STRATEGY: none
+    stage: release
+    except:
+        - master
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+
+release-latest:
+    variables:
+        GIT_STRATEGY: none
+    stage: release
+    only:
+        - master
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+        - docker push $CI_REGISTRY_IMAGE:latest
