@@ -6,6 +6,6 @@ import LecturerAuth from '../middlewares/LecturerAuth';
 const router = Router();
 router.get('/', StudentController.getStudents);
 router.get('/:id', StudentController.getStudentById);
-router.post('/import-student', LecturerAuth.admin, uploadMulter.single('file'), StudentController.importStudentByExcel);
+router.post('/import-student', LecturerAuth.headLecturer, uploadMulter.single('file'), StudentController.importStudentByExcel);
 
 export default router;
