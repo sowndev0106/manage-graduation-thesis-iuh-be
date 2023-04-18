@@ -79,6 +79,7 @@ deploy:
     before_script:
         - apk update && apk add openssh-client bash
     script:
+        - printenv
         # chạy ssh-agent tương ứng với Gitlab Runner hiện tại
         - eval $(ssh-agent -s)
 
