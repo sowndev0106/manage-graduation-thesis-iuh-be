@@ -86,7 +86,7 @@ deploy:
         - eval $(ssh-agent -s)
 
         # thêm nội dung của biến SSH_PRIVATE_KEY vào agent store
-        - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 --decode)'
+        - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY" | tr -d ' ' | base64 --decode )'
 
         # tạo folder ~/.ssh
         - mkdir -p ~/.ssh
