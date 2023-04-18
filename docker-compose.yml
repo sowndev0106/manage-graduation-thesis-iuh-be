@@ -1,6 +1,6 @@
 services:
   app:
-    image: node:18-alpine
+    image: registry.gitlab.com/nguyenthanhson162001/manage-graduation-thesis-iuh-be:latest
     command: sh -c "npm install && npm run build && npm start"
     ports:
       - 3000:3000
@@ -9,4 +9,4 @@ services:
       - ./:/app
       - /app/node_modules
     environment:
-      NODE_ENV: develop
+      NODE_ENV: production
