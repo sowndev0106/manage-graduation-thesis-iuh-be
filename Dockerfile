@@ -1,13 +1,16 @@
-FROM node:12.18.3-alpine3.12
+FROM node:18-alpine
 
-RUN apk add git
-
+ENV NODE_ENV="development"
 WORKDIR /app
+COPY package.json .
+COPY package-lock.json . /app/
+
 ARG BUILD_ENV
 COPY . .
 
 RUN npm ci
 RUN npm run build
+RUN chown -R node /app/node_modules
 
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start", "--env", "production"]

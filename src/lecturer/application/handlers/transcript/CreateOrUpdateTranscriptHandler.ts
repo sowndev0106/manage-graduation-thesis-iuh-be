@@ -89,12 +89,12 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 			if (!evaluation || transcriptDetail.grade > evaluation.gradeMax) {
 				continue;
 			}
-
 			let transcript = await this.transcriptDao.findOne({
 				lecturerId: lecturer.id!,
 				evaluationId: evaluation.id!,
 				studentId: student.id!,
 			});
+			console.log(transcript);
 
 			if (transcript) {
 				// update grade
