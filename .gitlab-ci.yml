@@ -132,8 +132,9 @@ deploy:
         - apk update && apk add openssh-client bash
     script:
         - printenv
-
         - echo "$SSH_PRIVATE_KEY"
+
+          - echo "${SSH_PRIVATE_KEY}"
         # chạy ssh-agent tương ứng với Gitlab Runner hiện tại
         - eval $(ssh-agent -s)
 
