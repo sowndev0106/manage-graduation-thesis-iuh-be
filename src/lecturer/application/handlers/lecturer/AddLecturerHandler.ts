@@ -61,12 +61,8 @@ export default class AddLecturerHandler extends RequestHandler {
 		lecturer = Lecturer.create({
 			username: input.username,
 			password: passwordEncript,
-			majors: Majors.createById(1),
-			avatar: faker.image.avatar(),
-			email: `${input.username}@gmail.com`,
+			majors: majors,
 			gender: TypeGender.FEMALE,
-			name: faker.name.fullName(),
-			phoneNumber: faker.phone.number(),
 			degree: TypeDegree.MASTERS,
 			isAdmin: false,
 			role: TypeRoleLecturer.LECTURER,
