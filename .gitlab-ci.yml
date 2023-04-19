@@ -85,7 +85,7 @@ deploy:
         - eval $(ssh-agent -s)
 
         # thêm nội dung của biến ID_RSA vào agent store
-        - bash -c 'ssh-add <(echo "$ID_RSA" | base64 -d)'
+        - bash -c 'ssh-add <(echo "$ID_RSA")'
 
         # tạo folder ~/.ssh
         - mkdir -p ~/.ssh
