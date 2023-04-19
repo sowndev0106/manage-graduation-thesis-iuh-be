@@ -138,6 +138,4 @@ deploy:
         - eval $(ssh-agent -s)
 
         # thêm nội dung của biến SSH_PRIVATE_KEY vào agent store
-        - ssh-add <(echo "$SSH_PRIVATE_KEY")
-
-        - mkdir -p ~/.ssh
+        - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY")'
