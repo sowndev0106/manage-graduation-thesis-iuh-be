@@ -1,75 +1,126 @@
+# image: docker:19
+
+# services:
+#     - docker:dind
+
+# stages:
+#     - build
+#     # - test
+#     - release
+#     - deploy
+
+# before_script:
+#     - docker version
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+# build:
+#     stage: build
+#     script:
+#         - echo cat $SSH_PRIVATE_KEY
+#         - docker pull $CI_REGISTRY_IMAGE:latest || true
+#         - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+#         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+# # .tests:
+# #     stage: test
+# #     before_script:
+# #         - apk add --no-cache py3-pip py3-setuptools python3 python3-dev libffi-dev openssl-dev gcc libc-dev make
+# #         - pip install docker-compose
+# #         - docker-compose version
+# #         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+# #         - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+# #         - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+
+# # linting:
+# #     extends: .tests
+# #     script:
+# #         - docker-compose up -d
+# #         - sleep 15
+# #         - docker-compose exec -T app npm run lint
+
+# # jest:
+# #     extends: .tests
+# #     script:
+# #         - docker-compose up -d
+# #         - sleep 15
+# #         - docker-compose exec -T app npm run test
+# #     coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+# #     artifacts:
+# #         paths:
+# #             - coverage/
+
+# release-tag:
+#     variables:
+#         GIT_STRATEGY: none
+#     stage: release
+#     except:
+#         - master
+#     script:
+#         - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+#         - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+#         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+
+# release-latest:
+#     variables:
+#         GIT_STRATEGY: none
+#     stage: release
+#     only:
+#         - master
+#     script:
+#         - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+#         - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+#         - docker push $CI_REGISTRY_IMAGE:latest
+
+# deploy:
+#     stage: deploy
+#     variables:
+#         GIT_STRATEGY: none
+#     only:
+#         - master
+#     before_script:
+#         - apk update && apk add openssh-client bash
+#     script:
+#         - printenv
+
+#         - echo "$SSH_PRIVATE_KEY"
+#         # chạy ssh-agent tương ứng với Gitlab Runner hiện tại
+#         - eval $(ssh-agent -s)
+
+#         # thêm nội dung của biến SSH_PRIVATE_KEY vào agent store
+#         - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)'
+
+#         # tạo folder ~/.ssh
+#         - mkdir -p ~/.ssh
+
+#         # Scan lấy SSH Host key cho địa chỉ IP server
+#         # Được kết quả bao nhiêu thì thêm vào file known_hosts
+#         - ssh-keyscan -H $SSH_SERVER_IP >> ~/.ssh/known_hosts
+
+#         # Sửa lại quyền của file known_hosts
+#         - chmod 644 ~/.ssh/known_hosts
+
+#         # Thực hiện SSH vào server, login vào Registry, chuyển tới folder project
+#         # Down project, pull image về, up project và xoá đi image cũ
+#         - >
+#             ssh $SSH_USER@$SSH_SERVER_IP
+#             "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY};
+#             cd ${PATH_TO_PROJECT};
+#             docker-compose down;
+#             docker pull ${CI_REGISTRY_IMAGE}:latest;
+#             docker-compose up -d;
+#             docker image prune -f;"
+
 image: docker:19
 
 services:
     - docker:dind
 
 stages:
-    - build
-    # - test
-    - release
     - deploy
 
 before_script:
     - docker version
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-
-build:
-    stage: build
-    script:
-        - echo cat $SSH_PRIVATE_KEY
-        - docker pull $CI_REGISTRY_IMAGE:latest || true
-        - docker build --cache-from $CI_REGISTRY_IMAGE:latest --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
-        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-
-# .tests:
-#     stage: test
-#     before_script:
-#         - apk add --no-cache py3-pip py3-setuptools python3 python3-dev libffi-dev openssl-dev gcc libc-dev make
-#         - pip install docker-compose
-#         - docker-compose version
-#         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#         - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-#         - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
-
-# linting:
-#     extends: .tests
-#     script:
-#         - docker-compose up -d
-#         - sleep 15
-#         - docker-compose exec -T app npm run lint
-
-# jest:
-#     extends: .tests
-#     script:
-#         - docker-compose up -d
-#         - sleep 15
-#         - docker-compose exec -T app npm run test
-#     coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-#     artifacts:
-#         paths:
-#             - coverage/
-
-release-tag:
-    variables:
-        GIT_STRATEGY: none
-    stage: release
-    except:
-        - master
-    script:
-        - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
-        - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
-
-release-latest:
-    variables:
-        GIT_STRATEGY: none
-    stage: release
-    only:
-        - master
-    script:
-        - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
-        - docker push $CI_REGISTRY_IMAGE:latest
 
 deploy:
     stage: deploy
@@ -87,25 +138,4 @@ deploy:
         - eval $(ssh-agent -s)
 
         # thêm nội dung của biến SSH_PRIVATE_KEY vào agent store
-        - bash -c ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 --decode)
-
-        # tạo folder ~/.ssh
-        - mkdir -p ~/.ssh
-
-        # Scan lấy SSH Host key cho địa chỉ IP server
-        # Được kết quả bao nhiêu thì thêm vào file known_hosts
-        - ssh-keyscan -H $SSH_SERVER_IP >> ~/.ssh/known_hosts
-
-        # Sửa lại quyền của file known_hosts
-        - chmod 644 ~/.ssh/known_hosts
-
-        # Thực hiện SSH vào server, login vào Registry, chuyển tới folder project
-        # Down project, pull image về, up project và xoá đi image cũ
-        - >
-            ssh $SSH_USER@$SSH_SERVER_IP
-            "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY};
-            cd ${PATH_TO_PROJECT};
-            docker-compose down;
-            docker pull ${CI_REGISTRY_IMAGE}:latest;
-            docker-compose up -d;
-            docker image prune -f;"
+        - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY")'
