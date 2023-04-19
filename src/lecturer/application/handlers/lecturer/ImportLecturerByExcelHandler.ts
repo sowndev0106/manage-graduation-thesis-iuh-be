@@ -131,8 +131,6 @@ export default class ImportLecturerByExcelHandler extends RequestHandler {
 
 		const lecturers = await Promise.all(lecturersPromise);
 
-		const result = await this.sendMailNotification();
-		console.log(result);
 		return lecturers.map(e => e.toJSON);
 	}
 	private async sendMailNotification() {
