@@ -34,7 +34,7 @@ export default class AddLecturerHandler extends RequestHandler {
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
 		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
-		const termId = this.errorCollector.collect('termId', () => termId.validate({ value: request.body['termId'] }));
+		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);

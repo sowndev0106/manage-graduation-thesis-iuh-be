@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/', LecturerController.getListLecturer);
 
-router.post('/', LecturerController.addLecturer);
+router.post('/', LecturerAuth.headLecturer, LecturerController.addLecturer);
 
 router.get('/:id', LecturerController.getListLecturerById);
 
