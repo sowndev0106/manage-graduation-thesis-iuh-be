@@ -107,5 +107,7 @@ deploy:
             cd ${PATH_TO_PROJECT};
             docker-compose down;
             docker pull ${CI_REGISTRY_IMAGE}:latest;
+            pwd
+            ls -a
             docker-compose up -d;
             docker image prune -f;"
