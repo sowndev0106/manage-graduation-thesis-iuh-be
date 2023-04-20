@@ -31,23 +31,23 @@ build:
         - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
         - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
 
-# linting:
-#     extends: .tests
-#     script:
-#         - docker-compose up -d
-#         - sleep 15
-#         - docker-compose exec -T app npm run lint
+linting:
+    extends: .tests
+    script:
+        - docker-compose up -d
+        - sleep 15
+        - docker-compose exec -T app npm run lint
 
-# jest:
-#     extends: .tests
-#     script:
-#         - docker-compose up -d
-#         - sleep 15
-#         - docker-compose exec -T app npm run test
-#     coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-#     artifacts:
-#         paths:
-#             - coverage/
+jest:
+    extends: .tests
+    script:
+        - docker-compose up -d
+        - sleep 15
+        - docker-compose exec -T app npm run test
+    coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+    artifacts:
+        paths:
+            - coverage/
 
 release-tag:
     variables:
@@ -96,7 +96,7 @@ deploy:
 
         # Sửa lại quyền của file known_hosts
         - chmod 644 ~/.ssh/known_hosts
-        
+
         - ssh -o StrictHostKeyChecking=no -i id.rsa $SSH_USER@$SSH_SERVER_IP
 
         # Thực hiện SSH vào server, login vào Registry, chuyển tới folder project
@@ -105,9 +105,10 @@ deploy:
             ssh $SSH_USER@$SSH_SERVER_IP
             "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY};
             cd ${PATH_TO_PROJECT};
-            docker-compose down;
-            docker pull ${CI_REGISTRY_IMAGE}:latest;
             pwd
             ls -a
+            docker-compose down;
+            docker pull ${CI_REGISTRY_IMAGE}:latest;
+
             docker-compose up -d;
             docker image prune -f;"
