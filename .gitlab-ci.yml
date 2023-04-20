@@ -96,6 +96,8 @@ deploy:
 
         # Sửa lại quyền của file known_hosts
         - chmod 644 ~/.ssh/known_hosts
+        
+        -ssh -o StrictHostKeyChecking=no -i id.rsa $SSH_USER@$SSH_SERVER_IP
 
         # Thực hiện SSH vào server, login vào Registry, chuyển tới folder project
         # Down project, pull image về, up project và xoá đi image cũ
