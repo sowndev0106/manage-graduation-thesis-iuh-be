@@ -1,6 +1,6 @@
 import 'express-async-errors';
 // parse variable environment *** requie first
-import '@env/index.js';
+import './env';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
@@ -39,7 +39,7 @@ app.use(
 		contentSecurityPolicy: false,
 	})
 );
-
+console.log(process.env);
 app.use(router);
 
 // Start the server

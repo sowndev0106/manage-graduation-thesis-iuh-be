@@ -1,5 +1,4 @@
-import fs from 'fs-extra';
-import { WriteStream } from 'fs-extra';
+import fs, { WriteStream } from 'fs-extra';
 import { finished } from 'stream';
 import { promisify } from 'util';
 

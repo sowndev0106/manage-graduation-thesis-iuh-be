@@ -1,6 +1,6 @@
 stages:
     - publish
-    -
+    - deploy
 
 variables:
     TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
@@ -18,18 +18,19 @@ publish:
         - docker push $TAG_LATEST
 
 deploy:
-    image: alpine:latest
+    image: node:8-alpine
     stage: deploy
-    tags:
-        - deployment
+    before_script:
+        - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
+        - eval $(ssh-agent -s)
     script:
         - chmod og= $ID_RSA
-        - apk update && apk add openssh-client
+        - apk add --no-cache --upgrade bash
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f manage-graduation-thesis-iuh || true"
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:80 --name manage-graduation-thesis-iuh $TAG_COMMIT"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f iuh || true"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 3000:3000 --name iuh $TAG_COMMIT"
     environment:
-        NODE_EVN: production
+        name: production
     only:
         - master
