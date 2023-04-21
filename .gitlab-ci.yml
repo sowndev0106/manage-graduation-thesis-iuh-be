@@ -31,6 +31,7 @@ deploy:
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f iuh || true"
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 3000:3000 --name iuh $TAG_COMMIT"
     environment:
+        name: production
         NODE_ENV: production
         PROJECT_NAME: manage-graduation-thesis-iuh
         BASE_URL: http://34.124.239.224:3000
