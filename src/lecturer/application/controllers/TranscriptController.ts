@@ -17,6 +17,10 @@ class TranscriptController {
 		const data = await Ioc.get(GetListTranscriptByStudentHandler).handle(req);
 		return res.status(200).json(data);
 	}
+	async getTranscriptByUser(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetListTranscriptByStudentHandler).handle(req);
+		return res.status(200).json(data);
+	}
 }
 
 export default new TranscriptController();
