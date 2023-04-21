@@ -29,9 +29,34 @@ deploy:
         - apk add --no-cache --upgrade bash
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f my-app || true"
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 3000:3000 --name my-app $TAG_COMMIT"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f iuh || true"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 3000:3000 --name iuh $TAG_COMMIT"
     environment:
         name: production
+        PROJECT_NAME: manage-graduation-thesis-iuh
+        BASE_URL: http://34.124.239.224:3000
+        PORT: 3000
+        URL_WEB: http://3.0.102.80:3000
+        DB_DEBUG: true
+        DB_CLIENT: mysql
+        DB_PORT: 3306
+        DB_HOST: 13.228.77.188
+        DB_USER: son
+        DB_PASSWORD: 162001
+        DB_NAME: manage-graduation-thesis-iuh
+        WRITE_LOG_FILE: false
+        REDIS_URL: redis://redis-12221.c252.ap-southeast-1-1.ec2.cloud.redislabs.com:12221
+        JWT_SECRECT_ACCESS_TOKEN: 5D64SaNalDRqvFr4F69c4YRPvdltq53mgHLTI6mklXXt1+lTW+ERKnasMgIF
+        JWT_SECRECT_REFRESH_TOKEN: s/DcWCLYogH4jR/WfdGnWnV3zyq2WCUTimc3z1Pr/lm93n6kePptgQe5JNCE
+        JWT_SECRECT_RESET_PASSWORD_TOKEN: sngVEpgkpXtzzjQO857Y6eYAxN6s3Thi
+        SALT_NUMBER: 9
+        PASWSWORD_DEFAULT: 123456
+        NODEMAILER_TRANSPORT_HOST: smtp.gmail.com
+        NODEMAILER_TRANSPORT_PORT: 465
+        NODEMAILER_TRANSPORT_SECURE: true
+        NODEMAILER_TRANSPORT_TLS: false
+        SMTP_USERNAME: graduationthesisiuh@gmail.com
+        SMTP_PASSWORD: bakvcfcczhydjoxj
+
     only:
         - master
