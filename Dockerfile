@@ -8,7 +8,7 @@ COPY package-lock.json . /app/
 ARG BUILD_ENV
 COPY . .
 
-RUN npm i
+RUN npm ci
 RUN npm run build
 RUN chown -R node /app/node_modules
 
