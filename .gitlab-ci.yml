@@ -18,7 +18,7 @@ publish:
         - docker push $TAG_LATEST
 
 deploy:
-    image: alpine:latest
+    image: node:8-alpine
     stage: deploy
     script:
         - chmod og= $ID_RSA
