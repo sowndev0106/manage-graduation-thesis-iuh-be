@@ -116,6 +116,7 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 				gradeByLecturer.set(transcrip.lecturerId!, transcrip.grade + grade);
 			}
 		});
+
 		return null as any;
 	}
 }
