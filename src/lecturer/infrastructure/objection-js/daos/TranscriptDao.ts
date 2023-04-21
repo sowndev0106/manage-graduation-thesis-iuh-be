@@ -6,6 +6,22 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class TranscriptDao extends TranscriptDaoCore implements ITranscriptDao {
+	async findByStudentAndType(props: { termId: number; studentId: number; type: TypeEvaluation }): Promise<Transcript[]> {
+		const query = this.initQuery();
+
+		const whereClause: Record<string, any> = {};
+
+		whereClause['student_id'] = props.studentId;
+		query.join('evaluation', 'transcript.evaluation_id', '=', 'evaluation.id');
+		whereClause['evaluation.type'] = props.type;
+		whereClause['evaluation.term_id'] = props.termId;
+
+		query.where(whereClause);
+
+		const result = await query.execute();
+
+		return result && result.map(e => this.convertModelToEntity(e));
+	}
 	async findOne(props: { lecturerId: number; evaluationId: number; studentId: number }): Promise<Transcript | null> {
 		const query = this.initQuery();
 
