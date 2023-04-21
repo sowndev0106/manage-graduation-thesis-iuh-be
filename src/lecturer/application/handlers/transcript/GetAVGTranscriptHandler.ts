@@ -1,4 +1,4 @@
-import { inject, injectable } from 'inversify';
+import { id, inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
@@ -107,10 +107,15 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 		};
 	}
 	caculateAVGGrade(transcripts: Array<Transcript>): IGrade {
-		// const sumWithInitial = transcripts.reduce((firstResult, currentValue) => accumulator + currentValue, {
-		// 	sumGradeMax: 0,
-		// 	sumGrade: 0,
-		// });
+		const gradeByLecturer = new Map<number, number>();
+		transcripts.forEach(transcrip => {
+			const grade = gradeByLecturer.get(transcrip.lecturerId!);
+			if (!grade) {
+				gradeByLecturer.set(transcrip.lecturerId!, transcrip.grade);
+			} else {
+				gradeByLecturer.set(transcrip.lecturerId!, transcrip.grade + grade);
+			}
+		});
 		return null as any;
 	}
 }

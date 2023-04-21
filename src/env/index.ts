@@ -5,7 +5,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'develop';
 
 let envFileDir = `./env/${process.env.NODE_ENV}.env`;
 if (fs.existsSync(envFileDir) === false) {
-	envFileDir = `${__dirname.replace('src\\env', '')}/env/${process.env.NODE_ENV}.env`;
+	envFileDir = `${__dirname.replace('/dist/env', '')}/env/${process.env.NODE_ENV}.env`;
 }
 const envConfigs = dotenv.parse(fs.readFileSync(envFileDir));
 const envVariables: any = {};
