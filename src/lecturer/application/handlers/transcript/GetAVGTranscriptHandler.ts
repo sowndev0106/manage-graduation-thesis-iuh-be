@@ -31,6 +31,21 @@ interface IGrade {
 	status: 'missing' | 'ok';
 	avg: number;
 }
+interface IGraderByLecturer {
+	lecturer: Lecturer;
+	grade: number;
+}
+interface IGradeByTypeEluvation {
+	avgGrader: number;
+	details: IGraderByLecturer[];
+}
+interface IResponse {
+	ADVISOR: IGradeByTypeEluvation;
+	REVIEWER: IGradeByTypeEluvation;
+	SESSION_HOST: IGradeByTypeEluvation;
+	missing: TypeEvaluation[];
+	avg: number;
+}
 @injectable()
 export default class GetAVGTranscriptHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
@@ -116,7 +131,6 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 				gradeByLecturer.set(transcrip.lecturerId!, transcrip.grade + grade);
 			}
 		});
-
 		return null as any;
 	}
 }
