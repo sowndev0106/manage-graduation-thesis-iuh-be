@@ -107,6 +107,10 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 		};
 	}
 	caculateAVGGrade(transcripts: Array<Transcript>): IGrade {
+		// const sumWithInitial = transcripts.reduce((firstResult, currentValue) => accumulator + currentValue, {
+		// 	sumGradeMax: 0,
+		// 	sumGrade: 0,
+		// });
 		return null as any;
 	}
 }
