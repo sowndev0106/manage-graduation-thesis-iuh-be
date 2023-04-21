@@ -1,6 +1,6 @@
 FROM node:18-alpine
 
-ENV NODE_ENV="production"
+ENV NODE_ENV="development"
 WORKDIR /app
 COPY package.json .
 COPY package-lock.json . /app/
@@ -8,9 +8,8 @@ COPY package-lock.json . /app/
 ARG BUILD_ENV
 COPY . .
 
-RUN npm i yarn 
-RUN yarn 
-RUN yarn build
+RUN npm ci
+RUN npm run build
 RUN chown -R node /app/node_modules
 
 EXPOSE 3000
