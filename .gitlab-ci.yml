@@ -21,9 +21,8 @@ deploy:
     image: node:8-alpine
     stage: deploy
     before_script:
-        - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' 
+        - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
         - eval $(ssh-agent -s)
-        # - echo "$ID_RSA" | tr -d '\r' | ssh-add -
     script:
         - chmod og= $ID_RSA
         - apk add --no-cache --upgrade bash
@@ -32,7 +31,7 @@ deploy:
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f iuh || true"
         - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 3000:3000 --name iuh $TAG_COMMIT"
     environment:
-        name: production
+        NODE_ENV: production
         PROJECT_NAME: manage-graduation-thesis-iuh
         BASE_URL: http://34.124.239.224:3000
         PORT: 3000
@@ -57,6 +56,5 @@ deploy:
         NODEMAILER_TRANSPORT_TLS: false
         SMTP_USERNAME: graduationthesisiuh@gmail.com
         SMTP_PASSWORD: bakvcfcczhydjoxj
-
     only:
         - master
