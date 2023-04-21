@@ -39,7 +39,7 @@ app.use(
 		contentSecurityPolicy: false,
 	})
 );
-console.log(process.env);
+
 app.use(router);
 
 // Start the server

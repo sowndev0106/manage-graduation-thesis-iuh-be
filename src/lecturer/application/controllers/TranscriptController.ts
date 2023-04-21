@@ -3,6 +3,7 @@ import Ioc from '@lecturer/infrastructure/inversify';
 import CreateOrUpdateTranscriptHandler from '../handlers/transcript/CreateOrUpdateTranscriptHandler';
 import GetListTranscriptByStudentHandler from '../handlers/transcript/GetListTranscriptByStudentHandler';
 import GetListTranscriptByGroupHandler from '../handlers/transcript/GetListTranscriptByGroupHandler';
+import GetAVGTranscriptHandler from '../handlers/transcript/GetAVGTranscriptHandler';
 
 class TranscriptController {
 	async createOrUpdateTranscript(req: Request, res: Response, next: NextFunction) {
@@ -17,8 +18,8 @@ class TranscriptController {
 		const data = await Ioc.get(GetListTranscriptByStudentHandler).handle(req);
 		return res.status(200).json(data);
 	}
-	async getTranscriptByUser(req: Request, res: Response, next: NextFunction) {
-		const data = await Ioc.get(GetListTranscriptByStudentHandler).handle(req);
+	async getAVGTranscriptByStudent(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetAVGTranscriptHandler).handle(req);
 		return res.status(200).json(data);
 	}
 }

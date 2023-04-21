@@ -22,14 +22,11 @@ import ITermDao from '@lecturer/domain/daos/ITermDao';
 import IGroupDao from '@lecturer/domain/daos/IGroupDao';
 import Group from '@core/domain/entities/Group';
 import Term from '@core/domain/entities/Term';
+import { forIn } from 'lodash';
 
 interface ValidatedInput {
 	student: Student;
 	term: Term;
-}
-interface IGrade {
-	status: 'missing' | 'ok';
-	avg: number;
 }
 interface IGraderByLecturer {
 	lecturer: Lecturer;
@@ -37,15 +34,11 @@ interface IGraderByLecturer {
 }
 interface IGradeByTypeEluvation {
 	avgGrader: number;
+	sumGrade: number;
+	count: number;
 	details: IGraderByLecturer[];
 }
-interface IResponse {
-	ADVISOR: IGradeByTypeEluvation;
-	REVIEWER: IGradeByTypeEluvation;
-	SESSION_HOST: IGradeByTypeEluvation;
-	missing: TypeEvaluation[];
-	avg: number;
-}
+
 @injectable()
 export default class GetAVGTranscriptHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
@@ -103,34 +96,95 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 			type: TypeEvaluation.SESSION_HOST,
 		});
 
-		const initValueGrade: IGrade = {
-			status: 'missing',
-			avg: 0,
-		};
-		const gradeByType: Record<TypeEvaluation, IGrade> = {
-			ADVISOR: initValueGrade,
-			REVIEWER: initValueGrade,
-			SESSION_HOST: initValueGrade,
+		const gradeByType: Record<TypeEvaluation, IGradeByTypeEluvation> = {
+			ADVISOR: {
+				avgGrader: 0,
+				sumGrade: 0,
+				count: 0,
+				details: [],
+			},
+			REVIEWER: {
+				avgGrader: 0,
+				sumGrade: 0,
+				count: 0,
+				details: [],
+			},
+			SESSION_HOST: {
+				avgGrader: 0,
+				sumGrade: 0,
+				count: 0,
+				details: [],
+			},
 		};
 
-		gradeByType.ADVISOR = this.caculateAVGGrade(transcriptByType.ADVISOR);
-		gradeByType.REVIEWER = this.caculateAVGGrade(transcriptByType.REVIEWER);
-		gradeByType.SESSION_HOST = this.caculateAVGGrade(transcriptByType.SESSION_HOST);
+		gradeByType.ADVISOR = (await this.caculateAVGGrade(transcriptByType.ADVISOR)) || [];
+		gradeByType.REVIEWER = (await this.caculateAVGGrade(transcriptByType.REVIEWER)) || [];
+		gradeByType.SESSION_HOST = (await this.caculateAVGGrade(transcriptByType.SESSION_HOST)) || [];
 
+		const missings = [];
+		if (gradeByType.ADVISOR.details.length == 0) missings.push('ADVISOR');
+		if (gradeByType.REVIEWER.details.length == 0) missings.push('REVIEWER');
+		if (gradeByType.SESSION_HOST.details.length == 0) missings.push('SESSION_HOST');
+		const avgGradeAdvisorReviewer =
+			(gradeByType.REVIEWER.sumGrade + gradeByType.ADVISOR.sumGrade) / (gradeByType.REVIEWER.count + gradeByType.ADVISOR.count);
 		return {
-			grade: gradeByType,
+			student: student.toJSON,
+			gradeSummary: (avgGradeAdvisorReviewer + gradeByType.SESSION_HOST.avgGrader) / 2,
+			missings,
+			ADVISOR: {
+				avgGrader: gradeByType.ADVISOR.avgGrader,
+				details: gradeByType.ADVISOR.details.map(e => {
+					return {
+						lecturer: e.lecturer.toJSON,
+						grade: e.grade,
+					};
+				}),
+			},
+			REVIEWER: {
+				avgGrader: gradeByType.REVIEWER.avgGrader,
+				details: gradeByType.REVIEWER.details.map(e => {
+					return {
+						lecturer: e.lecturer.toJSON,
+						grade: e.grade,
+					};
+				}),
+			},
+			SESSION_HOST: {
+				avgGrader: gradeByType.SESSION_HOST.avgGrader,
+				details: gradeByType.SESSION_HOST.details.map(e => {
+					return {
+						lecturer: e.lecturer.toJSON,
+						grade: e.grade,
+					};
+				}),
+			},
 		};
 	}
-	caculateAVGGrade(transcripts: Array<Transcript>): IGrade {
-		const gradeByLecturer = new Map<number, number>();
-		transcripts.forEach(transcrip => {
-			const grade = gradeByLecturer.get(transcrip.lecturerId!);
-			if (!grade) {
-				gradeByLecturer.set(transcrip.lecturerId!, transcrip.grade);
+	async caculateAVGGrade(transcripts: Array<Transcript>): Promise<IGradeByTypeEluvation> {
+		const gradeByLecturer = new Map<number, IGraderByLecturer>();
+		let sumGrade = 0;
+		for (const transcript of transcripts) {
+			sumGrade += transcript.grade;
+			const oldGrade = gradeByLecturer.get(transcript.lecturerId!);
+			if (!oldGrade) {
+				const lecturer = await this.lecturerDao.findEntityById(transcript.lecturerId);
+				gradeByLecturer.set(transcript.lecturerId!, {
+					grade: transcript.grade,
+					lecturer: lecturer!,
+				});
 			} else {
-				gradeByLecturer.set(transcrip.lecturerId!, transcrip.grade + grade);
+				gradeByLecturer.set(transcript.lecturerId!, {
+					grade: oldGrade.grade + transcript.grade,
+					lecturer: oldGrade.lecturer,
+				});
 			}
-		});
-		return null as any;
+		}
+		const gradeByLecturers = Array.from(gradeByLecturer.values());
+		return {
+			avgGrader: sumGrade / gradeByLecturers.length,
+			sumGrade: sumGrade,
+			count: gradeByLecturers.length,
+			details: gradeByLecturers,
+		};
 	}
 }
