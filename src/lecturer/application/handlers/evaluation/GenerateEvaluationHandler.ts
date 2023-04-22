@@ -7,9 +7,7 @@ import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
-import blobStream from 'blob-stream';
 import PDFKitService from '@core/infrastructure/pdfkit/PDFKitService';
-import fs from 'fs';
 interface ValidatedInput {
 	type: TypeEvaluation;
 	termId: number;

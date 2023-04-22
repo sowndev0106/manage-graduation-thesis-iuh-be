@@ -26,7 +26,7 @@ interface ValidatedInput {
 	endDateDiscussion: Date;
 	startDateReport: Date;
 	endDateReport: Date;
-	isPublicDate: boolean;
+	isPublicResult: boolean;
 }
 @injectable()
 export default class UpdateTermHandler extends RequestHandler {
@@ -36,7 +36,9 @@ export default class UpdateTermHandler extends RequestHandler {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: String(request.params['id']) }));
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
-		const isPublicDate = this.errorCollector.collect('isPublicDate', () => BooleanValidate.validate({ value: request.body['isPublicDate'] }));
+		const isPublicResult = this.errorCollector.collect('isPublicResult', () =>
+			BooleanValidate.validate({ value: request.body['isPublicResult'], required: false })
+		);
 		const startDate: Date = this.errorCollector.collect('startDate', () => DateValidate.validate({ value: request.body['startDate'] }));
 		const endDate: Date = this.errorCollector.collect('endDate', () => DateValidate.validate({ value: request.body['endDate'] }));
 
@@ -83,7 +85,7 @@ export default class UpdateTermHandler extends RequestHandler {
 			endDateReport,
 			startDateChooseTopic,
 			endDateChooseTopic,
-			isPublicDate,
+			isPublicResult,
 		};
 	}
 
@@ -102,27 +104,24 @@ export default class UpdateTermHandler extends RequestHandler {
 
 		if (termCheckName?.id && termCheckName.id != term.id)
 			throw new Error(`name already exists in majors and year ${input.startDate.getFullYear()} - ${input.endDate.getFullYear()}`);
-
-		term = await this.termDao.updateEntity(
-			Term.create(
-				{
-					name: input.name,
-					majors: Majors.createById(input.majorsId),
-					startDate: input.startDate,
-					endDate: input.endDate,
-					startDateSubmitTopic: input.startDateSubmitTopic,
-					endDateSubmitTopic: input.endDateSubmitTopic,
-					startDateDiscussion: input.startDateDiscussion,
-					endDateDiscussion: input.endDateDiscussion,
-					startDateReport: input.startDateReport,
-					endDateReport: input.endDateReport,
-					startDateChooseTopic: input.startDateChooseTopic,
-					endDateChooseTopic: input.endDateChooseTopic,
-					isPublicResult: false,
-				},
-				input.id
-			)
-		);
+		term.update({
+			name: input.name,
+			majors: Majors.createById(input.majorsId),
+			startDate: input.startDate,
+			endDate: input.endDate,
+			startDateSubmitTopic: input.startDateSubmitTopic,
+			endDateSubmitTopic: input.endDateSubmitTopic,
+			startDateDiscussion: input.startDateDiscussion,
+			endDateDiscussion: input.endDateDiscussion,
+			startDateReport: input.startDateReport,
+			endDateReport: input.endDateReport,
+			startDateChooseTopic: input.startDateChooseTopic,
+			endDateChooseTopic: input.endDateChooseTopic,
+		});
+		if (input.isPublicResult != undefined) {
+			term.update({ isPublicResult: input.isPublicResult });
+		}
+		await this.termDao.updateEntity(term);
 		if (!term) throw new Error('Create term fail');
 
 		return term.toJSON;
