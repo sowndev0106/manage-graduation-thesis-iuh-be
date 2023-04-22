@@ -24,7 +24,6 @@ interface ValidatedInput {
 	target: string;
 	standradOutput: string;
 	requireInput: string;
-	comment?: string;
 	termId: number;
 	lecturerId: number;
 }
@@ -41,7 +40,6 @@ export default class CreateTopicHandler extends RequestHandler {
 		const target = this.errorCollector.collect('target', () => SortText.validate({ value: request.body['target'] }));
 		const standradOutput = this.errorCollector.collect('standradOutput', () => SortText.validate({ value: request.body['standradOutput'] }));
 		const requireInput = this.errorCollector.collect('requireInput', () => SortText.validate({ value: request.body['requireInput'] }));
-		const comment = this.errorCollector.collect('comment', () => Text.validate({ value: request.body['comment'] }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const lecturerId = Number(request.headers['id']);
 		if (this.errorCollector.hasError()) {
@@ -57,7 +55,6 @@ export default class CreateTopicHandler extends RequestHandler {
 			target,
 			standradOutput,
 			requireInput,
-			comment,
 			termId,
 		};
 	}
@@ -83,7 +80,6 @@ export default class CreateTopicHandler extends RequestHandler {
 				target: input.target,
 				standradOutput: input.standradOutput,
 				requireInput: input.requireInput,
-				comment: input.comment,
 				status: TypeStatusTopic.PEDING,
 				lecturer: Lecturer.createById(input.lecturerId),
 				term: Term.createById(input.termId),
