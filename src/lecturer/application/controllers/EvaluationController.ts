@@ -6,6 +6,9 @@ import GetListEvaluationHandler from '../handlers/evaluation/GetListEvaluationHa
 import GetEvaluationByIdHandler from '../handlers/evaluation/GetEvaluationByIdHandler';
 import DeleteEvaluationHandler from '../handlers/evaluation/DeleteEvaluationHandler';
 import GenerateEvaluationHandler from '../handlers/evaluation/GenerateEvaluationHandler';
+import { Readable } from 'stream';
+
+import fs from 'fs-extra';
 
 class EvaluationController {
 	async createEvaluation(req: Request, res: Response, next: NextFunction) {
@@ -31,7 +34,8 @@ class EvaluationController {
 	}
 	async generateEvaluation(req: Request, res: Response, next: NextFunction) {
 		const doc = await Ioc.get(GenerateEvaluationHandler).handle(req);
-		doc.pipe(res);
+		res.setHeader('Content-Type', 'application/pdf');
+		res.end(doc);
 	}
 }
 

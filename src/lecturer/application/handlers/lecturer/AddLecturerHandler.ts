@@ -33,7 +33,7 @@ export default class AddLecturerHandler extends RequestHandler {
 	async validate(request: Request): Promise<ValidatedInput> {
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
-		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
+		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'], required: false }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 
 		if (this.errorCollector.hasError()) {
@@ -56,7 +56,8 @@ export default class AddLecturerHandler extends RequestHandler {
 		if (!term) {
 			throw new Error('term not found');
 		}
-		const passwordEncript = await encriptTextBcrypt(input.password);
+		const defaultPassword = '123456';
+		const passwordEncript = await encriptTextBcrypt(input.password || defaultPassword);
 
 		lecturer = Lecturer.create({
 			username: input.username,
