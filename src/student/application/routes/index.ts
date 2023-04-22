@@ -7,6 +7,7 @@ import lecturerRoute from './lecturer';
 import studentRoute from './student';
 import topicRoute from './topic';
 import groupRoute from './group';
+import transcriptRoute from './transcript';
 import studentAuthentication from '../middlewares/studentAuthentication';
 const router = Router();
 
@@ -23,5 +24,6 @@ router.use('/lecturers', lecturerRoute);
 router.use('/topics', topicRoute);
 router.use('/students', studentRoute);
 router.use('/groups', groupRoute);
+router.use('/transcripts', transcriptRoute);
 
 export default router;
