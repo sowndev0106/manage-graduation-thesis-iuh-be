@@ -1,9 +1,0 @@
-{
-    "apps": [
-        {
-            "name": "iuh",
-            "script": "npm",
-            "args" : "start"
-        }
-    ]
-}

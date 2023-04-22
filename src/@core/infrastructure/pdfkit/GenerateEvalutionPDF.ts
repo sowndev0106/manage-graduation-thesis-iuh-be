@@ -1,6 +1,5 @@
 import Evaluation from '@core/domain/entities/Evaluation';
 import puppeteer from 'puppeteer';
-import inlineCss from 'inline-css';
 import hb from 'handlebars';
 
 // Example of options with args //
@@ -22,10 +21,10 @@ export default class GenerateEvalutionPDF {
 			headless: true,
 		});
 		const page = await browser.newPage();
-		const data = await inlineCss(dataHDoc, { url: '/' });
+		// const data = await inlineCss(dataHDoc, { url: '/' });
 		// we have compile our code with handlebars
-		const template = hb.compile(data, { strict: true });
-		const result = template(data);
+		const template = hb.compile(dataHDoc, { strict: true });
+		const result = template(dataHDoc);
 		const html = result;
 
 		await page.setContent(html, {
