@@ -11,6 +11,7 @@ import assignRoute from './assign';
 import groupLecturerRoute from './groupLecturer';
 import transcriptRoute from './transcript';
 import groupRoute from './group';
+import achievementRoute from './achievement';
 import LecturerAuth from '../middlewares/LecturerAuth';
 
 const router = Router();
@@ -30,6 +31,7 @@ router.use('/assigns', assignRoute);
 router.use('/group-lecturer', groupLecturerRoute);
 router.use('/transcripts', transcriptRoute);
 router.use('/groups', groupRoute);
+router.use('/achievements', achievementRoute);
 router.use('/me', meRoute);
 
 export default router;

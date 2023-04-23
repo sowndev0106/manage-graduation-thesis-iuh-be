@@ -23,6 +23,7 @@ import IGroupDao from '@lecturer/domain/daos/IGroupDao';
 import Group from '@core/domain/entities/Group';
 import Term from '@core/domain/entities/Term';
 import { forIn } from 'lodash';
+import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
 
 interface ValidatedInput {
 	student: Student;
@@ -51,6 +52,7 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('EvaluationDao') private evaluationDao!: IEvaluationDao;
 	@inject('TranscriptDao') private transcriptDao!: ITranscriptDao;
+	@inject('AchievementDao') private achievementDao!: IAchievementDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const studentId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.query['studentId'] }));
@@ -127,10 +129,21 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 		if (gradeByType.SESSION_HOST.details.length == 0) missings.push('SESSION_HOST');
 		const avgGradeAdvisorReviewer =
 			(gradeByType.REVIEWER.sumGrade + gradeByType.ADVISOR.sumGrade) / (gradeByType.REVIEWER.count + gradeByType.ADVISOR.count);
+		let gradeSummary = (avgGradeAdvisorReviewer + gradeByType.SESSION_HOST.avgGrader) / 2;
+
+		const achievements = await this.achievementDao.findAll({
+			termId: term.id!,
+			studentId: student.id!,
+		});
+
+		// add grade achievement
+		gradeSummary += achievements.reduce((num, e) => e.bonusGrade + num, 0);
+
 		return {
 			student: student.toJSON,
-			gradeSummary: (avgGradeAdvisorReviewer + gradeByType.SESSION_HOST.avgGrader) / 2,
+			gradeSummary: gradeSummary > 10 ? 10 : gradeSummary,
 			missings,
+			achievements: achievements.map(achievement => achievement.toJSON),
 			ADVISOR: {
 				avgGrader: gradeByType.ADVISOR.avgGrader,
 				details: gradeByType.ADVISOR.details.map(e => {

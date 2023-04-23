@@ -30,6 +30,8 @@ import GroupLecturerDao from '../objection-js/daos/GroupLecturerDao';
 import GroupLecturerMemberDao from '../objection-js/daos/GroupLecturerMemberDao';
 import IGroupMemberDao from '@lecturer/domain/daos/IGroupMemberDao';
 import GroupMemberDao from '../objection-js/daos/GroupMemberDao';
+import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
+import AchievementDao from '../objection-js/daos/AchievementDao';
 
 const container = new Container({
 	autoBindInjectable: true,
@@ -58,6 +60,7 @@ container.bind<IGroupDao>('GroupDao').to(GroupDao);
 container.bind<IGroupMemberDao>('GroupMemberDao').to(GroupMemberDao);
 container.bind<IGroupLecturerDao>('GroupLecturerDao').to(GroupLecturerDao);
 container.bind<IGroupLecturerMemberDao>('GroupLecturerMemberDao').to(GroupLecturerMemberDao);
+container.bind<IAchievementDao>('AchievementDao').to(AchievementDao);
 container.bind('NodeMailer').to(Nodemailer);
 
 export default container;
