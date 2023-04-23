@@ -31,6 +31,7 @@ export default class GenerateEvaluationHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		const evaluations = await this.evaluationDao.findAll(input.termId, input.type);
+
 		const doc = PDFKitService.generateEvalutionPDF(evaluations);
 
 		return doc;
