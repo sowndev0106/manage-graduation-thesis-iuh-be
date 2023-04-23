@@ -18,7 +18,7 @@ const router = Router();
 // public api
 router.use('/auth', authRoute);
 
-// router.use(LecturerAuth.lecturer);
+router.use(LecturerAuth.lecturer);
 
 router.use('/terms', termRoute);
 router.use('/majors', majorsRoute);

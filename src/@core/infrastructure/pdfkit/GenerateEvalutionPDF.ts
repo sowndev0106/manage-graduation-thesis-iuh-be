@@ -19,7 +19,7 @@ export default class GenerateEvalutionPDF {
 	async printPDF() {
 		const browser = await puppeteer.launch({
 			headless: true,
-			executablePath: '/usr/bin/chromium-browser'
+			executablePath: '/usr/bin/chromium-browser',
 		});
 		const page = await browser.newPage();
 		// const data = await inlineCss(dataHDoc, { url: '/' });
@@ -53,21 +53,79 @@ const dataHDoc = `
 		<title>Phiếu chấm</title>
 	</head>
 	<style>
+		body {
+			padding: 40px 20px;
+			font-size: 12px;
+		}
 		header {
 			display: flex;
+			flex-direction: column;
+			align-items: center;
 		}
-	</style>
+		ol {
+			font-weight: 600;
+		}
+		li {
+			margin-top: 10px;
+		}
+		.content-info {
+			padding: 0 40px;
+		}
+		table,
+		th,
+		td {
+			border: 1px solid rgb(0, 0, 0);
+			border-collapse: collapse;
+		}
+		table {
+			margin-top: 10px;
+			width: 100%;
+		}
+		thead {
+			text-align: center;
+		}
+		</style>
 	<body>
 		<header>
-			<div>
-				<h1>TRƯỜNG ĐH CÔNG NGHIỆP TP. HCM</h1>
-				<h1>KHOA CÔNG NGHỆ THÔNG TIN</h1>
-				<h1>=======//======</h1>
-			</div>
-			<div>
-				<h1>PHIẾU CHẤM ĐIỂM KHÓA LUẬN TỐT NGHIỆP</h1>
-			</div>
+			<b>TRƯỜNG ĐH CÔNG NGHIỆP TP. HCM</b>
+			<span>KHOA CÔNG NGHỆ THÔNG TIN</span>
+			<span>=======//======</span>
+			<br />
+			<b>PHIẾU CHẤM ĐIỂM KHÓA LUẬN TỐT NGHIỆP</b>
 		</header>
+		<br />
+		<div class="content-info">
+			<ol>
+				<li>Tên đề tài:</li>
+				<li>
+					Nhóm thực hiện:
+					<table>
+						<thead>
+							<tr>
+								<th>MSSV</th>
+								<th>Họ tên</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td >&#x200B</td>
+								<td style="width: 70%;"></td>
+							</tr>
+							<tr>
+								<td>&#x200B</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>&#x200B</td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+				<li>Họ tên người chấm điểm:</li>
+				<li>Vai trò của người đánh giá:</li>
+			</ol>
+		</div>
 	</body>
 </html>
 `;
