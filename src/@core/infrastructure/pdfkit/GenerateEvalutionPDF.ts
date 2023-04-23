@@ -19,7 +19,7 @@ export default class GenerateEvalutionPDF {
 	async printPDF() {
 		const browser = await puppeteer.launch({
 			headless: true,
-			executablePath: '/usr/bin/chromium-browser',
+			// executablePath: '/usr/bin/chromium-browser',
 		});
 		const page = await browser.newPage();
 		// const data = await inlineCss(dataHDoc, { url: '/' });
