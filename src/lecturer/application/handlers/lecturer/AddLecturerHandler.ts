@@ -45,7 +45,6 @@ export default class AddLecturerHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-
 		let lecturer = await this.lecturerDao.findByUsername(input.username);
 		if (lecturer) throw new ConflictError('username already exists');
 
