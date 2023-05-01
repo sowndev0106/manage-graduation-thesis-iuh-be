@@ -7,7 +7,7 @@
 	"scripts": {
 		"build": "node ./tools/scripts/build.js",
 		"start": "node -r ts-node/register -r tsconfig-paths/register ./dist",
-		"local": "nodemon",
+		"local": "SET NODE_ENV=local&&nodemon",
 		"develop": "SET NODE_ENV=develop&&nodemon",
 		"deploy": "npm run start",
 		"lint:fix": "eslint ./src/**/*.ts --fix",

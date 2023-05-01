@@ -34,7 +34,12 @@ export default class GetAssignByIdHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { type, groupId, groupLecturerId, termId } = await this.validate(request);
-		const assigns = await this.assignDao.findAll(groupLecturerId, termId, type, groupId);
+		const assigns = await this.assignDao.findAll({
+			groupLecturerId,
+			termId,
+			type,
+			groupId,
+		});
 
 		return assigns.map(e => e.toJSON);
 	}

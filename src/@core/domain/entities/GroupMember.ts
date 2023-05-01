@@ -1,11 +1,11 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import Topic from './Topic';
-import Student from './Student';
+import StudentTerm from './StudentTerm';
 import Group from './Group';
 export interface IProps {
 	group: Group;
-	student: Student;
+	studentTerm: StudentTerm;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -23,11 +23,11 @@ export default class GroupMember extends Entity<IProps> {
 	get group() {
 		return this.props?.group;
 	}
-	get studentId() {
-		return this.props?.student?.id;
+	get studentTermId() {
+		return this.props?.studentTerm?.id;
 	}
-	get student() {
-		return this.props?.student;
+	get studentTerm() {
+		return this.props?.studentTerm;
 	}
 	get createdAt() {
 		return this.props.createdAt || new Date();
@@ -35,18 +35,18 @@ export default class GroupMember extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
-	updateStudent(student: Student) {
-		this._props.student = student;
+	updateStudentTerm(studentTerm: StudentTerm) {
+		this._props.studentTerm = studentTerm;
 	}
 	updateGroup(group: Group) {
 		this._props.group = group;
 	}
 	get toJSON() {
-		const { student, group, ...props } = lodash.cloneDeep(this._props || {});
+		const { studentTerm, group, ...props } = lodash.cloneDeep(this._props || {});
 
-		let studentProps = this.student?.toJSON;
+		let studentTermProps = this.studentTerm?.toJSON;
 		let groupProps: any = this.group?.toJSON;
 
-		return { id: this.id, ...props, student: studentProps, group: groupProps };
+		return { id: this.id, ...props, student: studentTermProps, group: groupProps };
 	}
 }

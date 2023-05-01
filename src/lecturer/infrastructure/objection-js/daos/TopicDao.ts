@@ -5,20 +5,29 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class TopicDao extends TopicDaoCore implements ITopicDao {
-	async findByNameLecturAndTerm(name: string, lecturer: number, term: number): Promise<Topic | null> {
+	async findOne(props: { name: string; lecturerTermId: number }): Promise<Topic | null> {
 		const query = this.initQuery();
+		query.withGraphFetched('[lecturer_term,lecturer_term.lecturer]');
 
-		const result = await query.findOne({ name, lecturer_id: lecturer, term_id: term });
+		const whereClause: Record<string, any> = {};
+
+		whereClause.lecturer_term_id = props.lecturerTermId;
+		whereClause.name = props.name;
+
+		const result = await query.findOne(whereClause);
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(term?: number, lecturer?: number): Promise<Topic[]> {
+	async findAll(props: { lecturerTermId?: number; termId?: number }): Promise<Topic[]> {
 		const query = this.initQuery();
+		query.withGraphFetched('[lecturer_term,lecturer_term.lecturer]');
+
 		const whereClause: Record<string, number> = {};
-
-		if (lecturer) whereClause.lecturer_id = lecturer;
-		if (term) whereClause.term_id = term;
-
+		if (props.lecturerTermId) whereClause.lecturer_term_id = props.lecturerTermId;
+		if (props.termId) {
+			query.join('lecturer_term', 'lecturer_term.id', '=', 'topic.lecturer_term_id');
+			whereClause['lecturer_term.term_id'] = props.termId;
+		}
 		query.where(whereClause);
 		const result = await query.execute();
 

@@ -15,6 +15,9 @@ import Term from '@core/domain/entities/Term';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import StatusTopic from '@core/domain/validate-objects/StatusTopic';
 import Majors from '@core/domain/entities/Majors';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 
 interface ValidatedInput {
 	name: string;
@@ -24,14 +27,16 @@ interface ValidatedInput {
 	target: string;
 	standradOutput: string;
 	requireInput: string;
-	termId: number;
-	lecturerId: number;
+	term: Term;
+	lecturerTerm: LecturerTerm;
 }
 @injectable()
 export default class CreateTopicHandler extends RequestHandler {
 	@inject('TopicDao') private topicDao!: ITopicDao;
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
+
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const quantityGroupMax = this.errorCollector.collect('quantityGroupMax', () => PositiveNumber.validate({ value: request.body['quantityGroupMax'] }));
@@ -45,28 +50,36 @@ export default class CreateTopicHandler extends RequestHandler {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
+		const term = await this.termDao.findEntityById(termId);
+		if (!term) {
+			throw new Error('Term not found');
+		}
 
+		const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturerId);
+
+		if (!lecturerTerm) {
+			throw new Error(`lecturer not in term ${termId}`);
+		}
 		return {
 			name,
-			lecturerId,
+			lecturerTerm,
 			quantityGroupMax,
 			description,
 			note,
 			target,
 			standradOutput,
 			requireInput,
-			termId,
+			term,
 		};
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-		const term = await this.termDao.findEntityById(input.termId);
-		if (!term) {
-			throw new Error('Term not found');
-		}
 
-		const isExistName = !!(await this.topicDao.findByNameLecturAndTerm(input.name, input.lecturerId, input.termId));
+		const isExistName = !!(await this.topicDao.findOne({
+			lecturerTermId: input.lecturerTerm.id!,
+			name: input.name,
+		}));
 		if (isExistName) {
 			throw new Error('name already exists');
 		}
@@ -81,11 +94,12 @@ export default class CreateTopicHandler extends RequestHandler {
 				standradOutput: input.standradOutput,
 				requireInput: input.requireInput,
 				status: TypeStatusTopic.PEDING,
-				lecturer: Lecturer.createById(input.lecturerId),
-				term: Term.createById(input.termId),
+				lecturerTerm: input.lecturerTerm,
 			})
 		);
 		if (!topic) throw new Error('Create Topic fail');
+
+		topic.update({ lecturerTerm: input.lecturerTerm });
 
 		return topic.toJSON;
 	}

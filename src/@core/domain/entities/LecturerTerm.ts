@@ -50,6 +50,6 @@ export default class LecturerTerm extends Entity<IProps> {
 		let lecturerProps = this.lecturer?.toJSON;
 		let termProps: any = this.term?.toJSON;
 
-		return { id: this.id, ...props, lecturer: lecturerProps, term: termProps };
+		return { ...lecturerProps, term: termProps };
 	}
 }

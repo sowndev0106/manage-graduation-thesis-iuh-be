@@ -10,6 +10,7 @@ import ITopicDao from '@student/domain/daos/ITopicDao';
 import Topic from '@core/domain/entities/Topic';
 import Group from '@core/domain/entities/Group';
 import ITermDao from '@student/domain/daos/ITermDao';
+import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 
 interface ValidatedInput {
 	group: Group;
@@ -21,6 +22,8 @@ export default class ChooseTopicHandler extends RequestHandler {
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
+
 	async validate(request: Request): Promise<ValidatedInput> {
 		const topicId = this.errorCollector.collect('topicId', () => EntityId.validate({ value: request.body['topicId'] }));
 		const termId = this.errorCollector.collect('termId ', () => EntityId.validate({ value: request.body['termId'] }));
@@ -35,7 +38,13 @@ export default class ChooseTopicHandler extends RequestHandler {
 		let term = await this.termDao.findEntityById(termId);
 		if (!term) throw new NotFoundError('term not found');
 
-		let group = await this.groupDao.findOneByTermAndStudent(term.id!, studentId);
+		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
+		if (!studentTerm) {
+			throw new Error(`student not in term ${termId}`);
+		}
+		let group = await this.groupDao.findOne({
+			studentTermId: studentTerm.id!,
+		});
 		if (!group) throw new NotFoundError('You not have group');
 
 		if (group.topicId) {
@@ -49,7 +58,7 @@ export default class ChooseTopicHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { topic, group } = await this.validate(request);
-		const groups = await this.groupDao.findAll(undefined, topic.id);
+		const groups = await this.groupDao.findAll({ topicId: topic.id });
 
 		if (topic.quantityGroupMax <= groups.length) {
 			throw new Error('max quality topic');

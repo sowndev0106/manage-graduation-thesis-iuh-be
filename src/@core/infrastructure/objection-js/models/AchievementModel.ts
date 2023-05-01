@@ -4,26 +4,20 @@ import StudentModel from './StudentModel';
 import Student from '@core/domain/entities/Student';
 import TermModel from './TermModel';
 import Term from '@core/domain/entities/Term';
+import StudentTerm from '@core/domain/entities/StudentTerm';
+import StudentTermModel from './StudentTermModel';
 
 export default class AchievementModel extends Model {
 	static get tableName() {
 		return 'achievement';
 	}
 	static relationMappings = {
-		student: {
+		student_term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: StudentModel,
+			modelClass: StudentTermModel,
 			join: {
-				from: 'achievement.student_id',
-				to: 'student.id',
-			},
-		},
-		term: {
-			relation: Model.BelongsToOneRelation,
-			modelClass: TermModel,
-			join: {
-				from: 'achievement.term_id',
-				to: 'term.id',
+				from: 'achievement.student_term_id',
+				to: 'student_term.id',
 			},
 		},
 	};
@@ -32,10 +26,9 @@ export default class AchievementModel extends Model {
 		const model = new AchievementModel();
 		model.$set({
 			id: entity.id,
-			student_id: entity.studentId,
+			student_term_id: entity.studentTermId,
 			name: entity.name,
 			bonus_grade: entity.bonusGrade,
-			term_id: entity.termId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -54,17 +47,13 @@ export default class AchievementModel extends Model {
 			{
 				name: dbJson['name'],
 				bonusGrade: dbJson['bonus_grade'],
-				student: Student.createById(dbJson['student_id']),
-				term: Term.createById(dbJson['term_id']),
+				studentTerm: StudentTerm.createById(dbJson['student_term_id']),
 			},
 			Number(dbJson['id'])
 		);
 
-		const student = dbJson['student'] && StudentModel.convertModelToEntity(dbJson['student']);
-		if (student) entity.update({ student });
-
-		const term = dbJson['term'] && StudentModel.convertModelToEntity(dbJson['term']);
-		if (term) entity.update({ term });
+		const studentTerm = dbJson['student_term'] && StudentModel.convertModelToEntity(dbJson['student_term']);
+		if (studentTerm) entity.update({ studentTerm });
 
 		return entity;
 	}

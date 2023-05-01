@@ -6,15 +6,14 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class TranscriptDao extends TranscriptDaoCore implements ITranscriptDao {
-	async findByStudentAndType(props: { termId: number; studentId: number; type: TypeEvaluation }): Promise<Transcript[]> {
+	async findByStudentAndType(props: { termId: number; studentTermId: number; type: TypeEvaluation }): Promise<Transcript[]> {
 		const query = this.initQuery();
 
 		const whereClause: Record<string, any> = {};
 
-		whereClause['student_id'] = props.studentId;
+		whereClause['student_term_id'] = props.studentTermId;
 		query.join('evaluation', 'transcript.evaluation_id', '=', 'evaluation.id');
 		whereClause['evaluation.type'] = props.type;
-		whereClause['evaluation.term_id'] = props.termId;
 
 		query.where(whereClause);
 
@@ -22,26 +21,26 @@ export default class TranscriptDao extends TranscriptDaoCore implements ITranscr
 
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
-	async findOne(props: { lecturerId: number; evaluationId: number; studentId: number }): Promise<Transcript | null> {
+	async findOne(props: { lecturerTermId: number; evaluationId: number; studentTermId: number }): Promise<Transcript | null> {
 		const query = this.initQuery();
 
 		const whereClause: Record<string, any> = {};
 
-		whereClause['lecturer_id'] = props.lecturerId;
+		whereClause['lecturer_term_id'] = props.lecturerTermId;
 		whereClause['evaluation_id'] = props.evaluationId;
-		whereClause['student_id'] = props.studentId;
+		whereClause['student_term_id'] = props.studentTermId;
 
 		const result = await query.findOne(whereClause);
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(props: { termId: number; lecturerId: number; studentId: number }): Promise<Transcript[]> {
+	async findAll(props: { lecturerTermId: number; studentTermId: number }): Promise<Transcript[]> {
 		const query = this.initQuery();
 
 		const whereClause: Record<string, any> = {};
 
-		whereClause['lecturer_id'] = props.lecturerId;
-		whereClause['student_id'] = props.studentId;
+		whereClause['lecturer_term_id'] = props.lecturerTermId;
+		whereClause['student_term_id'] = props.studentTermId;
 
 		query.where(whereClause);
 

@@ -14,11 +14,13 @@ import Lecturer from '@core/domain/entities/Lecturer';
 import Term from '@core/domain/entities/Term';
 import EntityIds from '@core/domain/validate-objects/EntityIds';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 interface ValidatedInput {
 	name: string;
 	term: Term;
-	lecturers: Lecturer[];
+	lecturerTerms: LecturerTerm[];
 }
 @injectable()
 export default class CreateGroupLecturerHandler extends RequestHandler {
@@ -26,6 +28,7 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupLecturerMemberDao') private groupMemberDao!: IGroupLecturerMemberDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
@@ -38,22 +41,22 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 		let term = await this.termDao.findEntityById(termId);
 		if (!term) throw new NotFoundError('term not found');
 
-		const lecturers: Lecturer[] = [];
+		const lecturerTerms: LecturerTerm[] = [];
 
 		for (const lecturerId of lecturerIds) {
-			const lecturer = await this.lecturerDao.findEntityById(lecturerId);
-			if (lecturer) lecturers.push(lecturer);
+			const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturerId);
+			if (lecturerTerm) lecturerTerms.push(lecturerTerm);
 		}
 
 		return {
 			name,
 			term,
-			lecturers,
+			lecturerTerms,
 		};
 	}
 
 	async handle(request: Request) {
-		const { name, term, lecturers } = await this.validate(request);
+		const { name, term, lecturerTerms } = await this.validate(request);
 
 		let groupLecturer = await this.groupLecturerDao.findOne({
 			termId: term.id!,
@@ -67,11 +70,12 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 				name: name,
 			})
 		);
-		const membersPromise = lecturers.map(async lecturer => {
+
+		const membersPromise = lecturerTerms.map(async lecturerTerm => {
 			return await this.groupMemberDao.insertEntity(
 				GroupLecturerMember.create({
 					groupLecturer: groupLecturer!,
-					lecturer,
+					lecturerTerm,
 				})
 			);
 		});

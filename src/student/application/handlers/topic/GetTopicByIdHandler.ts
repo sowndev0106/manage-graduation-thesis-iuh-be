@@ -5,6 +5,7 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import ITopicDao from '@student/domain/daos/ITopicDao';
 import ILecturerDao from '@student/domain/daos/ILecturerDao';
+import ILecturerTermDao from '@student/domain/daos/ILecturerTermDao';
 
 interface ValidatedInput {
 	id: number;
@@ -14,6 +15,7 @@ interface ValidatedInput {
 export default class GetTopicByIdHandler extends RequestHandler {
 	@inject('TopicDao') private topicDao!: ITopicDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: String(request.params['id']) }));
 
@@ -31,9 +33,9 @@ export default class GetTopicByIdHandler extends RequestHandler {
 		if (!topic) {
 			throw new Error('topic not found');
 		}
-		const lecturer = await this.lecturerDao.findEntityById(topic.lecturerId!);
+		const lecturerTerm = await this.lecturerTermDao.findOneGraphById(topic.lecturerTermId!);
 
-		lecturer && topic.updateLecturer(lecturer);
+		lecturerTerm && topic.update({ lecturerTerm });
 
 		return topic.toJSON;
 	}

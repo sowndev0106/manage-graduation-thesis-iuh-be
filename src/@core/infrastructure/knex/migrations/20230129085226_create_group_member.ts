@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
 		table.increments('id').primary();
 
 		table.integer('group_id').unsigned().references('id').inTable('group').onDelete('CASCADE');
-		table.integer('student_id').unsigned().references('id').inTable('student');
+		table.integer('student_term_id').unsigned().references('id').inTable('student_term');
 
 		table.timestamps();
 	});

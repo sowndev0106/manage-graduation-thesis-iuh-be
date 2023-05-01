@@ -4,6 +4,8 @@ import RequestJoinGroup from '@core/domain/entities/RequestJoinGroup';
 import Student from '@core/domain/entities/Student';
 import GroupModel from './GroupModel';
 import StudentModel from './StudentModel';
+import StudentTermModel from './StudentTermModel';
+import StudentTerm from '@core/domain/entities/StudentTerm';
 
 export default class RequestJoinGroupModel extends Model {
 	static get tableName() {
@@ -19,12 +21,12 @@ export default class RequestJoinGroupModel extends Model {
 				to: 'group.id',
 			},
 		},
-		student: {
+		student_term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: StudentModel,
+			modelClass: StudentTermModel,
 			join: {
-				from: 'request_join_group.student_id',
-				to: 'student.id',
+				from: 'request_join_group.student_term_id',
+				to: 'student_term.id',
 			},
 		},
 	};
@@ -35,7 +37,7 @@ export default class RequestJoinGroupModel extends Model {
 			id: entity.id,
 			message: entity.message,
 			group_id: entity.groupId,
-			student_id: entity.studentId,
+			student_term_id: entity.studentTermId,
 			type: entity.type,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
@@ -56,15 +58,15 @@ export default class RequestJoinGroupModel extends Model {
 				message: dbJson['message'],
 				type: dbJson['type'],
 				group: Group.createById(dbJson['group_id']),
-				student: Student.createById(dbJson['student_id']),
+				studentTerm: StudentTerm.createById(dbJson['student_term_id']),
 			},
 			Number(dbJson['id'])
 		);
 		const group = dbJson['group'] && GroupModel.convertModelToEntity(dbJson['group']);
-		const student = dbJson['student'] && StudentModel.convertModelToEntity(dbJson['student']);
+		const studentTerm = dbJson['student_term'] && StudentTermModel.convertModelToEntity(dbJson['student_term']);
 
-		if (group) entity.updateGroup(group);
-		if (student) entity.updateStudent(student);
+		if (group) entity.update({ group });
+		if (studentTerm) entity.update({ studentTerm });
 
 		return entity;
 	}

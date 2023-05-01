@@ -10,10 +10,14 @@ import NotFoundError from '@core/domain/errors/NotFoundError';
 import GroupMember from '@core/domain/entities/GroupMember';
 import Student from '@core/domain/entities/Student';
 import IGroupDao from '@student/domain/daos/IGroupDao';
+import StudentTerm from '@core/domain/entities/StudentTerm';
+import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
+import Group from '@core/domain/entities/Group';
 
 interface ValidatedInput {
-	studentId: number;
+	studentTerm: StudentTerm;
 	requestJoinGroup: RequestJoinGroup;
+	group: Group;
 }
 
 @injectable()
@@ -21,6 +25,7 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 	@inject('RequestJoinGroupDao') private requestJoinGroupDao!: IRequestJoinGroupDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
@@ -32,45 +37,48 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 		let requestJoinGroup = await this.requestJoinGroupDao.findEntityById(id);
 		if (!requestJoinGroup) throw new NotFoundError('request not found');
 
-		return { requestJoinGroup, studentId };
-	}
-	async handle(request: Request) {
-		const input = await this.validate(request);
-		let response: any;
-		if (input.requestJoinGroup.type === TypeRequestJoinGroup.REQUEST_INVITE) {
-			await this.accepInviteHandler(input);
-		} else {
-			// REQUEST_JOIN
-			await this.accepRequestJoinHandler(input);
-		}
-		await this.requestJoinGroupDao.deleteByStudent(input.requestJoinGroup.studentId!);
-
-		const group = await this.groupDao.findEntityById(input.requestJoinGroup.groupId);
+		const group = await this.groupDao.findEntityById(requestJoinGroup.groupId);
 		if (!group) {
 			throw new Error('Group have been deleted');
 		}
+		const studentTerm = await this.studentTermDao.findOne(group.termId!, studentId);
+		if (!studentTerm) {
+			throw new Error(`student not in term ${group.termId}`);
+		}
+		return { requestJoinGroup, studentTerm, group };
+	}
+	async handle(request: Request) {
+		const input = await this.validate(request);
+		if (input.requestJoinGroup.type === TypeRequestJoinGroup.REQUEST_INVITE) {
+			await this.checkAccepInviteHandler(input);
+		} else {
+			await this.checkAccepRequestJoinHandler(input);
+		}
+
+		await this.requestJoinGroupDao.deleteByStudentTerm({ studentTermId: input.requestJoinGroup.studentTermId! });
+
 		let groupMember = GroupMember.create({
-			student: Student.createById(input.studentId),
-			group: group,
+			studentTerm: input.studentTerm,
+			group: input.group,
 		});
 
 		groupMember = await this.groupMemberDao.insertEntity(groupMember);
 
-		group.members?.push(groupMember);
+		input.group.members?.push(groupMember);
 
 		return groupMember.toJSON;
 	}
-	private async accepRequestJoinHandler(input: ValidatedInput) {
+	private async checkAccepRequestJoinHandler(input: ValidatedInput) {
 		// check valid
 		const members = await this.groupMemberDao.findByGroupId(input.requestJoinGroup.groupId!);
-		const me = members.find(e => e.studentId === input.studentId);
+		const me = members.find(e => e.studentTermId === input.studentTerm.id!);
 		if (!me) {
 			throw new Error("Can't accep because You are not member in group");
 		}
 	}
-	private async accepInviteHandler(input: ValidatedInput) {
+	private async checkAccepInviteHandler(input: ValidatedInput) {
 		// check authorization
-		if (input.studentId != input.requestJoinGroup.studentId) {
+		if (input.studentTerm.id != input.requestJoinGroup.studentTermId) {
 			throw new Error("Can't accep because You are not invited");
 		}
 	}

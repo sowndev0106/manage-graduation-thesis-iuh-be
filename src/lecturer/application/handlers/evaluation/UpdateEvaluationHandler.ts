@@ -74,7 +74,6 @@ export default class UpdateEvaluationHandler extends RequestHandler {
 				throw new Error(`Duplicate Name: ${evaluation.name} in evaluation: ${evaluation.id}`);
 			}
 			if (evaluation.id == input.evaluation.id) {
-				console.log('update -------------------------- ');
 				evaluation.update({ ...input.evaluation.props });
 				evaluationExist = true;
 			}

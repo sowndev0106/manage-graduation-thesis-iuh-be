@@ -7,7 +7,7 @@ import { injectable } from 'inversify';
 export default class GroupMemberDao extends GroupMemberDaoCore implements IGroupMemberDao {
 	async findByGroupId(groupId: number): Promise<GroupMember[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('[student]');
+		query.withGraphFetched('[student_term,student_term.student]');
 
 		const whereClause: Record<string, number> = {};
 		whereClause.group_id = groupId;

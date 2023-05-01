@@ -4,6 +4,8 @@ import Lecturer from '@core/domain/entities/Lecturer';
 import GroupLecturerModel from './GroupLecturerModel';
 import LecturerModel from './LecturerModel';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
+import lecturerTermModel from './LecturerTermModel';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 export default class GroupLecturerMemberModel extends Model {
 	static get tableName() {
@@ -19,12 +21,12 @@ export default class GroupLecturerMemberModel extends Model {
 				to: 'group_lecturer.id',
 			},
 		},
-		lecturer: {
+		lecturer_term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: lecturerTermModel,
 			join: {
-				from: 'group_lecturer_member.lecturer_id',
-				to: 'lecturer.id',
+				from: 'group_lecturer_member.lecturer_term_id',
+				to: 'lecturer_term.id',
 			},
 		},
 	};
@@ -34,7 +36,7 @@ export default class GroupLecturerMemberModel extends Model {
 		model.$set({
 			id: entity.id,
 			group_lecturer_id: entity.groupLecturerId,
-			lecturer_id: entity.lecturerId,
+			lecturer_term_id: entity.lecturerTermId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -52,15 +54,15 @@ export default class GroupLecturerMemberModel extends Model {
 		const entity = GroupLecturerMember.create(
 			{
 				groupLecturer: GroupLecturer.createById(dbJson['group_lecturer_id']),
-				lecturer: Lecturer.createById(dbJson['lecturer_id']),
+				lecturerTerm: LecturerTerm.createById(dbJson['lecturer__term_id']),
 			},
 			Number(dbJson['id'])
 		);
-		const group_lecturer = dbJson['group_lecturer'] && GroupLecturerModel.convertModelToEntity(dbJson['group_lecturer']);
-		const lecturer = dbJson['lecturer'] && LecturerModel.convertModelToEntity(dbJson['lecturer']);
+		const groupLecturer = dbJson['group_lecturer'] && GroupLecturerModel.convertModelToEntity(dbJson['group_lecturer']);
+		const lecturerTerm = dbJson['lecturer_term'] && LecturerModel.convertModelToEntity(dbJson['lecturer_term']);
 
-		if (group_lecturer) entity.updateGroup(group_lecturer);
-		if (lecturer) entity.updateLecturer(lecturer);
+		if (groupLecturer) entity.update({ groupLecturer });
+		if (lecturerTerm) entity.update({ lecturerTerm });
 
 		return entity;
 	}

@@ -23,7 +23,7 @@ import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import ILecturerTermDao from '@student/domain/daos/ILecturerTermDao';
 import StudentTermDao from '../objection-js/daos/StudentTermDao';
 import ITranscriptDao from '@student/domain/daos/ITranscriptDao';
-import TranscriptDao from '../objection-js/TranscriptDao';
+import TranscriptDao from '../objection-js/daos/TranscriptDao';
 import AchievementDao from '../objection-js/daos/AchievementDao';
 import IAchievementDao from '@student/domain/daos/IAchievementDao';
 

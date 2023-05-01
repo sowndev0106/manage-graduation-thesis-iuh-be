@@ -32,7 +32,9 @@ export default class GetGroupLecturerByIdHandler extends RequestHandler {
 
 		if (!groupLecturer) throw new NotFoundError('groupLecturer not found');
 
-		const members = await this.groupLecturerMemberDao.findAll(groupLecturer.id!);
+		const members = await this.groupLecturerMemberDao.findAll({
+			groupLecturerId: groupLecturer.id!,
+		});
 
 		groupLecturer.update({ members });
 

@@ -6,14 +6,13 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class AchievementDao extends AchievementDaoCore implements IAchievementDao {
-	async findAll(props: { termId: number; studentId: number }): Promise<Achievement[]> {
+	async findAll(props: { studentTermId: number }): Promise<Achievement[]> {
 		const query = this.initQuery();
-		query.withGraphFetched('[student]');
+		query.withGraphFetched('[student_term,student_term.student]');
 
 		const whereClause: Record<string, any> = {};
 
-		if (props.termId) whereClause['term_id'] = props.termId;
-		if (props.studentId) whereClause['student_id'] = props.studentId;
+		if (props.studentTermId) whereClause['student_term_id'] = props.studentTermId;
 
 		query.where(whereClause);
 

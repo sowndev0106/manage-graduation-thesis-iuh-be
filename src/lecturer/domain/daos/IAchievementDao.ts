@@ -3,5 +3,5 @@ import Achievement from '@core/domain/entities/Achievement';
 import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 
 export default interface IAchievementDao extends IDao<Achievement> {
-	findAll(props: { termId: number; studentId: number }): Promise<Achievement[]>;
+	findAll(props: { studentTermId: number }): Promise<Achievement[]>;
 }

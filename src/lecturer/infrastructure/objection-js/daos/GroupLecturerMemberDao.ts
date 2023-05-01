@@ -5,26 +5,24 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class GroupLecturerMemberDao extends GroupLecturerMemberDaoCore implements IGroupLecturerMemberDao {
-	async findOne(groupLecturerId: number, lecturerId: number): Promise<GroupLecturerMember | null> {
+	async findOne(props: { groupLecturerId: number; lecturerTermId: number }): Promise<GroupLecturerMember | null> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
-		query.withGraphFetched('lecturer');
+		query.withGraphFetched('[lecturer_term, lecturer_term.lecturer]');
 
-		whereClause['group_lecturer_id'] = groupLecturerId;
-		whereClause['lecturer_id'] = lecturerId;
+		whereClause['group_lecturer_id'] = props.groupLecturerId;
+		whereClause['lecturer_term_id'] = props.lecturerTermId;
 
 		const result = await query.findOne(whereClause);
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(groupLecturerId: number): Promise<GroupLecturerMember[]> {
+	async findAll(props: { groupLecturerId: number }): Promise<GroupLecturerMember[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
-		query.withGraphFetched('lecturer');
-		// if (termId) whereClause['term_id'] = termId;
-		whereClause['group_lecturer_id'] = groupLecturerId;
-		// whereClause['lecturer_id'] = lecturerId;
+		query.withGraphFetched('[lecturer_term, lecturer_term.lecturer]');
+		whereClause['group_lecturer_id'] = props.groupLecturerId;
 
 		query.where(whereClause);
 

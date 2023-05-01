@@ -2,6 +2,7 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Lecturer from './Lecturer';
 import Term from './Term';
+import LecturerTerm from './LecturerTerm';
 export enum TypeStatusTopic {
 	REFUSE = 'REFUSE',
 	PEDING = 'PEDING',
@@ -17,8 +18,7 @@ export interface IProps {
 	requireInput: string;
 	comment?: string;
 	status: TypeStatusTopic;
-	lecturer: Lecturer;
-	term: Term;
+	lecturerTerm: LecturerTerm;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -56,17 +56,11 @@ export default class Topic extends Entity<IProps> {
 	get status() {
 		return this.props.status;
 	}
-	get term() {
-		return this.props.term;
+	get lecturerTermId() {
+		return this.props?.lecturerTerm?.id;
 	}
-	get termId() {
-		return this.props.term.id;
-	}
-	get lecturerId() {
-		return this.props?.lecturer?.id;
-	}
-	get lecturer() {
-		return this.props?.lecturer;
+	get lecturerTerm() {
+		return this.props?.lecturerTerm;
 	}
 	get createdAt() {
 		return this.props.createdAt || new Date();
@@ -74,14 +68,6 @@ export default class Topic extends Entity<IProps> {
 	get updatedAt() {
 		return this.props.updatedAt || new Date();
 	}
-
-	updateLecturer(lecturer: Lecturer) {
-		this._props.lecturer = lecturer;
-	}
-	updateTerm(term: Term) {
-		this._props.term = term;
-	}
-
 	update(props: Partial<IProps>) {
 		const updatedProps: IProps = {
 			...this.props,
@@ -92,11 +78,10 @@ export default class Topic extends Entity<IProps> {
 		return this;
 	}
 	get toJSON() {
-		const { lecturer, term, ...props } = lodash.cloneDeep(this._props || {});
+		const { lecturerTerm, ...props } = lodash.cloneDeep(this._props || {});
 
-		let lecturerProps = lecturer?.toJSON;
-		let termProps = term?.toJSON;
+		let lecturerTermProps = lecturerTerm?.toJSON;
 
-		return { id: this.id, ...props, lecturer: lecturerProps, term: termProps };
+		return { id: this.id, ...props, lecturer: lecturerTermProps };
 	}
 }

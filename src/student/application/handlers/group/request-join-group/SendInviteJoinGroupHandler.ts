@@ -12,11 +12,15 @@ import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import GroupMember from '@core/domain/entities/GroupMember';
 import Group from '@core/domain/entities/Group';
 import Student from '@core/domain/entities/Student';
+import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
+import ITermDao from '@student/domain/daos/ITermDao';
+import Term from '@core/domain/entities/Term';
+import StudentTerm from '@core/domain/entities/StudentTerm';
 
 interface ValidatedInput {
-	termId: number;
-	studentId: number;
-	studentInviteId: number;
+	term: Term;
+	studentTerm: StudentTerm;
+	studentTermInvite: StudentTerm;
 	message?: string;
 }
 
@@ -26,6 +30,8 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 	@inject('RequestJoinGroupDao') private requestJoinGroupDao!: IRequestJoinGroupDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
+	@inject('TermDao') private termDao!: ITermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const studentInviteId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.body['studentId'] }));
@@ -36,35 +42,49 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
+		const term = await this.termDao.findEntityById(termId);
+		if (!term) {
+			throw new Error('term not found');
+		}
+		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
+		if (!studentTerm) {
+			throw new Error(`student not in term ${termId}`);
+		}
 
-		return { termId, studentId, message, studentInviteId };
+		const student = await this.studentDao.findEntityById(studentInviteId);
+		if (!student) throw new Error('Student invite not found');
+
+		const studentTermInvite = await this.studentTermDao.findOne(termId, studentInviteId);
+		if (!studentTermInvite) {
+			throw new Error(`student invite not in term ${termId}`);
+		}
+		return { term, studentTerm, message, studentTermInvite };
 	}
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		const group = await this.groupDao.findOneByTermAndStudent(input.termId, input.studentId);
+		const group = await this.groupDao.findOne({
+			studentTermId: input.studentTerm.id!,
+		});
 		if (!group) throw new Error("You don't have a group");
 
-		const student = await this.studentDao.findEntityById(input.studentInviteId);
-		if (!student) throw new Error('Student not found');
-
-		const groupStudentInvite = await this.groupDao.findOneByTermAndStudent(input.termId, input.studentInviteId);
-		if (groupStudentInvite) throw new Error('student already exists group in termId');
+		const groupStudentInvite = await this.groupDao.findOne({ studentTermId: input.studentTermInvite.id! });
+		if (groupStudentInvite) throw new Error(`student already exists group in ${input.term.id}`);
 
 		// check exist
-		let requestJoinGroup = await this.requestJoinGroupDao.findByGroupIdAndStudentId(group.id!, student.id!);
+		let requestJoinGroup = await this.requestJoinGroupDao.findOneByGroupIdAndStudentTermId({ groupId: group.id!, studentTermId: input.studentTerm.id! });
 		if (requestJoinGroup) {
 			requestJoinGroup = await this.handleExistingRequestJoin(requestJoinGroup, input, group);
 		} else {
-			requestJoinGroup = await this.handleNewRequestJoin(input, group, student);
+			requestJoinGroup = await this.handleNewRequestJoin(input, group, input.studentTerm);
 		}
 
 		return requestJoinGroup?.toJSON;
 	}
-	private async handleNewRequestJoin(input: ValidatedInput, group: Group, student: Student) {
+	private async handleNewRequestJoin(input: ValidatedInput, group: Group, studentTerm: StudentTerm) {
 		const requestJoinGroup = RequestJoinGroup.create({
 			group,
-			student,
+			studentTerm,
 			message: input.message,
 			type: TypeRequestJoinGroup.REQUEST_INVITE,
 		});
@@ -74,9 +94,9 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 	private async handleExistingRequestJoin(requestJoinGroup: RequestJoinGroup, input: ValidatedInput, group: Group) {
 		if (requestJoinGroup.type === TypeRequestJoinGroup.REQUEST_JOIN) {
 			await this.requestJoinGroupDao.deleteEntity(requestJoinGroup);
-			await this.groupMemberDao.insertEntity(GroupMember.create({ group, student: requestJoinGroup.student }));
+			await this.groupMemberDao.insertEntity(GroupMember.create({ group, studentTerm: requestJoinGroup.studentTerm }));
 		} else if (input.message) {
-			requestJoinGroup.updateMessage(input.message);
+			requestJoinGroup.update({ message: input.message });
 			await this.requestJoinGroupDao.updateEntity(requestJoinGroup);
 		}
 		return requestJoinGroup;

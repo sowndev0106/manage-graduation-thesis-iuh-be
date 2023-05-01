@@ -1,20 +1,18 @@
 import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import { Request } from 'express';
-import SortText from '@core/domain/validate-objects/SortText';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 import IGroupLecturerMemberDao from '@lecturer/domain/daos/IGroupLecturerMemberDao';
-import ITermDao from '@lecturer/domain/daos/ITermDao';
 import ValidationError from '@core/domain/errors/ValidationError';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
-import GroupLecturerMember from '@core/domain/entities/GroupLecturerMember';
-import Lecturer from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 interface ValidatedInput {
-	lecturer: Lecturer;
+	lecturerTerm: LecturerTerm;
 	groupLecturer: GroupLecturer;
 }
 @injectable()
@@ -22,6 +20,7 @@ export default class DeleteGroupLecturerMemberHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupLecturerMemberDao') private groupLecturerMemberDao!: IGroupLecturerMemberDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const groupLecturerId = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
@@ -36,22 +35,30 @@ export default class DeleteGroupLecturerMemberHandler extends RequestHandler {
 		const lecturer = await this.lecturerDao.findEntityById(lecturerId);
 		if (!lecturer) throw new NotFoundError('lecturer not found');
 
+		const lecturerTerm = await this.lecturerTermDao.findOne(groupLecturer.termId!, lecturerId);
+		if (!lecturerTerm) {
+			throw new Error(`lecturer not in term ${groupLecturer.termId}`);
+		}
 		return {
-			lecturer,
+			lecturerTerm,
 			groupLecturer,
 		};
 	}
 
 	async handle(request: Request) {
-		const { lecturer, groupLecturer } = await this.validate(request);
+		const { lecturerTerm, groupLecturer } = await this.validate(request);
 
-		let member = await this.groupLecturerMemberDao.findOne(groupLecturer.id!, lecturer.id!);
+		let member = await this.groupLecturerMemberDao.findOne({
+			groupLecturerId: groupLecturer.id!,
+			lecturerTermId: lecturerTerm.id!,
+		});
 
 		if (member) {
 			await this.groupLecturerMemberDao.deleteEntity(member);
 		}
 
-		const members = await this.groupLecturerMemberDao.findAll(groupLecturer.id!);
+		const members = await this.groupLecturerMemberDao.findAll({ groupLecturerId: groupLecturer.id! });
+
 		groupLecturer.update({ members });
 
 		return groupLecturer?.toJSON;
