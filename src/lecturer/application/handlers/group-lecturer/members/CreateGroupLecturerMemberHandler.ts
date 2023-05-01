@@ -11,12 +11,12 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import GroupLecturerMember from '@core/domain/entities/GroupLecturerMember';
 import Lecturer from '@core/domain/entities/Lecturer';
-import Term from '@core/domain/entities/Term';
-import EntityIds from '@core/domain/validate-objects/EntityIds';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 
 interface ValidatedInput {
-	lecturer: Lecturer;
+	lecturerTerm: LecturerTerm;
 	groupLecturer: GroupLecturer;
 }
 @injectable()
@@ -25,6 +25,7 @@ export default class CreateGroupLecturerMemberHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupLecturerMemberDao') private groupLecturerMemberDao!: IGroupLecturerMemberDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const groupLecturerId = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
@@ -39,27 +40,37 @@ export default class CreateGroupLecturerMemberHandler extends RequestHandler {
 		const lecturer = await this.lecturerDao.findEntityById(lecturerId);
 		if (!lecturer) throw new NotFoundError('lecturer not found');
 
+		const lecturerTerm = await this.lecturerTermDao.findOne(groupLecturer.termId!, lecturerId);
+		if (!lecturerTerm) {
+			throw new Error(`lecturer not in term ${groupLecturer.termId}`);
+		}
+
 		return {
-			lecturer,
 			groupLecturer,
+			lecturerTerm,
 		};
 	}
 
 	async handle(request: Request) {
-		const { lecturer, groupLecturer } = await this.validate(request);
+		const { groupLecturer, lecturerTerm } = await this.validate(request);
 
-		let member = await this.groupLecturerMemberDao.findOne(groupLecturer.id!, lecturer.id!);
+		let member = await this.groupLecturerMemberDao.findOne({
+			groupLecturerId: groupLecturer.id!,
+			lecturerTermId: lecturerTerm.id!,
+		});
 
 		if (!member) {
 			member = await this.groupLecturerMemberDao.insertEntity(
 				GroupLecturerMember.create({
 					groupLecturer: groupLecturer!,
-					lecturer,
+					lecturerTerm,
 				})
 			);
 		}
 
-		const members = await this.groupLecturerMemberDao.findAll(groupLecturer.id!);
+		const members = await this.groupLecturerMemberDao.findAll({
+			groupLecturerId: groupLecturer.id!,
+		});
 		groupLecturer.update({ members });
 
 		return groupLecturer?.toJSON;

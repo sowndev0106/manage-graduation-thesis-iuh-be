@@ -11,14 +11,6 @@ export default class lecturerTermModel extends Model {
 	}
 
 	static relationMappings = {
-		term: {
-			relation: Model.BelongsToOneRelation,
-			modelClass: TermModel,
-			join: {
-				from: 'lecturer_term.term_id',
-				to: 'term.id',
-			},
-		},
 		lecturer: {
 			relation: Model.BelongsToOneRelation,
 			modelClass: lecturerModel,
@@ -58,10 +50,8 @@ export default class lecturerTermModel extends Model {
 			},
 			Number(dbJson['id'])
 		);
-		const term = dbJson['term'] && TermModel.convertModelToEntity(dbJson['term']);
 		const lecturer = dbJson['lecturer'] && lecturerModel.convertModelToEntity(dbJson['lecturer']);
 
-		if (term) entity.updateterm(term);
 		if (lecturer) entity.update({ lecturer });
 
 		return entity;

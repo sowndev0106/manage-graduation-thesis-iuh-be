@@ -3,10 +3,10 @@ import Majors from './Majors';
 import lodash from 'lodash';
 import Student from './Student';
 import Term from './Term';
+import StudentTerm from './StudentTerm';
 export interface IProps {
 	name: string;
-	student: Student;
-	term: Term;
+	studentTerm: StudentTerm;
 	bonusGrade: number;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -21,17 +21,11 @@ export default class Achievement extends Entity<IProps> {
 	get name() {
 		return this.props.name;
 	}
-	get student() {
-		return this.props.student;
+	get studentTerm() {
+		return this.props.studentTerm;
 	}
-	get studentId() {
-		return this.props.student.id;
-	}
-	get term() {
-		return this.props.term;
-	}
-	get termId() {
-		return this.props.term.id;
+	get studentTermId() {
+		return this.props.studentTerm.id;
 	}
 	get bonusGrade() {
 		return this.props.bonusGrade;
@@ -43,8 +37,8 @@ export default class Achievement extends Entity<IProps> {
 		return this.props.updatedAt || new Date();
 	}
 	get toJSON() {
-		const { student, term, ...props } = lodash.cloneDeep(this.props);
+		const { studentTerm, ...props } = lodash.cloneDeep(this.props);
 
-		return { id: this.id, ...props, student: student?.toJSON, term: term?.toJSON };
+		return { id: this.id, ...props, student: studentTerm?.toJSON };
 	}
 }

@@ -24,7 +24,6 @@ interface ValidatedInput {
 }
 @injectable()
 export default class CreateAssignHandler extends RequestHandler {
-	@inject('TermDao') private termDao!: ITermDao;
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('AssignDao') private assignDao!: IAssignDao;

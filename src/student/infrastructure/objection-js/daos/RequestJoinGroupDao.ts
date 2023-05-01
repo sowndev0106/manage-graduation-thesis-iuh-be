@@ -5,11 +5,11 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore implements IRequestJoinGroupDao {
-	async deleteByStudent(studentId: number): Promise<any> {
+	async deleteByStudentTerm(props: { studentTermId: number }): Promise<any> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
-		whereClause['student_id'] = studentId;
+		whereClause['student_term_id'] = props.studentTermId;
 
 		query.where(whereClause);
 
@@ -21,44 +21,31 @@ export default class RequestJoinGroupDao extends RequestJoinGroupDaoCore impleme
 
 		return result;
 	}
-	async findAllByStudentIdAndType(studentId: number, type: TypeRequestJoinGroup): Promise<RequestJoinGroup[]> {
+	async findAll(props: { studentTermId?: number; type?: TypeRequestJoinGroup; groupId?: number }): Promise<RequestJoinGroup[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
-		query.withGraphFetched('[student,group]');
-		whereClause['type'] = type;
-		whereClause['student_id'] = studentId;
+		query.withGraphFetched('[student_term,student_term.student,group]');
+
+		if (props.type) whereClause['type'] = props.type;
+		if (props.studentTermId) whereClause['student_term_id'] = props.studentTermId;
+		if (props.groupId) whereClause.group_id = props.groupId;
 
 		query.where(whereClause);
 
 		const result = await query.execute();
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
-	async findAllByGroupIdAndType(groupId: number, type: TypeRequestJoinGroup): Promise<RequestJoinGroup[]> {
+
+	async findOneByGroupIdAndStudentTermId(props: { groupId: number; studentTermId: number }): Promise<RequestJoinGroup | null> {
 		const query = this.initQuery();
-		query.withGraphFetched('[student,group]');
-
-		const whereClause: Record<string, any> = {};
-		whereClause.group_id = groupId;
-		whereClause.type = type;
-
-		query.where(whereClause);
-		const result = await query.execute();
-
-		return result && result.map(e => this.convertModelToEntity(e));
-	}
-
-	async findByGroupIdAndStudentId(groupId: number, studentId: number): Promise<RequestJoinGroup | null> {
-		const query = this.initQuery();
-		query.withGraphFetched('[student,group]');
+		query.withGraphFetched('[student_term,student_term.student,group]');
 		const whereClause: Record<string, number> = {};
 
-		whereClause['group_id'] = groupId;
-		whereClause['student_id'] = studentId;
+		whereClause['group_id'] = props.groupId;
+		whereClause['student_term_id'] = props.studentTermId;
 
-		query.where(whereClause);
+		const result = await query.findOne(whereClause);
 
-		const result = await query.execute();
-
-		return result[0] ? this.convertModelToEntity(result[0]) : null;
+		return result ? this.convertModelToEntity(result) : null;
 	}
 }

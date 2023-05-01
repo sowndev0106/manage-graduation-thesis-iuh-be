@@ -4,8 +4,8 @@ export async function up(knex: Knex): Promise<void> {
 	return knex.schema.createTable('transcript', table => {
 		table.increments('id').primary();
 		table.float('grade').notNullable();
-		table.integer('student_id').unsigned().references('id').inTable('student');
-		table.integer('lecturer_id').unsigned().references('id').inTable('lecturer');
+		table.integer('student_term_id').unsigned().references('id').inTable('student_term');
+		table.integer('lecturer_term_id').unsigned().references('id').inTable('lecturer_term');
 		table.integer('evaluation_id').unsigned().references('id').inTable('evaluation');
 
 		table.timestamps();

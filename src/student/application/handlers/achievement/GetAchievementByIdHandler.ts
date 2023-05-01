@@ -6,6 +6,7 @@ import EntityId from '@core/domain/validate-objects/EntityID';
 import IAchievementDao from '@student/domain/daos/IAchievementDao';
 import ILecturerDao from '@student/domain/daos/ILecturerDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
+import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 
 interface ValidatedInput {
 	id: number;
@@ -14,8 +15,7 @@ interface ValidatedInput {
 @injectable()
 export default class GetAchievementByIdHandler extends RequestHandler {
 	@inject('AchievementDao') private achievementDao!: IAchievementDao;
-	@inject('StudentDao') private studentDao!: IStudentDao;
-
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: String(request.params['id']) }));
 
@@ -33,11 +33,9 @@ export default class GetAchievementByIdHandler extends RequestHandler {
 		if (!achievement) {
 			throw new Error('achievement not found');
 		}
-		const student = await this.studentDao.findEntityById(achievement.studentId);
-		if (!student) {
-			throw new Error('Student not found');
-		}
-		achievement.update({ student });
+		const studentTerm = await this.studentTermDao.findOneGraphById(achievement.studentTermId!);
+
+		studentTerm && achievement.update({ studentTerm });
 
 		return achievement.toJSON;
 	}

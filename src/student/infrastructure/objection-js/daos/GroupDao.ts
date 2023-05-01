@@ -5,12 +5,12 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class GroupDao extends GroupDaoCore implements IGroupDao {
-	async findAll(termId?: number, topicId?: number): Promise<Group[]> {
+	async findAll(props: { termId?: number; topicId?: number }): Promise<Group[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, number> = {};
-
-		if (termId) whereClause['term_id'] = termId;
-		if (topicId) whereClause['topic_id'] = topicId;
+		query.withGraphFetched('[topic, members, members.student_term,members.student_term.student]');
+		if (props.termId) whereClause['term_id'] = props.termId;
+		if (props.topicId) whereClause['topic_id'] = props.topicId;
 
 		query.where(whereClause);
 
@@ -18,12 +18,11 @@ export default class GroupDao extends GroupDaoCore implements IGroupDao {
 
 		return result && result.map(e => this.convertModelToEntity(e));
 	}
-	async findOneByTermAndStudent(termId: number, studentId: number): Promise<Group | null> {
+	async findOne(props: { studentTermId: number }): Promise<Group | null> {
 		const query = this.initQuery();
 		const whereClause: Record<string, number> = {};
-
-		whereClause['term_id'] = termId;
-		whereClause['members.student_id'] = studentId;
+		query.withGraphFetched('[topic, members, members.student_term,members.student_term.student]');
+		whereClause['members.student_term_id'] = props.studentTermId;
 
 		query.joinRelated('members').where(whereClause);
 

@@ -5,15 +5,17 @@ import { Request } from 'express';
 import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
 import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
+import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
+import StudentTerm from '@core/domain/entities/StudentTerm';
 
 interface ValidatedInput {
-	termId: number;
-	studentId: number;
+	studentTerm: StudentTerm;
 }
 
 @injectable()
 export default class GetListAchievementHandler extends RequestHandler {
 	@inject('AchievementDao') private achievementDao!: IAchievementDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.query['termId'] }));
 		const studentId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.query['studentId'] }));
@@ -21,14 +23,17 @@ export default class GetListAchievementHandler extends RequestHandler {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
+		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 
-		return { termId, studentId };
+		if (!studentTerm) {
+			throw new Error(`student not in term ${termId}`);
+		}
+		return { studentTerm };
 	}
 
 	async handle(request: Request) {
-		const { termId, studentId } = await this.validate(request);
-
-		const listAchievement = await this.achievementDao.findAll({ termId, studentId });
+		const { studentTerm } = await this.validate(request);
+		const listAchievement = await this.achievementDao.findAll({ studentTermId: studentTerm.id! });
 
 		return listAchievement.map(e => e.toJSON);
 	}

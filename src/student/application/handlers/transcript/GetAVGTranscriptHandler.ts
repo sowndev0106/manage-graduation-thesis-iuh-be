@@ -1,50 +1,62 @@
-import { id, inject, injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import RequestHandler from '@core/application/RequestHandler';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ValidationError from '@core/domain/errors/ValidationError';
-import Evaluation, { TypeEvaluation } from '@core/domain/entities/Evaluation';
+import IAssignDao from '@lecturer/domain/daos/IAssignDao';
+import { TypeEvaluation } from '@core/domain/entities/Evaluation';
+import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 import Student from '@core/domain/entities/Student';
-import IStudentDao from '@student/domain/daos/IStudentDao';
+import IStudentDao from '@lecturer/domain/daos/IStudentDao';
+import IGroupMemberDao from '@lecturer/domain/daos/IGroupMemberDao';
+import IGroupLecturerMemberDao from '@lecturer/domain/daos/IGroupLecturerMemberDao';
+import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
 import Transcript from '@core/domain/entities/Transcript';
-import ITranscriptDao from '@student/domain/daos/ITranscriptDao';
+import ITranscriptDao from '@lecturer/domain/daos/ITranscriptDao';
 import Lecturer from '@core/domain/entities/Lecturer';
-import ILecturerDao from '@student/domain/daos/ILecturerDao';
-import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
-import ITermDao from '@student/domain/daos/ITermDao';
-import IGroupDao from '@student/domain/daos/IGroupDao';
-import Group from '@core/domain/entities/Group';
+import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import ITermDao from '@lecturer/domain/daos/ITermDao';
+import IGroupDao from '@lecturer/domain/daos/IGroupDao';
 import Term from '@core/domain/entities/Term';
-import { forIn } from 'lodash';
-import Achievement from '@core/domain/entities/Achievement';
-import IAchievementDao from '@student/domain/daos/IAchievementDao';
+import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
+import StudentTerm from '@core/domain/entities/StudentTerm';
+import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 interface ValidatedInput {
-	student: Student;
-	term: Term;
+	studentTerm: StudentTerm;
 }
-interface IGraderByLecturer {
-	lecturer: Lecturer;
+interface IGraderByLecturerTerm {
+	lecturerTerm: LecturerTerm;
 	grade: number;
 }
 interface IGradeByTypeEluvation {
 	avgGrader: number;
 	sumGrade: number;
 	count: number;
-	details: IGraderByLecturer[];
+	details: IGraderByLecturerTerm[];
 }
 
 @injectable()
 export default class GetAVGTranscriptHandler extends RequestHandler {
+	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
+	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
+	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
+	@inject('GroupLecturerMemberDao') private groupLecturerMemberDao!: IGroupLecturerMemberDao;
+	@inject('AssignDao') private assignDao!: IAssignDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	@inject('TermDao') private termDao!: ITermDao;
+	@inject('EvaluationDao') private evaluationDao!: IEvaluationDao;
 	@inject('TranscriptDao') private transcriptDao!: ITranscriptDao;
 	@inject('AchievementDao') private achievementDao!: IAchievementDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
 
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
-		const studentId = Number(request.headers['id']);
+		const studentId = Number(request.headers.id);
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.query['termId'] }));
 
 		if (this.errorCollector.hasError()) {
@@ -55,15 +67,18 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 
 		let term = await this.termDao.findEntityById(termId);
 		if (!term) throw new NotFoundError('term not found');
+		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 
+		if (!studentTerm) {
+			throw new Error(`student not in term ${termId}`);
+		}
 		return {
-			student,
-			term,
+			studentTerm,
 		};
 	}
 
 	async handle(request: Request) {
-		const { student, term } = await this.validate(request);
+		const { studentTerm } = await this.validate(request);
 
 		const transcriptByType: Record<TypeEvaluation, Array<Transcript>> = {
 			ADVISOR: [],
@@ -72,18 +87,15 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 		};
 
 		transcriptByType.ADVISOR = await this.transcriptDao.findByStudentAndType({
-			termId: term.id!,
-			studentId: student.id!,
+			studentTermId: studentTerm.id!,
 			type: TypeEvaluation.ADVISOR,
 		});
 		transcriptByType.REVIEWER = await this.transcriptDao.findByStudentAndType({
-			termId: term.id!,
-			studentId: student.id!,
+			studentTermId: studentTerm.id!,
 			type: TypeEvaluation.REVIEWER,
 		});
 		transcriptByType.SESSION_HOST = await this.transcriptDao.findByStudentAndType({
-			termId: term.id!,
-			studentId: student.id!,
+			studentTermId: studentTerm.id!,
 			type: TypeEvaluation.SESSION_HOST,
 		});
 
@@ -118,19 +130,17 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 		if (gradeByType.SESSION_HOST.details.length == 0) missings.push('SESSION_HOST');
 		const avgGradeAdvisorReviewer =
 			(gradeByType.REVIEWER.sumGrade + gradeByType.ADVISOR.sumGrade) / (gradeByType.REVIEWER.count + gradeByType.ADVISOR.count);
-
 		let gradeSummary = (avgGradeAdvisorReviewer + gradeByType.SESSION_HOST.avgGrader) / 2;
 
 		const achievements = await this.achievementDao.findAll({
-			termId: term.id!,
-			studentId: student.id!,
+			studentTermId: studentTerm.id!,
 		});
 
 		// add grade achievement
 		gradeSummary += achievements.reduce((num, e) => e.bonusGrade + num, 0);
 
 		return {
-			student: student.toJSON,
+			student: studentTerm.toJSON,
 			gradeSummary: gradeSummary > 10 ? 10 : gradeSummary,
 			missings,
 			achievements: achievements.map(achievement => achievement.toJSON),
@@ -138,7 +148,7 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 				avgGrader: gradeByType.ADVISOR.avgGrader,
 				details: gradeByType.ADVISOR.details.map(e => {
 					return {
-						lecturer: e.lecturer.toJSON,
+						lecturer: e.lecturerTerm.toJSON,
 						grade: e.grade,
 					};
 				}),
@@ -147,7 +157,7 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 				avgGrader: gradeByType.REVIEWER.avgGrader,
 				details: gradeByType.REVIEWER.details.map(e => {
 					return {
-						lecturer: e.lecturer.toJSON,
+						lecturer: e.lecturerTerm.toJSON,
 						grade: e.grade,
 					};
 				}),
@@ -156,7 +166,7 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 				avgGrader: gradeByType.SESSION_HOST.avgGrader,
 				details: gradeByType.SESSION_HOST.details.map(e => {
 					return {
-						lecturer: e.lecturer.toJSON,
+						lecturer: e.lecturerTerm.toJSON,
 						grade: e.grade,
 					};
 				}),
@@ -164,21 +174,21 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 		};
 	}
 	async caculateAVGGrade(transcripts: Array<Transcript>): Promise<IGradeByTypeEluvation> {
-		const gradeByLecturer = new Map<number, IGraderByLecturer>();
+		const gradeByLecturer = new Map<number, IGraderByLecturerTerm>();
 		let sumGrade = 0;
 		for (const transcript of transcripts) {
 			sumGrade += transcript.grade;
-			const oldGrade = gradeByLecturer.get(transcript.lecturerId!);
+			const oldGrade = gradeByLecturer.get(transcript.lecturerTermId!);
 			if (!oldGrade) {
-				const lecturer = await this.lecturerDao.findEntityById(transcript.lecturerId);
-				gradeByLecturer.set(transcript.lecturerId!, {
+				const lecturerTerm = await this.lecturerTermDao.findEntityById(transcript.lecturerTermId);
+				gradeByLecturer.set(transcript.lecturerTermId!, {
 					grade: transcript.grade,
-					lecturer: lecturer!,
+					lecturerTerm: lecturerTerm!,
 				});
 			} else {
-				gradeByLecturer.set(transcript.lecturerId!, {
+				gradeByLecturer.set(transcript.lecturerTermId!, {
 					grade: oldGrade.grade + transcript.grade,
-					lecturer: oldGrade.lecturer,
+					lecturerTerm: oldGrade.lecturerTerm,
 				});
 			}
 		}

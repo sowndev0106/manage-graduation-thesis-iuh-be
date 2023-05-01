@@ -4,12 +4,10 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import IGroupDao from '@student/domain/daos/IGroupDao';
-import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import ValidationError from '@core/domain/errors/ValidationError';
-import ITopicDao from '@student/domain/daos/ITopicDao';
-import Topic from '@core/domain/entities/Topic';
 import Group from '@core/domain/entities/Group';
 import ITermDao from '@student/domain/daos/ITermDao';
+import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 
 interface ValidatedInput {
 	group: Group;
@@ -18,9 +16,12 @@ interface ValidatedInput {
 export default class CancelTopicGroupHandler extends RequestHandler {
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('TermDao') private termDao!: ITermDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
+
 	async validate(request: Request): Promise<ValidatedInput> {
 		const termId = this.errorCollector.collect('termId ', () => EntityId.validate({ value: request.body['termId'] }));
 		const studentId = Number(request.headers['id']);
+
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
@@ -28,7 +29,13 @@ export default class CancelTopicGroupHandler extends RequestHandler {
 		let term = await this.termDao.findEntityById(termId);
 		if (!term) throw new NotFoundError('term not found');
 
-		let group = await this.groupDao.findOneByTermAndStudent(term.id!, studentId);
+		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
+		if (!studentTerm) {
+			throw new Error(`student not in term ${termId}`);
+		}
+		let group = await this.groupDao.findOne({
+			studentTermId: studentTerm.id!,
+		});
 		if (!group) throw new NotFoundError('You not have group');
 
 		return {

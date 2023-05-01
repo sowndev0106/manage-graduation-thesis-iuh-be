@@ -11,12 +11,17 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import Group from '@core/domain/entities/Group';
 import GroupMember from '@core/domain/entities/GroupMember';
 import IStudentDao from '@student/domain/daos/IStudentDao';
+import StudentTerm from '@core/domain/entities/StudentTerm';
+import Term from '@core/domain/entities/Term';
+import Topic from '@core/domain/entities/Topic';
+import ITopicDao from '@student/domain/daos/ITopicDao';
+import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 
 interface ValidatedInput {
 	name: string;
-	topicId: number;
-	termId: number;
-	studentId: number;
+	topic?: Topic;
+	term: Term;
+	studentTerm: StudentTerm;
 }
 @injectable()
 export default class CreateGroupHandler extends RequestHandler {
@@ -24,6 +29,9 @@ export default class CreateGroupHandler extends RequestHandler {
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
+	@inject('TopicDao') private topicDao!: ITopicDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
+
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const topicId = this.errorCollector.collect('topicId', () => EntityId.validate({ value: request.body['topicId'], required: false }));
@@ -33,33 +41,44 @@ export default class CreateGroupHandler extends RequestHandler {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
+		let term = await this.termDao.findEntityById(termId);
+		if (!term) throw new NotFoundError('term not found');
+
+		let topic: any = undefined;
+		if (topicId) {
+			topic = await this.topicDao.findEntityById(topicId);
+			if (!topic) throw new NotFoundError('topic not found');
+		}
+		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
+		if (!studentTerm) {
+			throw new Error(`student not in term ${termId}`);
+		}
 
 		return {
 			name,
-			topicId,
-			termId,
-			studentId,
+			topic,
+			term,
+			studentTerm,
 		};
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
 
-		let term = await this.termDao.findEntityById(input.termId);
-		if (!term) throw new NotFoundError('term not found');
+		let group = await this.groupDao.findOne({
+			studentTermId: input.studentTerm.id!,
+		});
 
-		let group = await this.groupDao.findOneByTermAndStudent(input.termId, input.studentId);
 		if (group) throw new Error('group already exists in student');
 
 		group = await this.groupDao.insertEntity(
 			Group.create({
-				term: term,
+				term: input.term,
 				name: input.name,
 			})
 		);
-		const student = await this.studentDao.findEntityById(input.studentId);
 		// add member is yoursefl
-		const member = GroupMember.create({ group: Group.createById(group.id), student: student! });
+		const member = GroupMember.create({ group: Group.createById(group.id), studentTerm: input.studentTerm });
 		await this.groupMemberDao.insertEntity(member);
 
 		group.updateMembers([member]);

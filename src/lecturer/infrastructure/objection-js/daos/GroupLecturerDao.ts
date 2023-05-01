@@ -14,7 +14,7 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 		if (props.termId) whereClause['term_id'] = props.termId;
 		if (props.name) whereClause['name'] = props.termId;
 
-		query.withGraphFetched('[members, members.lecturer]');
+		query.withGraphFetched('[members, members.lecturer_term]');
 
 		const result = await query.findOne(whereClause);
 
@@ -31,6 +31,8 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
+		query.withGraphFetched('[members, members.lecturer_term]');
+
 		if (props.termId) whereClause['term_id'] = props.termId;
 		if (props.name) whereClause['name'] = props.name;
 
@@ -41,8 +43,6 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 		}
 
 		query.where(whereClause);
-
-		query.withGraphFetched('[members, members.lecturer]');
 
 		const result = await query.execute();
 

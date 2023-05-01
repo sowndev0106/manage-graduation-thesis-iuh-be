@@ -1,10 +1,8 @@
-import Lecturer from '@core/domain/entities/Lecturer';
-import Majors from '@core/domain/entities/Majors';
-import Term from '@core/domain/entities/Term';
-import Topic from '@core/domain/entities/Topic';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import Objection, { Model } from 'objection';
 import LecturerModel from './LecturerModel';
-import TermModel from './TermModel';
+import Topic from '@core/domain/entities/Topic';
+import lecturerTermModel from './LecturerTermModel';
 
 export default class TopicModel extends Model {
 	static get tableName() {
@@ -12,20 +10,12 @@ export default class TopicModel extends Model {
 	}
 
 	static relationMappings = {
-		lecturer: {
+		lecturer_term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: lecturerTermModel,
 			join: {
-				from: 'topic.lecturer_id',
-				to: 'lecturer.id',
-			},
-		},
-		term: {
-			relation: Model.BelongsToOneRelation,
-			modelClass: TermModel,
-			join: {
-				from: 'topic.term_id',
-				to: 'term.id',
+				from: 'topic.lecturer_term_id',
+				to: 'lecturer_term.id',
 			},
 		},
 	};
@@ -43,8 +33,7 @@ export default class TopicModel extends Model {
 			require_input: entity.requireInput,
 			comment: entity.comment,
 			status: entity.status,
-			lecturer_id: entity.lecturerId,
-			term_id: entity.term.id,
+			lecturer_term_id: entity.lecturerTermId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -70,20 +59,15 @@ export default class TopicModel extends Model {
 				requireInput: dbJson['require_input'],
 				comment: dbJson['comment'],
 				status: dbJson['status'],
-				lecturer: Lecturer.createById(dbJson['lecturer_id']),
-				term: Term.createById(dbJson['term_id']),
+				lecturerTerm: LecturerTerm.createById(dbJson['lecturer_term_id']),
 				createdAt: dbJson['created_at'],
 				updatedAt: dbJson['updated_at'],
 			},
 			Number(dbJson['id'])
 		);
-		const lecutrer = dbJson['lecturer'] && LecturerModel.convertModelToEntity(dbJson['lecturer']);
+		const lecturerTerm = dbJson['lecturer_term'] && lecturerTermModel.convertModelToEntity(dbJson['lecturer_term']);
 
-		lecutrer && entity.updateLecturer(lecutrer);
-
-		const term = dbJson['term'] && TermModel.convertModelToEntity(dbJson['term']);
-
-		term && entity.updateTerm(term);
+		lecturerTerm && entity.update({ lecturerTerm });
 
 		return entity;
 	}

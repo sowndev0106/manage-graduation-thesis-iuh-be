@@ -7,23 +7,23 @@ import EntityId from '@core/domain/validate-objects/EntityID';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 import ITermDao from '@student/domain/daos/ITermDao';
 import PositiveNumber from '@core/domain/validate-objects/PositiveNumber';
-import Term from '@core/domain/entities/Term';
-import Student from '@core/domain/entities/Student';
 import Achievement from '@core/domain/entities/Achievement';
 import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
+import StudentTerm from '@core/domain/entities/StudentTerm';
+import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 
 interface ValidatedInput {
 	achievement: Achievement;
 	name: string;
 	bonusGrade: number;
-	term: Term;
-	student: Student;
+	studentTerm: StudentTerm;
 }
 @injectable()
 export default class UpdateAchievementHandler extends RequestHandler {
 	@inject('AchievementDao') private achievementDao!: IAchievementDao;
 	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('TermDao') private termDao!: ITermDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
@@ -50,29 +50,32 @@ export default class UpdateAchievementHandler extends RequestHandler {
 		if (!student) {
 			throw new Error('Student not found');
 		}
+		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
+
+		if (!studentTerm) {
+			throw new Error(`student not in term ${termId}`);
+		}
 		return {
 			achievement,
 			name,
-			term,
-			student,
+			studentTerm,
 			bonusGrade,
 		};
 	}
 
 	async handle(request: Request) {
-		const { achievement, name, term, student, bonusGrade } = await this.validate(request);
+		const { achievement, name, studentTerm, bonusGrade } = await this.validate(request);
 
 		achievement.update({
 			name,
-			term,
-			student,
+			studentTerm,
 			bonusGrade,
 		});
 
 		const achievementResult = await this.achievementDao.updateEntity(achievement);
 
 		if (!achievementResult) throw new Error('Create Achievement fail');
-		achievementResult.update({ student });
+		achievementResult.update({ studentTerm });
 
 		return achievementResult.toJSON;
 	}

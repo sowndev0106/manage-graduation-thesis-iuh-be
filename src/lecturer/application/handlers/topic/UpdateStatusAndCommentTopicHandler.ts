@@ -14,6 +14,7 @@ import Lecturer from '@core/domain/entities/Lecturer';
 import Term from '@core/domain/entities/Term';
 import StatusTopic from '@core/domain/validate-objects/StatusTopic';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 
 interface ValidatedInput {
 	id: number;
@@ -26,6 +27,7 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 	@inject('TopicDao') private topicDao!: ITopicDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	@inject('TermDao') private termDao!: ITermDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
@@ -51,16 +53,6 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 		let topic = await this.topicDao.findEntityById(input.id);
 		if (!topic) throw new Error('Topic not found');
 
-		// check is head lecture this majors of topic
-		const term = await this.termDao.findEntityById(topic.termId!);
-		const lecturer = await this.lecturerDao.findEntityById(input.lecturerId);
-
-		// check headlecturer of majors
-		// head lecturer only handler in my majors
-		// if (lecturer?.headLecturerId != lecturerTopic?.id) {
-		// 	throw new Error(`You doesn't permission for majors: ${majorsTopic?.name}`);
-		// }
-
 		topic.update({
 			comment: input.comment,
 			status: input.status,
@@ -69,6 +61,10 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 		topic = await this.topicDao.updateEntity(topic);
 
 		if (!topic) throw new Error('update status Topic fail');
+
+		const lecturerTerm = await this.lecturerTermDao.findOneGraphById(topic.lecturerTermId!);
+
+		lecturerTerm && topic.update({ lecturerTerm });
 
 		return topic.toJSON;
 	}

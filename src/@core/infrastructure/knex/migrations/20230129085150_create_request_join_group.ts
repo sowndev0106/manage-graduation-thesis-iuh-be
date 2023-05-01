@@ -4,9 +4,8 @@ export async function up(knex: Knex): Promise<void> {
 	return knex.schema.createTable('request_join_group', table => {
 		table.increments('id').primary();
 		table.string('message');
-
 		table.integer('group_id').unsigned().references('id').inTable('group');
-		table.integer('student_id').unsigned().references('id').inTable('student');
+		table.integer('student_term_id').unsigned().references('id').inTable('student_term');
 		table.enum('type', ['REQUEST_JOIN', 'REQUEST_INVITE']);
 
 		table.timestamps();

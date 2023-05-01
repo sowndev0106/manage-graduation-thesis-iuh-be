@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Ioc from '@lecturer/infrastructure/inversify';
 import CreateOrUpdateTranscriptHandler from '../handlers/transcript/CreateOrUpdateTranscriptHandler';
-import GetListTranscriptByStudentHandler from '../handlers/transcript/GetListTranscriptByStudentHandler';
+import GetListTranscriptByStudentHandler from '../handlers/transcript/GetListTranscriptByStudentAndLecturerHandler';
 import GetListTranscriptByGroupHandler from '../handlers/transcript/GetListTranscriptByGroupHandler';
 import GetAVGTranscriptHandler from '../handlers/transcript/GetAVGTranscriptHandler';
 

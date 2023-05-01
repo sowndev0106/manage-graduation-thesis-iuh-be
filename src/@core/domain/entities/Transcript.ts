@@ -2,12 +2,12 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Evaluation from './Evaluation';
 import Assign from './Assign';
-import Student from './Student';
-import Lecturer from './Lecturer';
+import StudentTerm from './StudentTerm';
+import LecturerTerm from './LecturerTerm';
 export interface IProps {
 	grade: number;
-	student: Student;
-	lecturer: Lecturer;
+	studentTerm: StudentTerm;
+	lecturerTerm: LecturerTerm;
 	evaluation: Evaluation;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -22,17 +22,17 @@ export default class Transcript extends Entity<IProps> {
 	get grade() {
 		return this.props.grade;
 	}
-	get studentId() {
-		return this.props?.student?.id;
+	get studentTermId() {
+		return this.props?.studentTerm?.id;
 	}
-	get student() {
-		return this.props?.student;
+	get studentTerm() {
+		return this.props?.studentTerm;
 	}
-	get lecturerId() {
-		return this.props?.lecturer?.id;
+	get lecturerTermId() {
+		return this.props?.lecturerTerm?.id;
 	}
-	get lecturer() {
-		return this.props?.lecturer;
+	get lecturerTerm() {
+		return this.props?.lecturerTerm;
 	}
 	get evaluationId() {
 		return this.props?.evaluation?.id;
@@ -47,11 +47,11 @@ export default class Transcript extends Entity<IProps> {
 		return this.props.updatedAt || new Date();
 	}
 	get toJSON() {
-		const { student, lecturer, ...props } = lodash.cloneDeep(this._props || {});
-		let studentJSON = this.student?.toJSON;
-		let lecturerJSON = this.lecturer?.toJSON;
+		const { studentTerm, lecturerTerm, ...props } = lodash.cloneDeep(this._props || {});
+		let studentTermJSON = this.studentTerm?.toJSON;
+		let lecturerTermJSON = this.lecturerTerm?.toJSON;
 		let evaluationJSON = this.evaluation?.toJSON;
 
-		return { id: this.id, ...props, student: studentJSON, lecturer: lecturerJSON, evaluation: evaluationJSON };
+		return { id: this.id, ...props, student: studentTermJSON, lecturer: lecturerTermJSON, evaluation: evaluationJSON };
 	}
 }

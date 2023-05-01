@@ -14,12 +14,14 @@ import Lecturer from '@core/domain/entities/Lecturer';
 import Term from '@core/domain/entities/Term';
 import EntityIds from '@core/domain/validate-objects/EntityIds';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 interface ValidatedInput {
 	groupLecturer: GroupLecturer;
 	name: string;
 	term: Term;
-	lecturers: Lecturer[];
+	lecturerTerms: LecturerTerm[];
 }
 @injectable()
 export default class CreateGroupLecturerHandler extends RequestHandler {
@@ -27,13 +29,14 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupLecturerMemberDao') private groupMemberDao!: IGroupLecturerMemberDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const groupLecturerId = this.errorCollector.collect('id', () => EntityId.validate({ value: String(request.params['id']) }));
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const lecturerIds = this.errorCollector.collect('lecturerIds', () => EntityIds.validate({ value: request.body['lecturerIds'], required: false }));
-
+		console.log(lecturerIds);
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
@@ -43,17 +46,17 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 		let groupLecturer = await this.groupLecturerDao.findEntityById(groupLecturerId);
 		if (!groupLecturer) throw new NotFoundError('group lecturer not found');
 
-		const lecturers: Lecturer[] = [];
+		const lecturerTerms: LecturerTerm[] = [];
 
 		for (const lecturerId of lecturerIds) {
-			const lecturer = await this.lecturerDao.findEntityById(lecturerId);
-			if (lecturer) lecturers.push(lecturer);
+			const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturerId);
+			if (lecturerTerm) lecturerTerms.push(lecturerTerm);
 		}
 
 		return {
 			name,
 			term,
-			lecturers,
+			lecturerTerms,
 			groupLecturer,
 		};
 	}
@@ -66,33 +69,35 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 
 		if (groupLecturer == null) {
 			groupLecturer = input.groupLecturer;
-			const members = await this.groupMemberDao.findAll(groupLecturer.id!);
+			const members = await this.groupMemberDao.findAll({
+				groupLecturerId: groupLecturer.id!,
+			});
 			groupLecturer.update({ members: members });
 		}
 		groupLecturer.update({ name: input.name });
 
-		await this.updateMember(groupLecturer, input.lecturers);
+		await this.updateMember(groupLecturer, input.lecturerTerms);
 
 		groupLecturer = await this.groupLecturerDao.updateEntity(groupLecturer);
 
-		groupLecturer.update({ members: await this.groupMemberDao.findAll(groupLecturer.id!) });
+		groupLecturer.update({ members: await this.groupMemberDao.findAll({ groupLecturerId: groupLecturer.id! }) });
 
 		return groupLecturer?.toJSON;
 	}
-	private async updateMember(groupLecturer: GroupLecturer, lecturers: Lecturer[]) {
-		if (!lecturers || !lecturers.length) return groupLecturer.members;
+	private async updateMember(groupLecturer: GroupLecturer, lecturerTerms: LecturerTerm[]) {
+		if (!lecturerTerms || !lecturerTerms.length) return groupLecturer.members;
 		const memberInsert: GroupLecturerMember[] = [];
 		let members: GroupLecturerMember[] = [];
 		const membersDelete: GroupLecturerMember[] = [];
 
 		groupLecturer.members?.forEach(member => {
-			if (!lecturers.find(e => e.id == member.lecturerId)) membersDelete.push(member);
+			if (!lecturerTerms.find(e => e.id == member.lecturerTermId)) membersDelete.push(member);
 			else members.push(member);
 		});
 
-		lecturers.forEach(lecturer => {
-			if (!groupLecturer.members?.find(e => e.lecturerId == lecturer.id))
-				memberInsert.push(GroupLecturerMember.create({ groupLecturer: groupLecturer!, lecturer }));
+		lecturerTerms.forEach(lecturerTerm => {
+			if (!groupLecturer.members?.find(e => e.lecturerTermId == lecturerTerm.id))
+				memberInsert.push(GroupLecturerMember.create({ groupLecturer: groupLecturer!, lecturerTerm }));
 		});
 
 		// delete

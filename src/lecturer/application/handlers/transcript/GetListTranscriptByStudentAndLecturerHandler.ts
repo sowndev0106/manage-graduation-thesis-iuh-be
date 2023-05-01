@@ -7,7 +7,6 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import IAssignDao from '@lecturer/domain/daos/IAssignDao';
 import Evaluation, { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
-import Student from '@core/domain/entities/Student';
 import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 import Assign from '@core/domain/entities/Assign';
 import IGroupMemberDao from '@lecturer/domain/daos/IGroupMemberDao';
@@ -15,17 +14,17 @@ import IGroupLecturerMemberDao from '@lecturer/domain/daos/IGroupLecturerMemberD
 import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
 import Transcript from '@core/domain/entities/Transcript';
 import ITranscriptDao from '@lecturer/domain/daos/ITranscriptDao';
-import Lecturer from '@core/domain/entities/Lecturer';
-import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
-import Term from '@core/domain/entities/Term';
-import ITermDao from '@lecturer/domain/daos/ITermDao';
 import IGroupDao from '@lecturer/domain/daos/IGroupDao';
 import Group from '@core/domain/entities/Group';
+import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
+import StudentTerm from '@core/domain/entities/StudentTerm';
+import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 interface ValidatedInput {
-	lecturer: Lecturer;
-	student: Student;
+	studentTerm: StudentTerm;
+	lecturerTerm: LecturerTerm;
 	typeEvaluation: TypeEvaluation;
 	assign: Assign;
 	group: Group;
@@ -34,14 +33,14 @@ interface ValidatedInput {
 export default class GetListTranscriptByStudentHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
-	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
+	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('GroupLecturerMemberDao') private groupLecturerMemberDao!: IGroupLecturerMemberDao;
 	@inject('AssignDao') private assignDao!: IAssignDao;
-	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
-	@inject('TermDao') private termDao!: ITermDao;
 	@inject('EvaluationDao') private evaluationDao!: IEvaluationDao;
 	@inject('TranscriptDao') private transcriptDao!: ITranscriptDao;
+	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const studentId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.params['studentId'] }));
@@ -49,56 +48,58 @@ export default class GetListTranscriptByStudentHandler extends RequestHandler {
 		const typeEvaluation = this.errorCollector.collect('typeEvaluation', () => TypeEvaluationValidate.validate({ value: request.query['typeEvaluation'] }));
 		let lecturerId = this.errorCollector.collect('lecturerId', () => EntityId.validate({ value: request.query['lecturerId'] }));
 
-		if (!lecturerId) {
-			lecturerId = Number(request.headers['id']);
-		}
-
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 		let student = await this.studentDao.findEntityById(studentId);
 		if (!student) throw new NotFoundError('student not found');
 
-		let lecturer = await this.lecturerDao.findEntityById(lecturerId);
-		if (!lecturer) throw new NotFoundError('lecturer not found');
-
 		const group = await this.groupDao.findEntityById(groupId);
 		if (!group) {
 			throw new Error('Student do not have group');
 		}
-		const groupMemberStudents = await this.groupMemberDao.findByGroupId(group.id!);
+		let studentTerm = await this.studentTermDao.findOne(group?.termId!, studentId);
+		if (!studentTerm) throw new NotFoundError('student Term not found');
 
-		const isExistStudent = groupMemberStudents.find(e => e.studentId == student!.id);
-		if (!isExistStudent) {
+		const groupMembertudents = await this.groupMemberDao.findOne({
+			studentTermId: studentTerm.id!,
+			groupId: group.id!,
+		});
+		if (!groupMembertudents) {
 			throw new Error(`Student not in group ${group.id}`);
 		}
 
+		let lecturerTerm = await this.lecturerTermDao.findOne(group?.termId!, lecturerId);
+		if (!lecturerTerm) throw new NotFoundError('lecturer Term not found');
+
 		const assign = await this.assignDao.findOneExtends({
-			termId: group.termId!,
-			lecturerId,
-			studentId,
+			lecturerTermId: lecturerTerm.id!,
+			studentTermId: studentTerm.id!,
 			typeEvaluation,
 		});
 		if (!assign) {
 			throw new Error('Lecturer do not have assign');
 		}
-		const groupMemberLecturers = await this.groupLecturerMemberDao.findAll(assign.groupLecturerId!);
-		const isExistLecturer = groupMemberLecturers.find(e => e.lecturerId == lecturerId);
-		if (!isExistLecturer) {
+
+		const groupMemberLecturer = await this.groupLecturerMemberDao.findOne({
+			groupLecturerId: assign.groupLecturerId!,
+			lecturerTermId: lecturerTerm.id!,
+		});
+		if (!groupMemberLecturer) {
 			throw new Error(`Lecturer not in group ${assign.groupLecturerId}`);
 		}
 
 		return {
 			typeEvaluation,
-			lecturer,
-			student,
+			lecturerTerm,
+			studentTerm,
 			assign,
 			group,
 		};
 	}
 
 	async handle(request: Request) {
-		const { typeEvaluation, lecturer, student, assign, group } = await this.validate(request);
+		const { typeEvaluation, studentTerm, assign, group, lecturerTerm } = await this.validate(request);
 		const groupLecturer = await this.groupLecturerDao.findEntityById(assign.groupLecturerId);
 		const evaluations = await this.evaluationDao.findAll(groupLecturer?.termId, assign.typeEvaluation);
 
@@ -107,9 +108,8 @@ export default class GetListTranscriptByStudentHandler extends RequestHandler {
 			evaluationMap.set(evaluation.id!, evaluation);
 		});
 		let transcripts = await this.transcriptDao.findAll({
-			termId: group.id!,
-			lecturerId: lecturer.id!,
-			studentId: student.id!,
+			lecturerTermId: lecturerTerm.id!,
+			studentTermId: studentTerm.id!,
 		});
 		const transcripMap = new Map<number, Transcript>();
 		transcripts.forEach(e => {

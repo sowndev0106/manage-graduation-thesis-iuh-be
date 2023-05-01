@@ -3,7 +3,7 @@ import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import Transcript from '@core/domain/entities/Transcript';
 
 export default interface ITranscriptDao extends IDao<Transcript> {
-	findAll(props: { termId: number; lecturerId: number; studentId: number }): Promise<Transcript[]>;
-	findByStudentAndType(props: { termId: number; studentId: number; type: TypeEvaluation }): Promise<Transcript[]>;
-	findOne(props: { lecturerId: number; evaluationId: number; studentId: number }): Promise<Transcript | null>;
+	findAll(props: { lecturerTermId: number; studentTermId: number }): Promise<Transcript[]>;
+	findByStudentAndType(props: { studentTermId: number; type: TypeEvaluation }): Promise<Transcript[]>;
+	findOne(props: { lecturerTermId: number; evaluationId: number; studentTermId: number }): Promise<Transcript | null>;
 }

@@ -46,6 +46,7 @@ export default class StudentTerm extends Entity<IProps> {
 		let studentProps = this.student?.toJSON;
 		let termProps: any = this.term?.toJSON;
 
-		return { id: this.id, ...props, student: studentProps, term: termProps };
+		// return { id: this.id, ...props, student: studentProps, term: termProps };
+		return { ...studentProps, term: termProps };
 	}
 }

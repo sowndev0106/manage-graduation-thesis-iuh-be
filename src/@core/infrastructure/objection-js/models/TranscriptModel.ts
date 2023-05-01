@@ -6,6 +6,10 @@ import LecturerModel from './LecturerModel';
 import Student from '@core/domain/entities/Student';
 import Lecturer from '@core/domain/entities/Lecturer';
 import Evaluation from '@core/domain/entities/Evaluation';
+import lecturerTermModel from './LecturerTermModel';
+import StudentTerm from '@core/domain/entities/StudentTerm';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import StudentTermModel from './StudentTermModel';
 
 export default class TranscriptModel extends Model {
 	static get tableName() {
@@ -13,20 +17,20 @@ export default class TranscriptModel extends Model {
 	}
 
 	static relationMappings = {
-		student: {
+		student_term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: StudentModel,
+			modelClass: StudentTermModel,
 			join: {
-				from: 'transcript.student_id',
-				to: 'student.id',
+				from: 'transcript.student_term_id',
+				to: 'student_term.id',
 			},
 		},
-		lecturer: {
+		lecturer_term: {
 			relation: Model.BelongsToOneRelation,
-			modelClass: LecturerModel,
+			modelClass: lecturerTermModel,
 			join: {
-				from: 'transcript.lecturer_id',
-				to: 'lecturer.id',
+				from: 'transcript.lecturer_term_id',
+				to: 'lecturer_term.id',
 			},
 		},
 		evaluation: {
@@ -44,8 +48,8 @@ export default class TranscriptModel extends Model {
 		model.$set({
 			id: entity.id,
 			grade: entity.grade,
-			student_id: entity.studentId,
-			lecturer_id: entity.lecturerId,
+			student_term_id: entity.studentTermId,
+			lecturer_term_id: entity.lecturerTermId,
 			evaluation_id: entity.evaluationId,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
@@ -64,19 +68,19 @@ export default class TranscriptModel extends Model {
 		const entity = Transcript.create(
 			{
 				grade: dbJson['grade'],
-				student: Student.createById(dbJson['student_id']),
-				lecturer: Lecturer.createById(dbJson['lecturer_id']),
+				studentTerm: StudentTerm.createById(dbJson['student_term_id']),
+				lecturerTerm: LecturerTerm.createById(dbJson['lecturer_term_id']),
 				evaluation: Evaluation.createById(dbJson['evaluation_id']),
 			},
 			Number(dbJson['id'])
 		);
 
-		const student = dbJson['student'] && StudentModel.convertModelToEntity(dbJson['student']);
-		const lecturer = dbJson['lecturer'] && LecturerModel.convertModelToEntity(dbJson['lecturer']);
+		const studentTerm = dbJson['student_term'] && StudentTermModel.convertModelToEntity(dbJson['student_term']);
+		const lecturerTerm = dbJson['lecturer_term'] && lecturerTermModel.convertModelToEntity(dbJson['lecturer_term']);
 		const evaluation = dbJson['evaluation'] && EvaluationModel.convertModelToEntity(dbJson['evaluation']);
 
-		if (student) entity.update({ student });
-		if (lecturer) entity.update({ lecturer });
+		if (studentTerm) entity.update({ studentTerm });
+		if (lecturerTerm) entity.update({ lecturerTerm });
 		if (evaluation) entity.update({ evaluation });
 
 		return entity;
