@@ -31,10 +31,11 @@ export default class GetListTopicHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		const props: any = { termId: input.termId };
-		if (input.termId) {
+		if (input.termId && input.lecturerId) {
 			const lecturerTerm = await this.lecturerTermDao.findOne(input.termId, input.lecturerId);
 			if (lecturerTerm) props.lecturerTermId = lecturerTerm?.id;
 		}
+		console.log(props);
 		const listTopic = await this.topicDao.findAll(props);
 
 		return listTopic.map(e => e.toJSON);
