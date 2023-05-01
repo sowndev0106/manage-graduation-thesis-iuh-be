@@ -4,7 +4,6 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ValidationError from '@core/domain/errors/ValidationError';
-import IAssignDao from '@lecturer/domain/daos/IAssignDao';
 import Evaluation, { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 import TranscriptDetails, { ITranscriptDetail } from '@core/domain/validate-objects/TranscriptDetails';
@@ -13,16 +12,17 @@ import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 import Assign from '@core/domain/entities/Assign';
 import IGroupMemberDao from '@lecturer/domain/daos/IGroupMemberDao';
 import IGroupLecturerMemberDao from '@lecturer/domain/daos/IGroupLecturerMemberDao';
-import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
 import Transcript from '@core/domain/entities/Transcript';
 import ITranscriptDao from '@lecturer/domain/daos/ITranscriptDao';
 import Lecturer from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
-import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
+import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import IGroupDao from '@lecturer/domain/daos/IGroupDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import StudentTerm from '@core/domain/entities/StudentTerm';
+import IAssignDao from '@lecturer/domain/daos/IAssignDao';
+import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
 
 interface ValidatedInput {
 	assign: Assign;
