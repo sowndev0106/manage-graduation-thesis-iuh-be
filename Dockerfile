@@ -1,4 +1,5 @@
-FROM node:slim AS app
+FROM node:latest
+WORKDIR /puppeteer
 
 # We don't need the standalone Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
