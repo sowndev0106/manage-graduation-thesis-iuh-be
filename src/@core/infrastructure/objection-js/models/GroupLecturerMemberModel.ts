@@ -59,7 +59,7 @@ export default class GroupLecturerMemberModel extends Model {
 			Number(dbJson['id'])
 		);
 		const groupLecturer = dbJson['group_lecturer'] && GroupLecturerModel.convertModelToEntity(dbJson['group_lecturer']);
-		const lecturerTerm = dbJson['lecturer_term'] && LecturerModel.convertModelToEntity(dbJson['lecturer_term']);
+		const lecturerTerm = dbJson['lecturer_term'] && lecturerTermModel.convertModelToEntity(dbJson['lecturer_term']);
 
 		if (groupLecturer) entity.update({ groupLecturer });
 		if (lecturerTerm) entity.update({ lecturerTerm });

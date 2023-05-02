@@ -8,7 +8,7 @@ export default class GroupDao extends GroupDaoCore implements IGroupDao {
 	async findAll(termId?: number, topicId?: number): Promise<Group[]> {
 		const query = this.initQuery();
 
-		query.withGraphFetched('[members, members.student_term, topic]');
+		query.withGraphFetched('[members, members.student_term, members.student_term.student, topic]');
 
 		const whereClause: Record<string, number> = {};
 
@@ -24,7 +24,7 @@ export default class GroupDao extends GroupDaoCore implements IGroupDao {
 	async findOneByTermAndStudent(termId: number, studentId: number): Promise<Group | null> {
 		const query = this.initQuery();
 
-		query.withGraphFetched('[members, members.student_term, topic]');
+		query.withGraphFetched('[members, members.student_term, members.student_term.student, topic]');
 
 		const whereClause: Record<string, number> = {};
 
