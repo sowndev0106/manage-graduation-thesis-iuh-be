@@ -1,7 +1,6 @@
 import Evaluation, { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import puppeteer from 'puppeteer';
 import hb from 'handlebars';
-
 // Example of options with args //
 
 export default class GenerateEvalutionPDF {
@@ -17,10 +16,8 @@ export default class GenerateEvalutionPDF {
 	}
 
 	async printPDF() {
-		const browserFetcher = puppeteer.createBrowserFetcher();
-		// let revisionInfo = await browserFetcher.download('884014');
 		const browser = await puppeteer.launch({
-			headless: true,
+			headless: false,
 			// executablePath: revisionInfo?.executablePath,
 			args: ['--no-sandbox', '--disabled-setupid-sandbox'],
 			executablePath: '/usr/bin/chromium-browser',

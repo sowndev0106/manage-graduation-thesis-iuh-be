@@ -4,6 +4,7 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import { TypeRoleLecturer } from '@core/domain/entities/Lecturer';
 
 interface ValidatedInput {}
 
@@ -24,6 +25,17 @@ export default class GetListTermHandler extends RequestHandler {
 
 		const listMajors = await this.majorsDao.getAllEntities();
 
-		return listMajors.map(e => e.toJSON);
+		const majorsHeadLecturerPromise = listMajors.map(async e => {
+			const headLecturer = await this.lecturerDao.findOneByRole(e.id!, TypeRoleLecturer.HEAD_LECTURER);
+			const subHeadLecturer = await this.lecturerDao.findOneByRole(e.id!, TypeRoleLecturer.SUB_HEAD_LECTURER);
+			return {
+				...e.toJSON,
+				headLecturer: headLecturer?.toJSON,
+				subHeadLecturer: subHeadLecturer?.toJSON,
+			};
+		});
+		const result = await Promise.all(majorsHeadLecturerPromise);
+
+		return result;
 	}
 }

@@ -5,6 +5,18 @@ import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 
 @injectable()
 export default class LecturerDao extends LecturerDaoCore implements ILecturerDao {
+	async findOneByRole(majorsId: number, role: TypeRoleLecturer): Promise<Lecturer | null> {
+		const query = this.initQuery();
+
+		const whereClause: Record<string, any> = {};
+
+		whereClause['lecturer.majors_id'] = majorsId;
+		whereClause['lecturer.role'] = role;
+
+		const result = await query.findOne(whereClause);
+
+		return result ? this.convertModelToEntity(result) : null;
+	}
 	async findAll(majorsId?: number, termId?: number, role?: TypeRoleLecturer): Promise<Lecturer[]> {
 		const query = this.initQuery();
 
