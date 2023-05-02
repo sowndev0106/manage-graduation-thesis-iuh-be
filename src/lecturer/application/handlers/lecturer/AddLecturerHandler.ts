@@ -86,6 +86,8 @@ export default class AddLecturerHandler extends RequestHandler {
 			role: TypeRoleLecturer.LECTURER,
 		});
 
+		lecturer = await this.lecturerDao.insertEntity(lecturer);
+
 		await this.LecturertermDao.insertEntity(
 			LecturerTerm.create({
 				lecturer,
@@ -93,7 +95,6 @@ export default class AddLecturerHandler extends RequestHandler {
 				role: lecturer.role,
 			})
 		);
-		lecturer = await this.lecturerDao.insertEntity(lecturer);
 
 		return lecturer.toJSON;
 	}
