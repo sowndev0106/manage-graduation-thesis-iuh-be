@@ -18,12 +18,12 @@ export default class GenerateEvalutionPDF {
 
 	async printPDF() {
 		const browserFetcher = puppeteer.createBrowserFetcher();
-		let revisionInfo = await browserFetcher.download('884014');
+		// let revisionInfo = await browserFetcher.download('884014');
 		const browser = await puppeteer.launch({
 			headless: true,
-			executablePath: revisionInfo?.executablePath,
+			// executablePath: revisionInfo?.executablePath,
 			args: ['--no-sandbox', '--disabled-setupid-sandbox'],
-			// executablePath: '/usr/bin/chromium-browser',
+			executablePath: '/usr/bin/chromium-browser',
 		});
 		const page = await browser.newPage();
 		// const data = await inlineCss(dataHDoc, { url: '/' });
