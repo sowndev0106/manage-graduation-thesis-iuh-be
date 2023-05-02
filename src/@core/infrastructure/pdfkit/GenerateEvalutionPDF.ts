@@ -17,7 +17,7 @@ export default class GenerateEvalutionPDF {
 
 	async printPDF() {
 		const browser = await puppeteer.launch({
-			headless: false,
+			// headless: false,
 			// executablePath: revisionInfo?.executablePath,
 			args: ['--no-sandbox', '--disabled-setupid-sandbox'],
 			executablePath: '/usr/bin/chromium-browser',

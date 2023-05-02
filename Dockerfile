@@ -22,7 +22,7 @@ RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
     && chown -R pptruser:pptruser /app
 
 # Run everything after as non-privileged user.
-USER pptruser
+# USER pptruser
 
 ENV NODE_ENV="develop"
 WORKDIR /app
