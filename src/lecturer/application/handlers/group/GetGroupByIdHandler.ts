@@ -5,7 +5,7 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import IGroupDao from '@lecturer/domain/daos/IGroupDao';
-import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
+import IGroupMemberDao from '@lecturer/domain/daos/IGroupMemberDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
@@ -34,7 +34,7 @@ export default class GetGroupByIdHandler extends RequestHandler {
 
 		if (!group) throw new NotFoundError('group not found');
 
-		const members = await this.groupMemberDao.findByGroupId(group.id!);
+		const members = await this.groupMemberDao.findByGroupId({ groupId: input.groupId });
 
 		group.updateMembers(members);
 
