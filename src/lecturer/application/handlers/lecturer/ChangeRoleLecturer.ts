@@ -34,11 +34,24 @@ export default class ChangeRoleLecturer extends RequestHandler {
 
 	async handle(request: Request) {
 		const { lecturer, role } = await this.validate(request);
-
+		if (lecturer.role == role) {
+			return lecturer.toJSON;
+		}
+		if (role == TypeRoleLecturer.SUB_HEAD_LECTURER || role == TypeRoleLecturer.HEAD_LECTURER) {
+			await this.destroyOldLecturer(lecturer, role);
+		}
 		lecturer.update({ role });
 
 		const lecturerUpdated = await this.lecturerDao.updateEntity(lecturer);
 
 		return lecturerUpdated?.toJSON || {};
+	}
+	private async destroyOldLecturer(lecturer: Lecturer, role: TypeRoleLecturer) {
+		const oldLecturerByRole = await this.lecturerDao.findOneByRole(lecturer.majorsId!, role);
+		if (oldLecturerByRole) {
+			oldLecturerByRole.update({ role: TypeRoleLecturer.LECTURER });
+			// update old lecturer
+			await this.lecturerDao.updateEntity(oldLecturerByRole);
+		}
 	}
 }

@@ -5,6 +5,27 @@ import { injectable } from 'inversify';
 import Objection from 'objection';
 @injectable()
 export default class TermDao extends TermDaoCore implements ITermDao {
+	async findNowByMajorsId(majorsId: number): Promise<Term | null> {
+		const query = this.initQuery();
+		const dateNow = new Date();
+
+		query.where('start_date', '>=', dateNow).andWhere('end_date', '<=', dateNow).andWhere('majors_id', '=', majorsId);
+
+		query.limit(1);
+
+		const result = await query.execute();
+
+		return result[0] ? this.convertModelToEntity(result[0]) : null;
+	}
+	async findLatestByMajorsId(majorsId: number): Promise<Term | null> {
+		const query = this.initQuery();
+		query.max('end_date').andWhere('majors_id', '=', majorsId);
+
+		query.limit(1);
+		const result = await query.execute();
+
+		return result[0] ? this.convertModelToEntity(result[0]) : null;
+	}
 	async findByYearAndMajors(majorsId: number, fromYear?: number, toYear?: number): Promise<Term[]> {
 		const query = this.initQuery();
 		if (fromYear && toYear) {
