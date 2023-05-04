@@ -19,12 +19,11 @@ export default class TermDao extends TermDaoCore implements ITermDao {
 	}
 	async findLatestByMajorsId(majorsId: number): Promise<Term | null> {
 		const query = this.initQuery();
-		query.max('end_date').andWhere('majors_id', '=', majorsId);
+		query.orderBy('end_date', 'desc');
 
-		query.limit(1);
-		const result = await query.execute();
+		const result = await query.findOne({ majors_id: majorsId });
 
-		return result[0] ? this.convertModelToEntity(result[0]) : null;
+		return result ? this.convertModelToEntity(result) : null;
 	}
 	async findByYearAndMajors(majorsId: number, fromYear?: number, toYear?: number): Promise<Term[]> {
 		const query = this.initQuery();

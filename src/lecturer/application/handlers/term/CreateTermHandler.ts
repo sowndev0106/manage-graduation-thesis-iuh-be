@@ -99,6 +99,11 @@ export default class CreateTermHandler extends RequestHandler {
 
 		if (term) throw new Error(`name already exists in majors and year ${input.startDate.getFullYear()} - ${input.endDate.getFullYear()}`);
 
+		const latestTerm = await this.termDao.findLatestByMajorsId(input.majorsId);
+
+		if (latestTerm && latestTerm.endDate >= input.startDate) {
+			throw new Error(`start date must be > ${latestTerm.endDate.toLocaleDateString()}`);
+		}
 		term = await this.termDao.insertEntity(
 			Term.create({
 				name: input.name,
