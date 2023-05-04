@@ -9,6 +9,7 @@ router.put('/:id', LecturerAuth.headLecturer, TermController.updateTerm);
 router.delete('/:id', LecturerAuth.headLecturer, TermController.deleteTerm);
 
 router.get('/', TermController.getListTerm);
+router.get('/now', TermController.getTermNow);
 router.get('/:id', TermController.getTermById);
 
 export default router;

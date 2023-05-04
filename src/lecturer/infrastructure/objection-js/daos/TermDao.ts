@@ -9,7 +9,7 @@ export default class TermDao extends TermDaoCore implements ITermDao {
 		const query = this.initQuery();
 		const dateNow = new Date();
 
-		query.where('start_date', '>=', dateNow).andWhere('end_date', '<=', dateNow).andWhere('majors_id', '=', majorsId);
+		query.where('start_date', '<=', dateNow).andWhere('end_date', '>=', dateNow).andWhere('majors_id', '=', majorsId);
 
 		query.limit(1);
 
