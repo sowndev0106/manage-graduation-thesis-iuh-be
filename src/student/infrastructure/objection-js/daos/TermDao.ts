@@ -5,10 +5,23 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class TermDao extends TermDaoCore implements ITermDao {
-	async findLastTermByMajors(majorsId: number): Promise<Term | null> {
+	async findNowByMajorsId(majorsId: number): Promise<Term | null> {
 		const query = this.initQuery();
-		query.orderBy('created_at', 'DESC').limit(1);
-		query.where({ majors_id: majorsId });
+		const dateNow = new Date();
+
+		query.where('start_date', '<=', dateNow).andWhere('end_date', '>=', dateNow).andWhere('majors_id', '=', majorsId);
+
+		query.limit(1);
+
+		const result = await query.execute();
+
+		return result[0] ? this.convertModelToEntity(result[0]) : null;
+	}
+	async findLatestByMajorsId(majorsId: number): Promise<Term | null> {
+		const query = this.initQuery();
+		query.max('end_date').andWhere('majors_id', '=', majorsId);
+
+		query.limit(1);
 		const result = await query.execute();
 
 		return result[0] ? this.convertModelToEntity(result[0]) : null;
