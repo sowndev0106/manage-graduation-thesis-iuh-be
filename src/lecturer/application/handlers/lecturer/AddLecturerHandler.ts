@@ -11,8 +11,6 @@ import EntityId from '@core/domain/validate-objects/EntityID';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
 import Lecturer, { TypeDegree, TypeGender, TypeRoleLecturer } from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
-import { faker } from '@faker-js/faker';
-import Majors from '@core/domain/entities/Majors';
 import ITermDao from '@lecturer/domain/daos/ITermDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
@@ -39,7 +37,7 @@ export default class AddLecturerHandler extends RequestHandler {
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('TermDao') private termDao!: ITermDao;
-	@inject('LecturerTermDao') private LecturertermDao!: ILecturerTermDao;
+	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.body['majorsId'] }));
 		const username = this.errorCollector.collect('username', () => Username.validate({ value: request.body['username'] }));
@@ -60,9 +58,6 @@ export default class AddLecturerHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { username, password, majorsId, termId, phoneNumber, email, name, degree, gender } = await this.validate(request);
-		let lecturer = await this.lecturerDao.findByUsername(username);
-		if (lecturer) throw new ConflictError('username already exists');
-
 		let majors = await this.majorsDao.findEntityById(majorsId);
 		if (!majors) throw new NotFoundError('majors not found');
 
@@ -70,32 +65,36 @@ export default class AddLecturerHandler extends RequestHandler {
 		if (!term) {
 			throw new Error('term not found');
 		}
-		const defaultPassword = '123456';
-		const passwordEncript = await encriptTextBcrypt(password || defaultPassword);
+		let lecturer = await this.lecturerDao.findByUsername(username);
+		if (!lecturer) {
+			const defaultPassword = '123456';
+			const passwordEncript = await encriptTextBcrypt(password || defaultPassword);
 
-		lecturer = Lecturer.create({
-			username: username,
-			password: passwordEncript,
-			phoneNumber,
-			majors: majors,
-			email,
-			name,
-			degree,
-			gender,
-			isAdmin: false,
-			role: TypeRoleLecturer.LECTURER,
-		});
+			lecturer = Lecturer.create({
+				username: username,
+				password: passwordEncript,
+				phoneNumber,
+				majors: majors,
+				email,
+				name,
+				degree,
+				gender,
+				isAdmin: false,
+				role: TypeRoleLecturer.LECTURER,
+			});
+			lecturer = await this.lecturerDao.insertEntity(lecturer);
+		}
 
-		lecturer = await this.lecturerDao.insertEntity(lecturer);
-
-		await this.LecturertermDao.insertEntity(
-			LecturerTerm.create({
-				lecturer,
-				term,
-				role: lecturer.role,
-			})
-		);
-
+		const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturer.id!);
+		if (!lecturerTerm) {
+			await this.lecturerTermDao.insertEntity(
+				LecturerTerm.create({
+					lecturer,
+					term,
+					role: lecturer.role,
+				})
+			);
+		}
 		return lecturer.toJSON;
 	}
 }

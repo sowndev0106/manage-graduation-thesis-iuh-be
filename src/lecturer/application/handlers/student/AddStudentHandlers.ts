@@ -64,32 +64,31 @@ export default class AddStudentHandlers extends RequestHandler {
 	async handle(request: Request) {
 		const { username, password, majorsId, termId, phoneNumber, email, name, gender, typeTraining, schoolYear } = await this.validate(request);
 
-		let user = await this.studentDao.findByUsername(username);
-		if (user) throw new ConflictError('username already exists');
-
 		let majors = await this.majorsDao.findEntityById(majorsId);
 		if (!majors) throw new NotFoundError('majors not found');
 
 		let term = await this.termDao.findEntityById(termId);
 		if (!term) throw new NotFoundError('majors not found');
 
-		const defaultPassword = '123456';
+		let student = await this.studentDao.findByUsername(username);
+		if (!student) {
+			const defaultPassword = '123456';
+			const passwordEncript = await encriptTextBcrypt(password || defaultPassword);
 
-		const passwordEncript = await encriptTextBcrypt(password || defaultPassword);
+			student = Student.create({
+				username: username,
+				password: passwordEncript,
+				majors: majors,
+				phoneNumber,
+				email,
+				name,
+				gender,
+				typeTraining,
+				schoolYear,
+			});
 
-		let student = Student.create({
-			username: username,
-			password: passwordEncript,
-			majors: majors,
-			phoneNumber,
-			email,
-			name,
-			gender,
-			typeTraining,
-			schoolYear,
-		});
-
-		student = await this.studentDao.insertEntity(student);
+			student = await this.studentDao.insertEntity(student);
+		}
 
 		let studentterm = await this.studentTermDao.findOne(term.id!, student.id!);
 		if (!studentterm) {
