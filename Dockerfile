@@ -24,7 +24,7 @@ RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
 # Run everything after as non-privileged user.
 # USER pptruser
 
-ENV NODE_ENV="production"
+ENV NODE_ENV="develop"
 WORKDIR /app
 COPY package.json .
 COPY package-lock.json . /app/
