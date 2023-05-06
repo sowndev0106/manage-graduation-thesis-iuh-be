@@ -1,25 +1,25 @@
-stages:
-    - publish
+stages-proxy:
+    - publish-proxy
     - deploy-proxy
 
 variables:
     TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
     TAG_COMMIT: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
 
-publish:
+publish-proxy:
     image: docker:latest
     stage: publish
     services:
         - docker:dind
+    before_script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     script:
-        - docker build -t $TAG_COMMIT -t $TAG_LATEST .
-        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-        - docker push $TAG_COMMIT
-        - docker push $TAG_LATEST
+        - docker build -t $TAG_COMMIT_PROXY -f Dockerfile.proxy .
+        - docker push $TAG_COMMIT_PROXY
     only:
-        - master
+        - master-proxy
 
-deploy:
+deploy-proxy:
     image: node:8-alpine
     stage: deploy
     before_script:
@@ -29,10 +29,10 @@ deploy:
     script:
         - chmod og= $ID_RSA
         - apk add --no-cache --upgrade bash
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f iuh || true"
-        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:3000 --name iuh $TAG_COMMIT"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT_PROXY"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f iuh-v2-proxy || true"
+        - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 3000:3000 --name iuh-v2-proxy $TAG_COMMIT_PROXY"
     environment:
         name: production
     only:
