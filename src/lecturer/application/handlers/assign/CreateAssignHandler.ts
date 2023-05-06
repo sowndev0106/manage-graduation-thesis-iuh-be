@@ -51,6 +51,9 @@ export default class CreateAssignHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { typeEvaluation, group, groupLecturer } = await this.validate(request);
+		if (group.termId != groupLecturer.termId) {
+			throw new Error('term of group student not same group lecturer');
+		}
 		let assign = await this.assignDao.findOne({
 			type: typeEvaluation,
 			groupId: group.id!,

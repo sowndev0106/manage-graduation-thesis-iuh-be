@@ -60,6 +60,9 @@ export default class UpdateAssignHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { typeEvaluation, group, groupLecturer, assign } = await this.validate(request);
+		if (group.termId != groupLecturer.termId) {
+			throw new Error('term of group student not same group lecturer');
+		}
 		// update entiry
 		assign.update({
 			typeEvaluation: typeEvaluation,

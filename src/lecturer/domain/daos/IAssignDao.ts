@@ -5,6 +5,6 @@ import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 export default interface IAssignDao extends IDao<Assign> {
 	findAll(props: { termId?: number; groupLecturerId?: number; type?: TypeEvaluation; groupId?: number }): Promise<Assign[]>;
 	findOne(props: { groupLecturerId?: number; type?: TypeEvaluation; groupId?: number }): Promise<Assign | null>;
-	findByLecturer(props: { lecturerTermId: number; typeEvaluation?: TypeEvaluation }): Promise<Assign[]>;
+	findByLecturer(props: { lecturerId: number; typeEvaluation?: TypeEvaluation }): Promise<Assign[]>;
 	findOneExtends(props: { lecturerTermId: number; studentTermId: number; typeEvaluation: TypeEvaluation }): Promise<Assign | null>;
 }

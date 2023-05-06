@@ -6,21 +6,20 @@ import EntityId from '@core/domain/validate-objects/EntityID';
 import IAssignDao from '@lecturer/domain/daos/IAssignDao';
 import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
 import { TypeEvaluation } from '@core/domain/entities/Evaluation';
-import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
-import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import Lecturer from '@core/domain/entities/Lecturer';
 
 interface ValidatedInput {
-	lecturerTerm: LecturerTerm;
+	lecturer: Lecturer;
 	typeEvaluation: TypeEvaluation;
 }
 
 @injectable()
 export default class GetListAssignByLecturerHandler extends RequestHandler {
 	@inject('AssignDao') private assignDao!: IAssignDao;
-	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
+	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const lecturerId = this.errorCollector.collect('lecturerId', () => EntityId.validate({ value: request.params['lecturerId'], required: false }));
-		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.query['termId'], required: true }));
 		const typeEvaluation = this.errorCollector.collect('typeEvaluation', () =>
 			TypeEvaluationValidate.validate({ value: request.query['typeEvaluation'], required: false })
 		);
@@ -28,18 +27,18 @@ export default class GetListAssignByLecturerHandler extends RequestHandler {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
-		const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturerId);
-		if (!lecturerTerm) {
-			throw new Error(`lecturer not in term ${termId}`);
+		const lecturer = await this.lecturerDao.findEntityById(lecturerId);
+		if (!lecturer) {
+			throw new Error(`lecturer not `);
 		}
-		return { lecturerTerm, typeEvaluation };
+		return { lecturer, typeEvaluation };
 	}
 
 	async handle(request: Request) {
-		const { lecturerTerm, typeEvaluation } = await this.validate(request);
+		const { lecturer, typeEvaluation } = await this.validate(request);
 
 		const assigns = await this.assignDao.findByLecturer({
-			lecturerTermId: lecturerTerm.id!,
+			lecturerId: lecturer.id!,
 			typeEvaluation,
 		});
 		return assigns.map(e => e.toJSON);
