@@ -5,6 +5,7 @@ import MeController from '../controllers/MeController';
 const router = Router();
 
 router.get('/', MeController.getMyInfo);
+router.patch('/password', MeController.updateMyPassword);
 router.put('/', uploadCloudinary.single('avatar'), MeController.updateMyInfo);
 
 export default router;
