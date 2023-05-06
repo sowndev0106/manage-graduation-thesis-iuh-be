@@ -76,15 +76,15 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 		if (requestJoinGroup) {
 			requestJoinGroup = await this.handleExistingRequestJoin(requestJoinGroup, input, group);
 		} else {
-			requestJoinGroup = await this.handleNewRequestJoin(input, group, input.studentTerm);
+			requestJoinGroup = await this.handleNewRequestJoin(input, group);
 		}
 
 		return requestJoinGroup?.toJSON;
 	}
-	private async handleNewRequestJoin(input: ValidatedInput, group: Group, studentTerm: StudentTerm) {
+	private async handleNewRequestJoin(input: ValidatedInput, group: Group) {
 		const requestJoinGroup = RequestJoinGroup.create({
 			group,
-			studentTerm,
+			studentTerm: input.studentTermInvite,
 			message: input.message,
 			type: TypeRequestJoinGroup.REQUEST_INVITE,
 		});
