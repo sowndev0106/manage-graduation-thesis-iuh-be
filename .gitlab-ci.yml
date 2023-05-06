@@ -1,14 +1,14 @@
-stages-proxy:
-    - publish-proxy
-    - deploy-proxy
+stages:
+    - publish_proxy
+    - deploy_proxy
 
 variables:
     TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
     TAG_COMMIT: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
 
-publish-proxy:
+publish_proxy:
     image: docker:latest
-    stage: publish
+    stage: publish_proxy
     services:
         - docker:dind
     before_script:
@@ -19,9 +19,9 @@ publish-proxy:
     only:
         - master-proxy
 
-deploy-proxy:
+deploy_proxy:
     image: node:8-alpine
-    stage: deploy
+    stage: deploy_proxy
     before_script:
         - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
         - eval $(ssh-agent -s)
