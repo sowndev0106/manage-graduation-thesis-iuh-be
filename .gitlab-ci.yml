@@ -20,7 +20,7 @@ publish_proxy:
         - master-proxy
 
 deploy_proxy:
-    image: node:8-alpine
+    image: docker:latest
     stage: deploy_proxy
     before_script:
         - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )'
