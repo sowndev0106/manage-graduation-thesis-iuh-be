@@ -1,6 +1,6 @@
 stages:
     - publish
-    - deploy
+    - deploy-proxy
 
 variables:
     TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
@@ -36,4 +36,4 @@ deploy:
     environment:
         name: production
     only:
-        - master
+        - master-proxy

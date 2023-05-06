@@ -9,8 +9,8 @@ import cors from 'cors';
 import http from 'http';
 import path from 'path';
 // import socket from '@core/infrastructure/socket';
-import router from './router';
-import ServerSocket from '@core/infrastructure/socket';
+// import router from './router';
+// import ServerSocket from '@core/infrastructure/socket';
 
 // connect database
 import '@core/infrastructure/objection-js';
@@ -19,11 +19,9 @@ import '@core/infrastructure/redis';
 
 const app = express();
 const server = http.createServer(app);
-const port = Number(process.env.PORT || 3000);
-const baseURL = `${process.env.BASE_URL || 'http://localhost:' + port}`;
 
-// init socket
-new ServerSocket(server);
+// // init socket
+// new ServerSocket(server);
 
 app.use(cors());
 app.use(express.json());
@@ -47,10 +45,6 @@ app.use(
 	})
 );
 
-app.use(router);
-
 // Start the server
 
-server.listen(port, () => {
-	console.log(`Express server started on ${baseURL} ` + process.env.NODE_ENV);
-});
+export default app;
