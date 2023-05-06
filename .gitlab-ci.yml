@@ -1,5 +1,5 @@
 stages:
-    # - publish_proxy
+    - publish_proxy
     - deploy_proxy
 
 variables:
