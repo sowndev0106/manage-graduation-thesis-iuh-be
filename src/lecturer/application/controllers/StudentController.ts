@@ -6,6 +6,7 @@ import ImportLecturerByExcelHandler from '../handlers/lecturer/ImportLecturerByE
 import GetListStudent from '../handlers/student/GetListStudent';
 import GetStudentById from '../handlers/student/GetStudentById';
 import AddStudentHandlers from '../handlers/student/AddStudentHandlers';
+import ResetPassword from '../handlers/student/ResetPassword';
 
 class UserController {
 	async importStudentByExcel(req: Request, res: Response, next: NextFunction) {
@@ -22,6 +23,10 @@ class UserController {
 	}
 	async getStudentById(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(GetStudentById).handle(req);
+		return res.status(200).json(data);
+	}
+	async resetPassword(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(ResetPassword).handle(req);
 		return res.status(200).json(data);
 	}
 }

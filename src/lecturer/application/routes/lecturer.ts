@@ -10,6 +10,8 @@ router.post('/', LecturerAuth.headLecturer, LecturerController.addLecturer);
 
 router.get('/:id', LecturerController.getListLecturerById);
 
+router.patch('/:lecturerId/reset-password', LecturerAuth.headLecturer, LecturerController.resetPassword);
+
 router.put('/:id/role', LecturerAuth.admin, LecturerController.changeRoleLecturer);
 
 router.post('/import-lecturer', LecturerAuth.headLecturer, uploadMulter.single('file'), LecturerController.importLecturerByExcel);
