@@ -6,8 +6,8 @@ const port = Number(process.env.PORT_PROXY || 3000);
 const portStudent = Number(process.env.PORT_STUDENT || 3001);
 const portLecturer = Number(process.env.PORT_LECTURER || 3002);
 const baseURL = `${process.env.BASE_URL}:${port}`;
-const serverStudent = `${process.env.BASE_URL}:${portStudent}`;
-const serverLecturer = `${process.env.BASE_URL}:${portLecturer}`;
+const serverStudent = `${process.env.BASE_URL_STUDENT}:${portStudent}`;
+const serverLecturer = `${process.env.BASE_URL_LECTURER}:${portLecturer}`;
 console.log({ serverStudent, serverLecturer, baseURL });
 const options: Options = {
 	target: baseURL, // target host
@@ -28,7 +28,7 @@ const options: Options = {
 	// 	});
 	// },
 	onProxyReq: function (proxyReq, req, res, options) {
-		if (req.body) {
+		if (req.body && req.headers['content-type'] === 'application/x-www-form-urlencoded') {
 			let bodyData = JSON.stringify(req.body);
 			// incase if content-type is application/x-www-form-urlencoded -> we need to change to application/json
 			proxyReq.setHeader('Content-Type', 'application/json');
