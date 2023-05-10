@@ -8,7 +8,7 @@ import IGroupDao from '@student/domain/daos/IGroupDao';
 import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
 import ITermDao from '@student/domain/daos/ITermDao';
 import ValidationError from '@core/domain/errors/ValidationError';
-import Group from '@core/domain/entities/Group';
+import Group, { TypeStatusGroup } from '@core/domain/entities/Group';
 import GroupMember from '@core/domain/entities/GroupMember';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 import StudentTerm from '@core/domain/entities/StudentTerm';
@@ -75,6 +75,7 @@ export default class CreateGroupHandler extends RequestHandler {
 			Group.create({
 				term: input.term,
 				name: input.name,
+				status: TypeStatusGroup.OPEN,
 			})
 		);
 		// add member is yoursefl

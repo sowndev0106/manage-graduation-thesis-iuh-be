@@ -13,6 +13,7 @@ import Term from '@core/domain/entities/Term';
 import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
 import PositiveNumber from '@core/domain/validate-objects/PositiveNumber';
 import Text from '@core/domain/validate-objects/Text';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 const sumGradeMax = 10;
 interface ValidatedInput {
 	type: TypeEvaluation;
@@ -86,7 +87,7 @@ export default class UpdateEvaluationHandler extends RequestHandler {
 		const sumGrade = evaluations.reduce((sum, evaluation) => sum + evaluation.gradeMax, 0);
 
 		if (sumGrade > sumGradeMax) {
-			throw new Error(`sum all grade max in deatail can\'t > ${sumGradeMax}`);
+			throw new ErrorCode('EVALUATION_SUM_GRADE', `sum all grade max in deatail can\'t > ${sumGradeMax}`);
 		}
 
 		const evaluation = await this.evaluationDao.updateEntity(input.evaluation);

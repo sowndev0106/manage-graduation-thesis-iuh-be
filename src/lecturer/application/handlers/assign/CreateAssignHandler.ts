@@ -16,6 +16,7 @@ import IGroupDao from '@lecturer/domain/daos/IGroupDao';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import Term from '@core/domain/entities/Term';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	typeEvaluation: TypeEvaluation;
@@ -37,7 +38,7 @@ export default class CreateAssignHandler extends RequestHandler {
 		}
 
 		let group = await this.groupDao.findEntityById(groupId);
-		if (!group) throw new NotFoundError(' group not found');
+		if (!group) throw new NotFoundError('group not found');
 
 		let groupLecturer = await this.groupLecturerDao.findEntityById(groupLecturerId);
 		if (!groupLecturer) throw new NotFoundError('groupLecturer not found');
@@ -52,7 +53,7 @@ export default class CreateAssignHandler extends RequestHandler {
 	async handle(request: Request) {
 		const { typeEvaluation, group, groupLecturer } = await this.validate(request);
 		if (group.termId != groupLecturer.termId) {
-			throw new Error('term of group student not same group lecturer');
+			throw new ErrorCode('FAIL_CREATE_ENTITY', 'term of group student not same group lecturer');
 		}
 		let assign = await this.assignDao.findOne({
 			type: typeEvaluation,

@@ -13,6 +13,7 @@ import Term from '@core/domain/entities/Term';
 import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
 import Text from '@core/domain/validate-objects/Text';
 import PositiveNumber from '@core/domain/validate-objects/PositiveNumber';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 const sumGradeMax = 10;
 
 interface ValidatedInput {
@@ -54,13 +55,16 @@ export default class CreateEvaluationHandler extends RequestHandler {
 
 		const isDuplicateName = evaluations.find(e => e.name == input.name);
 		if (isDuplicateName) {
-			throw new Error(`Evaluation type '${input.type}' and name '${input.name}' already exists in term ${input.term.name}`);
+			throw new ErrorCode(
+				'EVALUATION_DUPLICATE_NAME',
+				`Evaluation type '${input.type}' and name '${input.name}' already exists in term ${input.term.name}`
+			);
 		}
 
 		const sumGrade = evaluations.reduce((sum, evaluation) => sum + evaluation.gradeMax, 0) + input.gradeMax;
 
 		if (sumGrade > sumGradeMax) {
-			throw new Error(`sum all grade max in deatail can\'t > ${sumGradeMax}`);
+			throw new ErrorCode('EVALUATION_SUM_GRADE', `sum all grade max in detail can\'t > ${sumGradeMax}`);
 		}
 
 		const evaluation = await this.evaluationDao.insertEntity(

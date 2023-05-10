@@ -8,6 +8,7 @@ import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import Majors from '@core/domain/entities/Majors';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	name: string;
@@ -33,14 +34,14 @@ export default class CreateMajorsHandler extends RequestHandler {
 		const input = await this.validate(request);
 		const isExistName = !!(await this.majorsDao.findByName(input.name));
 		if (isExistName) {
-			throw new Error('name already exists');
+			throw new ErrorCode('MAJORS_DUPLICATE_NAME', 'name already exists');
 		}
 		let majors = await this.majorsDao.insertEntity(
 			Majors.create({
 				name: input.name,
 			})
 		);
-		if (!majors) throw new Error('Create Majors fail');
+		if (!majors) throw new ErrorCode('FAIL_CREATE_ENTITY', 'Create Majors fail');
 
 		return majors.toJSON;
 	}

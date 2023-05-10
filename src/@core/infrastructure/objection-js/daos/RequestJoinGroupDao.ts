@@ -3,6 +3,7 @@ import Dao from './Dao';
 import RequestJoinGroupModel from '@core/infrastructure/objection-js/models/RequestJoinGroupModel';
 import RequestJoinGroup from '@core/domain/entities/RequestJoinGroup';
 import { GraphParameters, ModelClass, PartialModelGraph, QueryBuilder } from 'objection';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 @injectable()
 export default class RequestJoinGroupDao extends Dao<RequestJoinGroup, RequestJoinGroupModel> {
@@ -10,7 +11,7 @@ export default class RequestJoinGroupDao extends Dao<RequestJoinGroup, RequestJo
 		return RequestJoinGroupModel;
 	}
 	protected convertEntityToPartialModelGraph(entity: RequestJoinGroup): PartialModelGraph<RequestJoinGroupModel, RequestJoinGroupModel & GraphParameters> {
-		throw new Error('Method not implemented.');
+		throw new ErrorCode('SERVER', 'Method not implemented.');
 	}
 	protected initQuery(): QueryBuilder<RequestJoinGroupModel, RequestJoinGroupModel[]> {
 		return RequestJoinGroupModel.query();

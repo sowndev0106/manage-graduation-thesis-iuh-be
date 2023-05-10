@@ -1,3 +1,4 @@
+import ErrorCode, { ErrorCodeDefine, IKeyErrorCode } from '@core/domain/errors/ErrorCode';
 import ValidationError from '@core/domain/errors/ValidationError';
 import { NextFunction, Request, Response } from 'express';
 
@@ -11,36 +12,25 @@ export default function (err: Error, req: Request, res: Response, next: NextFunc
 	// console.log('Error: ', err);
 	console.log('Error stack: ', err.stack);
 
+	// default	error message
 	const error: any = {
+		code: 'UNKNOWN',
 		success: false,
 		error: err.message,
 	};
 
-	switch (err.name) {
-		case 'UnauthorizedError':
-			res.status(401);
-			break;
+	const errorCodeInfo = ErrorCodeDefine[err.name];
 
-		case 'NotFoundError':
-			res.status(404);
-			break;
-
-		case 'ForbiddenError':
-			res.status(403);
-			break;
-
-		case 'ValidationError':
-			res.status(422);
-			error.error = (err as ValidationError).messageBag;
-			break;
-
-		case 'ConflictError':
-			res.status(409);
-			break;
-
-		default:
-			res.status(400);
+	if (errorCodeInfo) {
+		error.code = errorCodeInfo.key;
+		res.status(errorCodeInfo.statusCode);
+	} else {
+		res.status(400);
 	}
 
+	// special case (validate)
+	if ((err as any).messageBag) {
+		error.error = (err as any).messageBag;
+	}
 	return res.json(error);
 }

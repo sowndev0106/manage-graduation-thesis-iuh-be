@@ -1,10 +1,11 @@
+import { IKeyErrorCode } from './ErrorCode';
+
 export default class ValidationError extends Error {
-	private _messageBag: object;
+	private _messageBag: object | string;
 
-	constructor(messageBag: object) {
-		super('ValidationError');
-
-		this.name = 'ValidationError';
+	constructor(messageBag: object | string) {
+		super('VALIDATE');
+		this.name = 'VALIDATE';
 		this._messageBag = messageBag;
 	}
 

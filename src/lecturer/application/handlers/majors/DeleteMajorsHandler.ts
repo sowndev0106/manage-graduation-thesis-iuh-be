@@ -4,6 +4,7 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -27,7 +28,7 @@ export default class DeleteMajorsHandler extends RequestHandler {
 		const term = await this.majorsDao.findEntityById(input.id);
 
 		if (!term) {
-			throw new Error('term not found');
+			throw new NotFoundError('term not found');
 		}
 
 		const result = await this.majorsDao.deleteEntity(term);

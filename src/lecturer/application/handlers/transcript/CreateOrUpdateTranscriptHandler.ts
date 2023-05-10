@@ -90,6 +90,7 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 		if (!groupMemberLecturer) {
 			throw new Error(`Lecturer not in group ${assign.groupLecturerId}`);
 		}
+		//  Check time term
 
 		return {
 			transcriptDetails,

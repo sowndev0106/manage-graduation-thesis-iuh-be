@@ -8,6 +8,7 @@ import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluation
 import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import Lecturer from '@core/domain/entities/Lecturer';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	lecturer: Lecturer;
@@ -29,7 +30,7 @@ export default class GetListAssignByLecturerHandler extends RequestHandler {
 		}
 		const lecturer = await this.lecturerDao.findEntityById(lecturerId);
 		if (!lecturer) {
-			throw new Error(`lecturer not `);
+			throw new NotFoundError(`lecturer not found`);
 		}
 		return { lecturer, typeEvaluation };
 	}

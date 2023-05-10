@@ -16,6 +16,7 @@ import EntityIds from '@core/domain/validate-objects/EntityIds';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	name: string;
@@ -62,7 +63,7 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 			termId: term.id!,
 			name,
 		});
-		if (groupLecturer) throw new Error(`group name ${name}  already exists in student`);
+		if (groupLecturer) throw new ErrorCode('GROUP_LECTURER_DUPLICATE_NAME', `group name ${name}  already exists in student`);
 
 		groupLecturer = await this.groupLecturerDao.insertEntity(
 			GroupLecturer.create({
