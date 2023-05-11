@@ -1,4 +1,5 @@
 stages:
+    - test_main
     - publish_proxy
     - deploy_proxy
     - publish_lecturer
@@ -9,6 +10,18 @@ stages:
 variables:
     TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
     TAG_COMMIT: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+
+test_main:
+    image: docker:latest
+    stage: test_main
+    services:
+        - docker:dind
+    before_script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+    script:
+        - docker build -t $TAG_COMMIT_PROXY -f Dockerfile.proxy .
+    only:
+        - master-proxy
 
 publish_proxy:
     image: docker:latest
