@@ -48,7 +48,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 		const dateNow = new Date();
 
 		query.withGraphFetched(
-			'[group_lecturer, group_lecturer.members,group_lecturer.members.lecturer_term, group_lecturer.members.lecturer_term.lecturer, group, group.members]'
+			'[group_lecturer, group_lecturer.members,group_lecturer.members.lecturer_term, group_lecturer.members.lecturer_term.lecturer, group, group.members, group.members.student_term,group.members.student_term.student]'
 		);
 		query.join('group_lecturer', 'group_lecturer.id', '=', 'assign.group_lecturer_id');
 		query.join('group_lecturer_member', 'group_lecturer_member.group_lecturer_id', '=', 'group_lecturer.id');
