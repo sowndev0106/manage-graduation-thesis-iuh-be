@@ -14,6 +14,7 @@ import Lecturer from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	lecturerTerm: LecturerTerm;
@@ -42,7 +43,7 @@ export default class CreateGroupLecturerMemberHandler extends RequestHandler {
 
 		const lecturerTerm = await this.lecturerTermDao.findOne(groupLecturer.termId!, lecturerId);
 		if (!lecturerTerm) {
-			throw new Error(`lecturer not in term ${groupLecturer.termId}`);
+			throw new ErrorCode('LECTURER_NOT_IN_TERM', `lecturer not in term ${groupLecturer.termId}`);
 		}
 
 		return {

@@ -18,6 +18,8 @@ import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import Student, { TypeTraining } from '@core/domain/entities/Student';
 import StudentTerm from '@core/domain/entities/StudentTerm';
+import ErrorCode from '@core/domain/errors/ErrorCode';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface IValidatedInput {
 	users: Array<{
@@ -47,7 +49,8 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 			if (!file) throw new Error('file is require');
 			const result = converExcelBufferToObject(file);
 			if (!result[0]['username']) {
-				throw new Error(
+				throw new ErrorCode(
+					'IMPORT_STUDENT_MISSING_COLUMN',
 					`This requirement specifies the need for a mandatory 'username' column and optional columns for 'password', 'name', 'phone', and 'email'.`
 				);
 			}
@@ -80,11 +83,11 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 		}
 		const majors = await this.majorsDao.findEntityById(majorsId);
 		if (!majors) {
-			throw new Error('major not found');
+			throw new NotFoundError('major not found');
 		}
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('term not found');
+			throw new NotFoundError('term not found');
 		}
 
 		return { users: usersValidate, majors, term };

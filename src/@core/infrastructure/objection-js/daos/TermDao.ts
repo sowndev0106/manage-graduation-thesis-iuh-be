@@ -3,6 +3,7 @@ import Dao from './Dao';
 import TermModel from '@core/infrastructure/objection-js/models/TermModel';
 import Term from '@core/domain/entities/Term';
 import { GraphParameters, ModelClass, PartialModelGraph, QueryBuilder } from 'objection';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 @injectable()
 export default class TermDao extends Dao<Term, TermModel> {
@@ -10,7 +11,7 @@ export default class TermDao extends Dao<Term, TermModel> {
 		return TermModel;
 	}
 	protected convertEntityToPartialModelGraph(entity: Term): PartialModelGraph<TermModel, TermModel & GraphParameters> {
-		throw new Error('Method not implemented.');
+		throw new ErrorCode('SERVER', 'Method not implemented.');
 	}
 	protected initQuery(): QueryBuilder<TermModel, TermModel[]> {
 		return TermModel.query();

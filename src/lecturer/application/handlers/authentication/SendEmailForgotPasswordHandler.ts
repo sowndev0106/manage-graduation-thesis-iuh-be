@@ -7,6 +7,7 @@ import NotFoundError from '@core/domain/errors/NotFoundError';
 import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import MailService from '@core/infrastructure/nodemailer/service/MailService';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	username: string;
@@ -28,9 +29,9 @@ export default class SendEmailResetPasswordHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		const lecturer = await this.lecturerDao.findByUsername(input.username);
-		if (!lecturer) throw new NotFoundError('email not found');
+		if (!lecturer) throw new NotFoundError('username not found');
 		if (!lecturer.email) {
-			throw new Error('Lecturer missing email');
+			throw new ErrorCode('LECTURER_MISSING_EMAIL', 'Lecturer missing email');
 		}
 
 		const token = JWTService.signTokenResetPassword(lecturer.username!, 'lecturer');

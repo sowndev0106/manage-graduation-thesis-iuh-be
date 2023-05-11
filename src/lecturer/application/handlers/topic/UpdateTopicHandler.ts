@@ -16,6 +16,8 @@ import Term from '@core/domain/entities/Term';
 import StatusTopic from '@core/domain/validate-objects/StatusTopic';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import ErrorCode from '@core/domain/errors/ErrorCode';
+import ForbiddenError from '@core/domain/errors/ForbiddenError';
 
 interface ValidatedInput {
 	id: number;
@@ -53,13 +55,13 @@ export default class UpdateTopicHandler extends RequestHandler {
 		}
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('Term not found');
+			throw new NotFoundError('Term not found');
 		}
 
 		const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturerId);
 
 		if (!lecturerTerm) {
-			throw new Error(`lecturer not in term ${termId}`);
+			throw new ErrorCode('LECTURER_NOT_IN_TERM', `lecturer not in term ${termId}`);
 		}
 		return {
 			id,
@@ -79,10 +81,10 @@ export default class UpdateTopicHandler extends RequestHandler {
 		const input = await this.validate(request);
 
 		let topic = await this.topicDao.findEntityById(input.id);
-		if (!topic) throw new Error('Topic not found');
+		if (!topic) throw new NotFoundError('Topic not found');
 
 		if (topic.lecturerTermId != input.lecturerTerm.id) {
-			throw new Error("You doesn't permission to this topic");
+			throw new ForbiddenError("You doesn't permission to this topic");
 		}
 
 		const topicByName = await this.topicDao.findOne({
@@ -90,7 +92,7 @@ export default class UpdateTopicHandler extends RequestHandler {
 			name: input.name,
 		});
 		if (topicByName?.id && topicByName?.id != input.id) {
-			throw new Error('name already exists');
+			throw new ErrorCode('TOPIC_DUPLICATE_NAME', 'name already exists');
 		}
 
 		topic.update({
@@ -106,7 +108,7 @@ export default class UpdateTopicHandler extends RequestHandler {
 
 		topic = await this.topicDao.updateEntity(topic);
 
-		if (!topic) throw new Error('Create Topic fail');
+		if (!topic) throw new ErrorCode('FAIL_CREATE_ENTITY', 'Create Topic fail');
 
 		return topic.toJSON;
 	}

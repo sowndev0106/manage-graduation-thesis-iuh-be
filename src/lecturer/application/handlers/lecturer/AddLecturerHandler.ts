@@ -63,7 +63,7 @@ export default class AddLecturerHandler extends RequestHandler {
 
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('term not found');
+			throw new NotFoundError('term not found');
 		}
 		let lecturer = await this.lecturerDao.findByUsername(username);
 		if (!lecturer) {

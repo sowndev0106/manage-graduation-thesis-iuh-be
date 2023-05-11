@@ -4,6 +4,7 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -27,7 +28,7 @@ export default class DeleteAchievementHandler extends RequestHandler {
 		const term = await this.achievementDao.findEntityById(input.id);
 
 		if (!term) {
-			throw new Error('achievement not found');
+			throw new NotFoundError('achievement not found');
 		}
 
 		const result = await this.achievementDao.deleteEntity(term);

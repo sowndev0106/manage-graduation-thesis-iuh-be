@@ -7,6 +7,7 @@ import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -32,7 +33,7 @@ export default class GetAchievementByIdHandler extends RequestHandler {
 		const achievement = await this.achievementDao.findEntityById(input.id);
 
 		if (!achievement) {
-			throw new Error('achievement not found');
+			throw new NotFoundError('achievement not found');
 		}
 		const studentTerm = await this.studentTermDao.findOneGraphById(achievement.studentTermId!);
 

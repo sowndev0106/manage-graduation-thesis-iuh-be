@@ -12,6 +12,8 @@ import ITermDao from '@lecturer/domain/daos/ITermDao';
 import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import StudentTerm from '@core/domain/entities/StudentTerm';
+import NotFoundError from '@core/domain/errors/NotFoundError';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	name: string;
@@ -31,7 +33,7 @@ export default class CreateAchievementHandler extends RequestHandler {
 		const studentId = this.errorCollector.collect('studentId', () => EntityId.validate({ value: request.body['studentId'] }));
 		const bonusGrade = this.errorCollector.collect('bonusGrade', () => {
 			const value = PositiveNumber.validate({ value: request.body['bonusGrade'] });
-			if (value >= 10) throw new Error('bonusGrade must be < 10');
+			if (value >= 10) throw new ValidationError('bonusGrade must be < 10');
 			return value;
 		});
 
@@ -40,16 +42,16 @@ export default class CreateAchievementHandler extends RequestHandler {
 		}
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('Term not found');
+			throw new NotFoundError('Term not found');
 		}
 		const student = await this.studentDao.findEntityById(studentId);
 		if (!student) {
-			throw new Error('Student not found');
+			throw new ErrorCode('STUDENT_NOT_FOUND', 'Student not found');
 		}
 		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 
 		if (!studentTerm) {
-			throw new Error(`student not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
 		}
 		return {
 			name,
@@ -69,7 +71,7 @@ export default class CreateAchievementHandler extends RequestHandler {
 			})
 		);
 
-		if (!achievement) throw new Error('Create Achievement fail');
+		if (!achievement) throw new ErrorCode('FAIL_CREATE_ENTITY', 'Create Achievement fail');
 		achievement.update({ studentTerm });
 		return achievement.toJSON;
 	}

@@ -3,6 +3,7 @@ import Dao from './Dao';
 import TopicModel from '@core/infrastructure/objection-js/models/TopicModel';
 import Topic from '@core/domain/entities/Topic';
 import { GraphParameters, ModelClass, PartialModelGraph, QueryBuilder } from 'objection';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 @injectable()
 export default class TopicDao extends Dao<Topic, TopicModel> {
@@ -10,7 +11,7 @@ export default class TopicDao extends Dao<Topic, TopicModel> {
 		return TopicModel;
 	}
 	protected convertEntityToPartialModelGraph(entity: Topic): PartialModelGraph<TopicModel, TopicModel & GraphParameters> {
-		throw new Error('Method not implemented.');
+		throw new ErrorCode('SERVER', 'Method not implemented.');
 	}
 	protected initQuery(): QueryBuilder<TopicModel, TopicModel[]> {
 		return TopicModel.query();

@@ -50,6 +50,7 @@ export default class GroupModel extends Model {
 			topic_id: entity.topicId || null,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
+			status: entity.status,
 		});
 
 		return model;
@@ -67,6 +68,7 @@ export default class GroupModel extends Model {
 				name: dbJson['name'],
 				term: Term.createById(dbJson['term_id']),
 				topic: Topic.createById(dbJson['topic_id']),
+				status: dbJson['status'],
 			},
 			Number(dbJson['id'])
 		);

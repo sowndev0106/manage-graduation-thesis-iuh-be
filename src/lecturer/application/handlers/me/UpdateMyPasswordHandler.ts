@@ -7,6 +7,7 @@ import Password from '@core/domain/validate-objects/Password';
 import { compareTextBcrypt } from '@core/infrastructure/bcrypt';
 import ForbiddenError from '@core/domain/errors/ForbiddenError';
 import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -35,7 +36,7 @@ export default class UpdateMyPasswordHandler extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		let lecturer = await this.lecturerDao.findEntityById(input.id);
-		if (!lecturer) throw new Error('Error! Please login again');
+		if (!lecturer) throw new NotFoundError('Error! Please login again');
 
 		if (input.newPassword == input.oldPassword) return lecturer?.toJSON;
 

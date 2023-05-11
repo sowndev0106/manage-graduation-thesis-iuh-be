@@ -4,6 +4,7 @@ import Lodash from 'lodash';
 
 import { injectable } from 'inversify';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 @injectable()
 export default class Nodemailer {
@@ -46,7 +47,7 @@ export default class Nodemailer {
 				text: props.text,
 			});
 		} catch (e: any) {
-			throw new Error(`Send mail error: ${e.message}`);
+			throw new ErrorCode('SEND_MAIL_FAIL', `Send mail error: ${e.message}`);
 		}
 	}
 
@@ -62,7 +63,7 @@ export default class Nodemailer {
 				html: props.html,
 			});
 		} catch (e: any) {
-			throw new Error(`Send mail error: ${e.message}`);
+			throw new ErrorCode('SEND_MAIL_FAIL', `Send mail error: ${e.message}`);
 		}
 	}
 }

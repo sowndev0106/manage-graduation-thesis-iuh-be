@@ -5,6 +5,7 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -29,7 +30,7 @@ export default class GetTermByIdHandler extends RequestHandler {
 		const majors = await this.majorsDao.findEntityById(input.id);
 
 		if (!majors) {
-			throw new Error('majors not found');
+			throw new NotFoundError('majors not found');
 		}
 
 		return majors.toJSON;

@@ -4,6 +4,7 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -27,7 +28,7 @@ export default class DeleteGroupLecturerHandler extends RequestHandler {
 		const groupLecturer = await this.groupLecturerDao.findEntityById(input.id);
 
 		if (!groupLecturer) {
-			throw new Error('groupLecturer not found');
+			throw new NotFoundError('groupLecturer not found');
 		}
 
 		const result = await this.groupLecturerDao.deleteEntity(groupLecturer);

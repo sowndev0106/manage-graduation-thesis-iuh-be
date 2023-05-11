@@ -34,7 +34,7 @@ export default class LoginHandlers extends RequestHandler {
 		const input = await this.validate(request);
 		const lecturer = await this.lecturerDao.findByUsername(input.username);
 
-		if (!lecturer) throw new NotFoundError('incorrect username');
+		if (!lecturer) throw new ForbiddenError('incorrect username');
 
 		const isCorrectPassword = await compareTextBcrypt(input.password, lecturer.password!);
 

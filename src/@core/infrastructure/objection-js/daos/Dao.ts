@@ -1,5 +1,6 @@
 import IDao from '@core/domain/daos/IDao';
 import Entity, { IEntity } from '@core/domain/entities/Entity';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 import { Model, PartialModelGraph, PartialModelObject, QueryBuilder, transaction, ModelClass } from 'objection';
 export default abstract class Dao<E extends IEntity, M extends Model> implements IDao<E> {
 	protected abstract initQuery(): QueryBuilder<M, M[]>;
@@ -21,27 +22,27 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 	}
 	async updateGraphEntity(entity: E): Promise<E> {
 		if (entity == undefined || entity == null) {
-			throw new Error('Cannot insert undefined or null');
+			throw new ErrorCode('FAIL_CREATE_ENTITY', 'Cannot insert undefined or null');
 		}
 		const partialModelObject = this.convertEntityToPartialModelGraph(entity);
 
 		const model = await this.initQuery().upsertGraphAndFetch(partialModelObject);
 
 		if (model == undefined || model == null) {
-			throw new Error('Fail to insert entity');
+			throw new ErrorCode('FAIL_CREATE_ENTITY', 'Fail to insert entity');
 		}
 
 		return this.convertModelToEntity(model);
 	}
 	async insertGraphEntity(entity: E): Promise<E> {
 		if (entity == undefined || entity == null) {
-			throw new Error('Cannot insert undefined or null');
+			throw new ErrorCode('FAIL_CREATE_ENTITY', 'Cannot insert undefined or null');
 		}
 		const partialModelObject = this.convertEntityToPartialModelGraph(entity);
 		const model = await this.initQuery().insertGraphAndFetch(partialModelObject);
 
 		if (model == undefined || model == null) {
-			throw new Error('Fail to insert entity');
+			throw new ErrorCode('FAIL_CREATE_ENTITY', 'Fail to insert entity');
 		}
 
 		return this.convertModelToEntity(model);
@@ -54,7 +55,7 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 			const models = await Bound.query().insertGraphAndFetch(partialModelObjects);
 
 			if (models == undefined || models == null) {
-				throw new Error('Fail to insert entity');
+				throw new ErrorCode('FAIL_CREATE_ENTITY', 'Fail to insert entity');
 			}
 			return models.map((model: any) => this.convertModelToEntity(model));
 		});
@@ -62,13 +63,13 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 
 	async insertEntity(entity: E): Promise<E> {
 		if (entity == undefined || entity == null) {
-			throw new Error('Cannot insert undefined or null');
+			throw new ErrorCode('FAIL_CREATE_ENTITY', 'Cannot insert undefined or null');
 		}
 		const partialModelObject = this.convertEntityToPartialModelObject(entity);
 		const model = await this.initQuery().insertAndFetch(partialModelObject);
 
 		if (model == undefined || model == null) {
-			throw new Error('Fail to insert entity');
+			throw new ErrorCode('FAIL_CREATE_ENTITY', 'Fail to insert entity');
 		}
 
 		return this.convertModelToEntity(model);
@@ -87,11 +88,11 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 
 	async updateEntity(entity: E): Promise<E> {
 		if (entity == undefined || entity == null) {
-			throw new Error('Cannot update undefined or null');
+			throw new ErrorCode('FAIL_UPDATE_ENTITY', 'Cannot update undefined or null');
 		}
 
 		if (entity.id == undefined || entity.id == null) {
-			throw new Error('Cannot update without identifier');
+			throw new ErrorCode('FAIL_UPDATE_ENTITY', 'Cannot update without identifier');
 		}
 
 		const model = this.convertEntityToPartialModelObject(entity);
@@ -99,7 +100,7 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 		const result = await this.initQuery().update(model).where('id', entity.id).execute();
 
 		if (result <= 0) {
-			throw new Error('Fail to update entity');
+			throw new ErrorCode('FAIL_UPDATE_ENTITY', 'Fail to update entity');
 		}
 
 		return entity;
@@ -107,17 +108,21 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 
 	async deleteEntity(entity: E): Promise<E> {
 		if (entity == undefined || entity == null) {
-			throw new Error('Cannot delete undefined or null');
+			throw new ErrorCode('FAIL_DELETE_ENTITY', 'Cannot delete undefined or null');
 		}
 
 		if (entity.id == undefined || entity.id == null) {
-			throw new Error('Cannot delete without identifier');
+			throw new ErrorCode('FAIL_DELETE_ENTITY', 'Cannot delete without identifier');
 		}
 
-		const result = await this.initQuery().deleteById(entity.id).execute();
-
-		if (result <= 0) {
-			throw new Error('Fail to delete entity');
+		try {
+			const result = await this.initQuery().deleteById(entity.id).execute();
+			if (result <= 0) {
+				throw new ErrorCode('FAIL_DELETE_ENTITY', 'Fail to delete entity');
+			}
+		} catch (error) {
+			console.log(error);
+			throw new ErrorCode('FAIL_DELETE_ENTITY', 'Fail to delete entity');
 		}
 
 		return entity;
@@ -152,10 +157,14 @@ export default abstract class Dao<E extends IEntity, M extends Model> implements
 	async deleteBulkOfEntities(entities: E[]): Promise<E[]> {
 		const ids = entities.map(entity => entity.id!);
 
-		const result = await this.initQuery().whereIn('id', ids).delete();
-
-		if (result <= 0) {
-			throw new Error('Fail to delete entities');
+		try {
+			const result = await this.initQuery().whereIn('id', ids).delete();
+			if (result <= 0) {
+				throw new ErrorCode('FAIL_DELETE_ENTITY', 'Fail to delete entity');
+			}
+		} catch (error) {
+			console.log(error);
+			throw new ErrorCode('FAIL_DELETE_ENTITY', 'Fail to delete entity');
 		}
 
 		return entities;

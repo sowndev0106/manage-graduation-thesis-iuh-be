@@ -4,6 +4,7 @@ import ValidationError from '@core/domain/errors/ValidationError';
 import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import ITopicDao from '@lecturer/domain/daos/ITopicDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -27,7 +28,7 @@ export default class DeleteTopicHandler extends RequestHandler {
 		const term = await this.topicDao.findEntityById(input.id);
 
 		if (!term) {
-			throw new Error('topic not found');
+			throw new NotFoundError('topic not found');
 		}
 
 		const result = await this.topicDao.deleteEntity(term);

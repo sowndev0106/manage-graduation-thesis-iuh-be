@@ -3,11 +3,21 @@ import lodash from 'lodash';
 import Term from './Term';
 import Topic from './Topic';
 import GroupMember from './GroupMember';
+export enum TypeStatusGroup {
+	OPEN = 'OPEN',
+	FAIL_ADVISOR = 'FAIL_ADVISOR',
+	FAIL_REVIEWER = 'FAIL_REVIEWER',
+	FAIL_SESSION_HOST = 'FAIL_SESSION_HOST',
+	PASS_ADVISOR = 'PASS_ADVISOR',
+	PASS_REVIEWER = 'PASS_REVIEWER',
+	PASS_SESSION_HOST = 'PASS_SESSION_HOST',
+}
 export interface IProps {
 	name: string;
 	term: Term;
 	topic?: Topic;
 	members?: Array<GroupMember>;
+	status: TypeStatusGroup;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -20,6 +30,9 @@ export default class Group extends Entity<IProps> {
 	}
 	get name() {
 		return this.props.name;
+	}
+	get status() {
+		return this.props.status;
 	}
 	get termId() {
 		return this.props?.term?.id;

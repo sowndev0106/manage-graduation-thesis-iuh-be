@@ -8,6 +8,7 @@ import { encriptTextBcrypt } from '@core/infrastructure/bcrypt';
 import JWTService from '@core/infrastructure/jsonwebtoken/JWTService';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import Password from '@core/domain/validate-objects/Password';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	username: string;
@@ -21,11 +22,11 @@ export default class UpdatePasswordHandler extends RequestHandler {
 		const token = request.body['token'];
 		const password = this.errorCollector.collect('password', () => Password.validate({ value: request.body['password'] }));
 		if (!token) {
-			throw new Error('Token missing');
+			throw new ErrorCode('UNAUTHORIZED', 'Token missing');
 		}
 		const { username, type } = JWTService.verifyTokenResetPassword(token);
 		if (type != 'lecturer') {
-			throw new Error('Error token');
+			throw new ErrorCode('UNAUTHORIZED', 'Error token');
 		}
 
 		if (this.errorCollector.hasError()) {

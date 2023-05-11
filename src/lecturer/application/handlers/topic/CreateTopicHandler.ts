@@ -18,6 +18,7 @@ import Majors from '@core/domain/entities/Majors';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	name: string;
@@ -52,13 +53,13 @@ export default class CreateTopicHandler extends RequestHandler {
 		}
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('Term not found');
+			throw new NotFoundError('Term not found');
 		}
 
 		const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturerId);
 
 		if (!lecturerTerm) {
-			throw new Error(`lecturer not in term ${termId}`);
+			throw new ErrorCode('LECTURER_NOT_IN_TERM', `lecturer not in term ${termId}`);
 		}
 		return {
 			name,
@@ -81,7 +82,7 @@ export default class CreateTopicHandler extends RequestHandler {
 			name: input.name,
 		}));
 		if (isExistName) {
-			throw new Error('name already exists');
+			throw new ErrorCode('TOPIC_DUPLICATE_NAME', 'name already exists');
 		}
 
 		const topic = await this.topicDao.insertEntity(
@@ -97,7 +98,7 @@ export default class CreateTopicHandler extends RequestHandler {
 				lecturerTerm: input.lecturerTerm,
 			})
 		);
-		if (!topic) throw new Error('Create Topic fail');
+		if (!topic) throw new ErrorCode('FAIL_CREATE_ENTITY', 'Create Topic fail');
 
 		topic.update({ lecturerTerm: input.lecturerTerm });
 
