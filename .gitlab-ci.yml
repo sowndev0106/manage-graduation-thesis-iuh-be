@@ -21,7 +21,7 @@ test_main:
     script:
         - docker build -t $TAG_COMMIT_PROXY -f Dockerfile.proxy .
     only:
-        - mail
+        - main
 
 publish_proxy:
     image: docker:latest
