@@ -21,6 +21,7 @@ import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
@@ -56,7 +57,7 @@ export default class GetListTranscriptByStudentHandler extends RequestHandler {
 
 		const group = await this.groupDao.findEntityById(groupId);
 		if (!group) {
-			throw new Error('Student do not have group');
+			throw new ErrorCode('STUDENT_DONT_HAVE_GROUP', 'Student do not have group');
 		}
 		let studentTerm = await this.studentTermDao.findOne(group?.termId!, studentId);
 		if (!studentTerm) throw new NotFoundError('student Term not found');
@@ -66,7 +67,7 @@ export default class GetListTranscriptByStudentHandler extends RequestHandler {
 			groupId: group.id!,
 		});
 		if (!groupMembertudents) {
-			throw new Error(`Student not in group ${group.id}`);
+			throw new ErrorCode('STUDENT_NOT_IN_THIS_GROUP', `Student not in group ${group.id}`);
 		}
 
 		let lecturerTerm = await this.lecturerTermDao.findOne(group?.termId!, lecturerId);
@@ -78,7 +79,7 @@ export default class GetListTranscriptByStudentHandler extends RequestHandler {
 			typeEvaluation,
 		});
 		if (!assign) {
-			throw new Error('Lecturer do not have assign');
+			throw new ErrorCode('LECTURER_DO_NOT_HAVE_ASSIGN', 'Lecturer do not have assign');
 		}
 
 		const groupMemberLecturer = await this.groupLecturerMemberDao.findOne({
@@ -86,7 +87,7 @@ export default class GetListTranscriptByStudentHandler extends RequestHandler {
 			lecturerTermId: lecturerTerm.id!,
 		});
 		if (!groupMemberLecturer) {
-			throw new Error(`Lecturer not in group ${assign.groupLecturerId}`);
+			throw new ErrorCode('LECTURER_NOT_IN_THIS_GROUP', `Lecturer not in group ${assign.groupLecturerId}`);
 		}
 
 		return {

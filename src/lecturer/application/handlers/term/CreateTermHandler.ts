@@ -14,10 +14,11 @@ import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import ILecturerDao from '@student/domain/daos/ILecturerDao';
 import { TypeRoleLecturer } from '@core/domain/entities/Lecturer';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	name: string;
-	majorsId: number;
+	majors: Majors;
 	startDate: Date;
 	endDate: Date;
 	startDateSubmitTopic: Date;
@@ -66,15 +67,18 @@ export default class CreateTermHandler extends RequestHandler {
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}
+
 		if (startDate >= endDate) throw new Error('startDate must be better endDate');
 		if (startDateSubmitTopic > endDateSubmitTopic) throw new Error('startDateSubmitTopic must be better endDateSubmitTopic');
 		if (startDateChooseTopic > endDateChooseTopic) throw new Error('startDateChooseTopic must be better endDateChooseTopic');
 		if (startDateDiscussion > endDateDiscussion) throw new Error('startDateDiscussion must be better endDateDiscussion');
 		if (startDateReport > endDateReport) throw new Error('startDateReport must be better endDateReport');
 
-		return {
+		let majors = await this.majorsDao.findEntityById(majorsId);
+		if (!majors) throw new NotFoundError('majors not found');
+		return await this.checkValidateDate({
 			name,
-			majorsId,
+			majors,
 			startDate,
 			endDate,
 			startDateSubmitTopic,
@@ -85,21 +89,23 @@ export default class CreateTermHandler extends RequestHandler {
 			endDateReport,
 			startDateChooseTopic,
 			endDateChooseTopic,
-		};
+		});
 	}
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-		let majors = await this.majorsDao.findEntityById(input.majorsId);
-		if (!majors) throw new NotFoundError('majors not found');
 
-		let termsByYear = await this.termDao.findByYearAndMajors(input.majorsId, input.startDate.getFullYear(), input.endDate.getFullYear());
+		let termsByYear = await this.termDao.findByYearAndMajors(input.majors.id!, input.startDate.getFullYear(), input.endDate.getFullYear());
 
 		let term = termsByYear.find(e => e.name == input.name);
 
-		if (term) throw new Error(`name already exists in majors and year ${input.startDate.getFullYear()} - ${input.endDate.getFullYear()}`);
+		if (term)
+			throw new ErrorCode(
+				'TERM_DUPLICATE_NAME',
+				`name already exists in majors and year ${input.startDate.getFullYear()} - ${input.endDate.getFullYear()}`
+			);
 
-		const latestTerm = await this.termDao.findLatestByMajorsId(input.majorsId);
+		const latestTerm = await this.termDao.findLatestByMajorsId(input.majors.id!);
 
 		if (latestTerm && latestTerm.endDate >= input.startDate) {
 			throw new Error(`start date must be > ${latestTerm.endDate.toLocaleDateString()}`);
@@ -107,7 +113,7 @@ export default class CreateTermHandler extends RequestHandler {
 		term = await this.termDao.insertEntity(
 			Term.create({
 				name: input.name,
-				majors: Majors.createById(input.majorsId),
+				majors: input.majors,
 				startDate: input.startDate,
 				endDate: input.endDate,
 				startDateSubmitTopic: input.startDateSubmitTopic,
@@ -141,4 +147,34 @@ export default class CreateTermHandler extends RequestHandler {
 
 		return term.toJSON;
 	}
+	// async checkValidateDate({
+	// 	name,
+	// 	majors,
+	// 	startDate,
+	// 	endDate,
+	// 	startDateSubmitTopic,
+	// 	endDateSubmitTopic,
+	// 	startDateDiscussion,
+	// 	endDateDiscussion,
+	// 	startDateReport,
+	// 	endDateReport,
+	// 	startDateChooseTopic,
+	// 	endDateChooseTopic,
+	// }: ValidatedInput): Promise<ValidatedInput> {
+	// 	this.errorCollector.collect('startDate', () => {});
+	// 	this.errorCollector.collect('endDate', () => DateValidate.validate({ endDate}));
+	// 	this.errorCollector.collect('startDateSubmitTopic', () => DateValidate.validate({ startDateSubmitTopic'] }));
+	// 	this.errorCollector.collect('endDateSubmitTopic', () => DateValidate.validate({ endDateSubmitTopic'] }));
+	// 	this.errorCollector.collect('startDateChooseTopic', () => DateValidate.validate({ startDateChooseTopic'] }));
+	// 	this.errorCollector.collect('endDateChooseTopic', () => DateValidate.validate({ endDateChooseTopic'] }));
+	// 	this.errorCollector.collect('endDateDiscussion', () => DateValidate.validate({ endDateDiscussion'] }));
+	// 	this.errorCollector.collect('startDateDiscussion', () => DateValidate.validate({ startDateDiscussion'] }));
+	// 	this.errorCollector.collect('endDateReport', () => DateValidate.validate({ endDateReport'] }));
+	// 	this.errorCollector.collect('startDateReport', () => DateValidate.validate({ startDateReport'] }));
+
+	// 	if (this.errorCollector.hasError()) {
+	// 		throw new ValidationError(this.errorCollector.errors);
+	// 	}
+	// 	return input;
+	// }
 }

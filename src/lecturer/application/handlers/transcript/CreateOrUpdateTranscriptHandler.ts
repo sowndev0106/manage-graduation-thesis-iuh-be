@@ -23,6 +23,7 @@ import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import IAssignDao from '@lecturer/domain/daos/IAssignDao';
 import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	assign: Assign;
@@ -79,7 +80,7 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 		});
 
 		if (!groupMembertudents) {
-			throw new Error(`Student not in group ${assign.groupId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_THIS_GROUP', `Student not in group ${assign.groupId}`);
 		}
 
 		const groupMemberLecturer = await this.groupLecturerMemberDao.findOne({
@@ -88,7 +89,7 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 		});
 
 		if (!groupMemberLecturer) {
-			throw new Error(`Lecturer not in group ${assign.groupLecturerId}`);
+			throw new ErrorCode('LECTURER_NOT_IN_THIS_GROUP', `Lecturer not in group ${assign.groupLecturerId}`);
 		}
 		//  Check time term
 

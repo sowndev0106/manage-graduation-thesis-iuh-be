@@ -24,6 +24,7 @@ import StudentTerm from '@core/domain/entities/StudentTerm';
 import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
@@ -70,7 +71,7 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 
 		if (!studentTerm) {
-			throw new Error(`student not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
 		}
 		return {
 			studentTerm,

@@ -15,6 +15,8 @@ import Term from '@core/domain/entities/Term';
 import StatusTopic from '@core/domain/validate-objects/StatusTopic';
 import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	id: number;
@@ -51,7 +53,7 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 		const input = await this.validate(request);
 
 		let topic = await this.topicDao.findEntityById(input.id);
-		if (!topic) throw new Error('Topic not found');
+		if (!topic) throw new NotFoundError('Topic not found');
 
 		topic.update({
 			comment: input.comment,
@@ -60,7 +62,7 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 
 		topic = await this.topicDao.updateEntity(topic);
 
-		if (!topic) throw new Error('update status Topic fail');
+		if (!topic) throw new ErrorCode('FAIL_UPDATE_ENTITY', 'update status Topic fail');
 
 		const lecturerTerm = await this.lecturerTermDao.findOneGraphById(topic.lecturerTermId!);
 

@@ -9,6 +9,9 @@ import Student from '@core/domain/entities/Student';
 import Lecturer from '@core/domain/entities/Lecturer';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
+import NotFoundError from '@core/domain/errors/NotFoundError';
+import ForbiddenError from '@core/domain/errors/ForbiddenError';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	me: Lecturer;
@@ -28,10 +31,10 @@ export default class ResetPassword extends RequestHandler {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 		let student = await this.studentDao.findEntityById(studentId);
-		if (!student) throw new Error('student not found');
+		if (!student) throw new NotFoundError('student not found');
 
 		let me = await this.lecturerDao.findEntityById(Number(request.headers['id']));
-		if (!me) throw new Error('Error! please login again');
+		if (!me) throw new ForbiddenError('Error! please login again');
 		return {
 			me,
 			password,
@@ -42,7 +45,7 @@ export default class ResetPassword extends RequestHandler {
 	async handle(request: Request) {
 		const input = await this.validate(request);
 		if (!input.me.isAdmin && input.me.majorsId != input.student.majorsId) {
-			throw new Error(`You don\'t have permission to student with majors ${input.student.majorsId}`);
+			throw new ErrorCode('DONT_HAVE_PERMISSION_THIS_MAJORS', `You don\'t have permission to student with majors ${input.student.majorsId}`);
 		}
 		const newPassword = await encriptTextBcrypt(input.password);
 

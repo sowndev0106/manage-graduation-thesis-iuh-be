@@ -25,8 +25,15 @@ export type IKeyErrorCode =
 	| 'EVALUATION_SUM_GRADE'
 	| 'GROUP_LECTURER_DUPLICATE_NAME'
 	| 'IMPORT_LECTURER_MISSING_COLUMN'
+	| 'IMPORT_STUDENT_MISSING_COLUMN'
 	| 'DONT_HAVE_PERMISSION_THIS_MAJORS'
-	| 'MAJORS_DUPLICATE_NAME';
+	| 'MAJORS_DUPLICATE_NAME'
+	| 'TOPIC_DUPLICATE_NAME'
+	| 'LECTURER_NOT_IN_THIS_GROUP'
+	| 'STUDENT_NOT_IN_THIS_GROUP'
+	| 'STUDENT_DONT_HAVE_GROUP'
+	| 'LECTURER_DO_NOT_HAVE_ASSIGN'
+	| 'TERM_DUPLICATE_NAME';
 
 export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 	SERVER: {
@@ -82,6 +89,10 @@ export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 		key: 'IMPORT_LECTURER_MISSING_COLUMN',
 		statusCode: 400,
 	},
+	IMPORT_STUDENT_MISSING_COLUMN: {
+		key: 'IMPORT_STUDENT_MISSING_COLUMN',
+		statusCode: 400,
+	},
 	DONT_HAVE_PERMISSION_THIS_MAJORS: {
 		key: 'DONT_HAVE_PERMISSION_THIS_MAJORS',
 		statusCode: 403,
@@ -131,10 +142,36 @@ export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 		key: 'GROUP_LECTURER_DUPLICATE_NAME',
 		statusCode: 409,
 	},
-
+	LECTURER_NOT_IN_THIS_GROUP: {
+		key: 'LECTURER_NOT_IN_THIS_GROUP',
+		statusCode: 400,
+	},
+	LECTURER_DO_NOT_HAVE_ASSIGN: {
+		key: 'LECTURER_DO_NOT_HAVE_ASSIGN',
+		statusCode: 400,
+	},
+	// GROUP
+	STUDENT_NOT_IN_THIS_GROUP: {
+		key: 'STUDENT_NOT_IN_THIS_GROUP',
+		statusCode: 400,
+	},
+	STUDENT_DONT_HAVE_GROUP: {
+		key: 'STUDENT_DONT_HAVE_GROUP',
+		statusCode: 400,
+	},
 	// MAJORS
 	MAJORS_DUPLICATE_NAME: {
 		key: 'MAJORS_DUPLICATE_NAME',
+		statusCode: 409,
+	},
+	// MAJORS
+	TOPIC_DUPLICATE_NAME: {
+		key: 'TOPIC_DUPLICATE_NAME',
+		statusCode: 409,
+	},
+	// TERM
+	TERM_DUPLICATE_NAME: {
+		key: 'TERM_DUPLICATE_NAME',
 		statusCode: 409,
 	},
 };
