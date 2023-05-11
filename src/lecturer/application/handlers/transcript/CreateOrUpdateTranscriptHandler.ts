@@ -24,9 +24,12 @@ import StudentTerm from '@core/domain/entities/StudentTerm';
 import IAssignDao from '@lecturer/domain/daos/IAssignDao';
 import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
 import ErrorCode from '@core/domain/errors/ErrorCode';
+import Group, { TypeStatusGroup } from '@core/domain/entities/Group';
+import GroupMember from '@core/domain/entities/GroupMember';
 
 interface ValidatedInput {
 	assign: Assign;
+	group: Group;
 	transcriptDetails: ITranscriptDetail[];
 	lecturerTerm: LecturerTerm;
 	studentTerm: StudentTerm;
@@ -98,11 +101,12 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 			assign,
 			lecturerTerm,
 			studentTerm,
+			group: groupStudent,
 		};
 	}
 
 	async handle(request: Request) {
-		const { transcriptDetails, assign, lecturerTerm, studentTerm } = await this.validate(request);
+		const { transcriptDetails, assign, lecturerTerm, studentTerm, group } = await this.validate(request);
 		const groupLecturer = await this.groupLecturerDao.findEntityById(assign.groupLecturerId);
 		const evaluations = await this.evaluationDao.findAll(groupLecturer?.termId, assign.typeEvaluation);
 		const evaluationMap = new Map<number, Evaluation>();
@@ -139,6 +143,32 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 			}
 			transcripts.push(transcript);
 		}
+		await this.updateStatusGroup(group, assign.typeEvaluation);
 		return transcripts.map(e => e.toJSON);
+	}
+	async updateStatusGroup(group: Group, type: TypeEvaluation) {
+		const members = await this.groupMemberDao.findByGroupId({ groupId: group.id! });
+		const gradeMinPass = 5;
+		let pass = true;
+		for (const member of members) {
+			const transcripts = await this.transcriptDao.findByStudentAndType({ studentTermId: member.studentTermId!, type });
+			//Only update when all member in group have transcript
+			if (transcripts.length == 0) return;
+
+			const sumGrade = transcripts.reduce((sum, transcript) => sum + transcript.grade, 0);
+
+			// if someone in member have grade < 5 => fail all group
+			if (sumGrade < gradeMinPass) pass = false;
+		}
+		if (type == TypeEvaluation.ADVISOR) {
+			group.update({ status: pass ? TypeStatusGroup.PASS_ADVISOR : TypeStatusGroup.FAIL_ADVISOR });
+		} else if (type == TypeEvaluation.REVIEWER) {
+			group.update({ status: pass ? TypeStatusGroup.PASS_REVIEWER : TypeStatusGroup.FAIL_REVIEWER });
+		} else {
+			// SESSION_HOST
+			group.update({ status: pass ? TypeStatusGroup.PASS_SESSION_HOST : TypeStatusGroup.FAIL_SESSION_HOST });
+		}
+
+		await this.groupDao.updateEntity(group);
 	}
 }

@@ -68,15 +68,9 @@ export default class CreateTermHandler extends RequestHandler {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 
-		if (startDate >= endDate) throw new Error('startDate must be better endDate');
-		if (startDateSubmitTopic > endDateSubmitTopic) throw new Error('startDateSubmitTopic must be better endDateSubmitTopic');
-		if (startDateChooseTopic > endDateChooseTopic) throw new Error('startDateChooseTopic must be better endDateChooseTopic');
-		if (startDateDiscussion > endDateDiscussion) throw new Error('startDateDiscussion must be better endDateDiscussion');
-		if (startDateReport > endDateReport) throw new Error('startDateReport must be better endDateReport');
-
 		let majors = await this.majorsDao.findEntityById(majorsId);
 		if (!majors) throw new NotFoundError('majors not found');
-		return await this.checkValidateDate({
+		return this.checkValidateDate({
 			name,
 			majors,
 			startDate,
@@ -104,12 +98,11 @@ export default class CreateTermHandler extends RequestHandler {
 				'TERM_DUPLICATE_NAME',
 				`name already exists in majors and year ${input.startDate.getFullYear()} - ${input.endDate.getFullYear()}`
 			);
-
 		const latestTerm = await this.termDao.findLatestByMajorsId(input.majors.id!);
-
 		if (latestTerm && latestTerm.endDate >= input.startDate) {
 			throw new Error(`start date must be > ${latestTerm.endDate.toLocaleDateString()}`);
 		}
+
 		term = await this.termDao.insertEntity(
 			Term.create({
 				name: input.name,
@@ -147,34 +140,66 @@ export default class CreateTermHandler extends RequestHandler {
 
 		return term.toJSON;
 	}
-	// async checkValidateDate({
-	// 	name,
-	// 	majors,
-	// 	startDate,
-	// 	endDate,
-	// 	startDateSubmitTopic,
-	// 	endDateSubmitTopic,
-	// 	startDateDiscussion,
-	// 	endDateDiscussion,
-	// 	startDateReport,
-	// 	endDateReport,
-	// 	startDateChooseTopic,
-	// 	endDateChooseTopic,
-	// }: ValidatedInput): Promise<ValidatedInput> {
-	// 	this.errorCollector.collect('startDate', () => {});
-	// 	this.errorCollector.collect('endDate', () => DateValidate.validate({ endDate}));
-	// 	this.errorCollector.collect('startDateSubmitTopic', () => DateValidate.validate({ startDateSubmitTopic'] }));
-	// 	this.errorCollector.collect('endDateSubmitTopic', () => DateValidate.validate({ endDateSubmitTopic'] }));
-	// 	this.errorCollector.collect('startDateChooseTopic', () => DateValidate.validate({ startDateChooseTopic'] }));
-	// 	this.errorCollector.collect('endDateChooseTopic', () => DateValidate.validate({ endDateChooseTopic'] }));
-	// 	this.errorCollector.collect('endDateDiscussion', () => DateValidate.validate({ endDateDiscussion'] }));
-	// 	this.errorCollector.collect('startDateDiscussion', () => DateValidate.validate({ startDateDiscussion'] }));
-	// 	this.errorCollector.collect('endDateReport', () => DateValidate.validate({ endDateReport'] }));
-	// 	this.errorCollector.collect('startDateReport', () => DateValidate.validate({ startDateReport'] }));
+	checkValidateDate(input: ValidatedInput): ValidatedInput {
+		const {
+			name,
+			majors,
+			startDate,
+			endDate,
+			startDateSubmitTopic,
+			endDateSubmitTopic,
+			startDateDiscussion,
+			endDateDiscussion,
+			startDateReport,
+			endDateReport,
+			startDateChooseTopic,
+			endDateChooseTopic,
+		} = input;
 
-	// 	if (this.errorCollector.hasError()) {
-	// 		throw new ValidationError(this.errorCollector.errors);
-	// 	}
-	// 	return input;
-	// }
+		this.errorCollector.collect('startDate', () => {
+			if (startDate >= endDate) throw new Error('startDate must be < endDate');
+		});
+		this.errorCollector.collect('endDate', () => {});
+
+		this.errorCollector.collect('startDateSubmitTopic', () => {
+			if (startDateSubmitTopic > endDateSubmitTopic) throw new Error('startDateSubmitTopic must be < endDateSubmitTopic');
+			if (startDateSubmitTopic < startDate) throw new Error('startDateSubmitTopic must be > startDate');
+		});
+		this.errorCollector.collect('endDateSubmitTopic', () => {
+			if (endDateSubmitTopic > startDateChooseTopic) throw new Error('endDateSubmitTopic must be < startDateChooseTopic');
+			if (endDateSubmitTopic > endDate) throw new Error('endDateSubmitTopic must be < endDate');
+		});
+
+		this.errorCollector.collect('startDateChooseTopic', () => {
+			if (startDateChooseTopic > endDateChooseTopic) throw new Error('startDateChooseTopic must be < endDateChooseTopic');
+			if (startDateChooseTopic < startDate) throw new Error('startDateChooseTopic must be > startDate');
+		});
+		this.errorCollector.collect('endDateChooseTopic', () => {
+			if (endDateChooseTopic > startDateDiscussion) throw new Error('endDateChooseTopic must be < startDateDiscussion');
+			if (endDateSubmitTopic > endDate) throw new Error('endDateSubmitTopic must be < endDate');
+		});
+
+		this.errorCollector.collect('startDateDiscussion', () => {
+			if (startDateDiscussion > endDateDiscussion) throw new Error('startDateDiscussion must be < endDateDiscussion');
+			if (startDateDiscussion < startDate) throw new Error('startDateDiscussion must be > startDate');
+		});
+		this.errorCollector.collect('endDateDiscussion', () => {
+			if (endDateDiscussion > startDateReport) throw new Error('endDateDiscussion must be < startDateReport');
+			if (endDateSubmitTopic > endDate) throw new Error('endDateSubmitTopic must be < endDate');
+		});
+
+		this.errorCollector.collect('startDateReport', () => {
+			if (startDateReport > endDateReport) throw new Error('startDateReport must be better endDateReport');
+			if (startDateReport < startDate) throw new Error('startDateReport must be > startDate');
+		});
+		this.errorCollector.collect('endDateReport', () => {
+			if (endDateReport > endDate) throw new Error('endDateReport must be < endDate');
+			if (endDateSubmitTopic > endDate) throw new Error('endDateSubmitTopic must be < endDate');
+		});
+
+		if (this.errorCollector.hasError()) {
+			throw new ValidationError(this.errorCollector.errors);
+		}
+		return input;
+	}
 }
