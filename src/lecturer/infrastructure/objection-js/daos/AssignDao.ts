@@ -60,7 +60,7 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 			.andWhere('lecturer_term.lecturer_id', '=', props.lecturerId);
 
 		if (props.typeEvaluation) {
-			query.andWhere('type_evaluation', '=', ' props.typeEvaluation');
+			query.andWhere('type_evaluation', '=', props.typeEvaluation);
 		}
 		const result = await query.execute();
 		return result && result.map(e => this.convertModelToEntity(e));
