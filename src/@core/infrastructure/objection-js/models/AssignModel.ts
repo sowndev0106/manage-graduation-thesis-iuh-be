@@ -63,7 +63,7 @@ export default class AssignModel extends Model {
 			Number(dbJson['id'])
 		);
 
-		const groupLecturer = dbJson['group_lecturer'] && LecturerModel.convertModelToEntity(dbJson['group_lecturer']);
+		const groupLecturer = dbJson['group_lecturer'] && GroupLecturerModel.convertModelToEntity(dbJson['group_lecturer']);
 		const group = dbJson['group'] && GroupModel.convertModelToEntity(dbJson['group']);
 
 		if (groupLecturer) entity.update({ groupLecturer });
