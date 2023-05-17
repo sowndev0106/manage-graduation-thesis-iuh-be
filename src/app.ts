@@ -18,7 +18,7 @@ import '@core/infrastructure/objection-js';
 import '@core/infrastructure/redis';
 
 const app = express();
-const server = http.createServer(app);
+// const server = http.createServer(app);
 
 // // init socket
 // new ServerSocket(server);
@@ -46,5 +46,4 @@ app.use(
 );
 
 // Start the server
-
 export default app;

@@ -1,7 +1,7 @@
 import Transcript from '@core/domain/entities/Transcript';
 import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 import TranscriptDaoCore from '@core/infrastructure/objection-js/daos/TranscriptDao';
-import ITranscriptDao from '@lecturer/domain/daos/ITranscriptDao';
+import ITranscriptDao from '@student/domain/daos/ITranscriptDao';
 import { injectable } from 'inversify';
 
 @injectable()

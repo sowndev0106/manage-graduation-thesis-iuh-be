@@ -26,6 +26,8 @@ import IEvaluationDao from '@lecturer/domain/daos/IEvaluationDao';
 import ErrorCode from '@core/domain/errors/ErrorCode';
 import Group, { TypeStatusGroup } from '@core/domain/entities/Group';
 import GroupMember from '@core/domain/entities/GroupMember';
+import GroupLecturer from '@core/domain/entities/GroupLecturer';
+import { forIn, sum } from 'lodash';
 
 interface ValidatedInput {
 	assign: Assign;
@@ -33,6 +35,16 @@ interface ValidatedInput {
 	transcriptDetails: ITranscriptDetail[];
 	lecturerTerm: LecturerTerm;
 	studentTerm: StudentTerm;
+}
+interface IGraderByLecturerTerm {
+	lecturerTerm: LecturerTerm;
+	grade: number;
+}
+interface IGradeByTypeEluvation {
+	avgGrader: number;
+	sumGrade: number;
+	count: number;
+	lecturerTermIds: number[];
 }
 @injectable()
 export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
@@ -143,22 +155,30 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 			}
 			transcripts.push(transcript);
 		}
-		await this.updateStatusGroup(group, assign.typeEvaluation);
+		await this.updateStatusGroup(group, groupLecturer!, assign.typeEvaluation);
+		// const isFinishTranscript = await this.transcriptDao.isFinishTranscript({ groupId: group.id!, type: assign.typeEvaluation });
+
 		return transcripts.map(e => e.toJSON);
 	}
-	async updateStatusGroup(group: Group, type: TypeEvaluation) {
+	async updateStatusGroup(group: Group, groupLecturer: GroupLecturer, type: TypeEvaluation) {
 		const members = await this.groupMemberDao.findByGroupId({ groupId: group.id! });
+		const groupLecturerMember = await this.groupLecturerMemberDao.findAll({ groupLecturerId: groupLecturer.id! });
 		const gradeMinPass = 5;
 		let pass = true;
 		for (const member of members) {
 			const transcripts = await this.transcriptDao.findByStudentAndType({ studentTermId: member.studentTermId!, type });
-			//Only update when all member in group have transcript
-			if (transcripts.length == 0) return;
+			if (transcripts.length == 0) return; // stop
 
-			const sumGrade = transcripts.reduce((sum, transcript) => sum + transcript.grade, 0);
+			const summary = this.caculateAVGGrade(transcripts);
+			console.log(summary.lecturerTermIds);
+			// checll all lecturer was have transcripts with this student
+			for (const lecturerMember of groupLecturerMember) {
+				//Stop the function so someone hasn't transcript it yet
+				if (!summary.lecturerTermIds.find(e => e == lecturerMember.lecturerTermId)) return;
+			}
 
 			// if someone in member have grade < 5 => fail all group
-			if (sumGrade < gradeMinPass) pass = false;
+			if (summary.avgGrader < gradeMinPass) pass = false;
 		}
 		if (type == TypeEvaluation.ADVISOR) {
 			group.update({ status: pass ? TypeStatusGroup.PASS_ADVISOR : TypeStatusGroup.FAIL_ADVISOR });
@@ -170,5 +190,33 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 		}
 
 		await this.groupDao.updateEntity(group);
+	}
+
+	caculateAVGGrade(transcripts: Array<Transcript>): IGradeByTypeEluvation {
+		const gradeByLecturer = new Map<number, IGraderByLecturerTerm>();
+		let sumGrade = 0;
+		for (const transcript of transcripts) {
+			sumGrade += transcript.grade;
+			const oldGrade = gradeByLecturer.get(transcript.lecturerTermId!);
+			if (!oldGrade) {
+				// const lecturerTerm = await this.lecturerTermDao.findEntityById(transcript.lecturerTermId);
+				gradeByLecturer.set(transcript.lecturerTermId!, {
+					grade: transcript.grade,
+					lecturerTerm: transcript.lecturerTerm!,
+				});
+			} else {
+				gradeByLecturer.set(transcript.lecturerTermId!, {
+					grade: oldGrade.grade + transcript.grade,
+					lecturerTerm: oldGrade.lecturerTerm,
+				});
+			}
+		}
+		const lecturerTermIds = Array.from(gradeByLecturer.keys());
+		return {
+			avgGrader: sumGrade / lecturerTermIds.length,
+			sumGrade: sumGrade,
+			count: gradeByLecturer.values.length,
+			lecturerTermIds,
+		};
 	}
 }

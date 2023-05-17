@@ -6,6 +6,30 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class AssignDao extends AssignDaoCore implements IAssignDao {
+	async isFinishTranscript(props: { groupLecturerId: number; groupId: number; type: TypeEvaluation }): Promise<boolean> {
+		const query = this.initQuery();
+
+		const whereClause: Record<string, any> = {};
+
+		// query.join('evaluation', 'transcript.evaluation_id', '=', 'evaluation.id');
+
+		// query.join('student_term', 'transcript.student_term_id', '=', 'student_term.id');
+
+		// // query.join('group_member', 'group_member.student_term_id', '=', 'student_term.id');
+
+		// query.join('group_lecturer_member', 'group_lecturer_member.student_term_id', '=', 'student_term.id');
+
+		// query.join('assign', 'assign.group_id', '=', 'group_member.group_id');
+
+		// whereClause['evaluation.type'] = props.type;
+		// whereClause['group_member.group_id'] = props.groupId;
+
+		query.where(whereClause);
+
+		const result = await query.execute();
+
+		return true;
+	}
 	async findOne(props: { groupLecturerId?: number; type?: TypeEvaluation; groupId?: number }): Promise<Assign | null> {
 		const query = this.initQuery();
 		query.withGraphFetched('[group_lecturer, group]');

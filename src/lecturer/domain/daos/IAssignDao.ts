@@ -7,4 +7,5 @@ export default interface IAssignDao extends IDao<Assign> {
 	findOne(props: { groupLecturerId?: number; type?: TypeEvaluation; groupId?: number }): Promise<Assign | null>;
 	findByLecturer(props: { lecturerId: number; typeEvaluation?: TypeEvaluation }): Promise<Assign[]>;
 	findOneExtends(props: { lecturerTermId: number; studentTermId: number; typeEvaluation: TypeEvaluation }): Promise<Assign | null>;
+	isFinishTranscript(props: { groupLecturerId: number; groupId: number; type: TypeEvaluation }): Promise<boolean>;
 }
