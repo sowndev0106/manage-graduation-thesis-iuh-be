@@ -33,7 +33,19 @@ export type IKeyErrorCode =
 	| 'STUDENT_NOT_IN_THIS_GROUP'
 	| 'STUDENT_DONT_HAVE_GROUP'
 	| 'LECTURER_DO_NOT_HAVE_ASSIGN'
-	| 'TERM_DUPLICATE_NAME';
+	| 'TERM_DUPLICATE_NAME'
+	| 'GROUP_ALREADY_EXIST_TOPIC'
+	| 'GROUP_MAX_QUALITY'
+	| 'TERM_HAS_NOT_STARTED'
+	| 'TERM_HAS_EXPRIED'
+	| 'TERM_SUBMIT_TOPIC_HAS_NOT_STARTED'
+	| 'TERM_SUBMIT_TOPIC_HAS_EXPRIED'
+	| 'TERM_CHOOSE_TOPIC_HAS_NOT_STARTED'
+	| 'TERM_CHOOSE_TOPIC_HAS_EXPRIED'
+	| 'TERM_DISCUSSION_HAS_NOT_STARTED'
+	| 'TERM_DISCUSSION_HAS_EXPRIED'
+	| 'TERM_REPORT_HAS_NOT_STARTED'
+	| 'TERM_REPORT_HAS_EXPRIED';
 
 export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 	SERVER: {
@@ -159,6 +171,14 @@ export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 		key: 'STUDENT_DONT_HAVE_GROUP',
 		statusCode: 400,
 	},
+	GROUP_ALREADY_EXIST_TOPIC: {
+		key: 'GROUP_ALREADY_EXIST_TOPIC',
+		statusCode: 400,
+	},
+	GROUP_MAX_QUALITY: {
+		key: 'GROUP_MAX_QUALITY',
+		statusCode: 400,
+	},
 	// MAJORS
 	MAJORS_DUPLICATE_NAME: {
 		key: 'MAJORS_DUPLICATE_NAME',
@@ -173,6 +193,46 @@ export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 	TERM_DUPLICATE_NAME: {
 		key: 'TERM_DUPLICATE_NAME',
 		statusCode: 409,
+	},
+	TERM_HAS_NOT_STARTED: {
+		key: 'TERM_HAS_NOT_STARTED',
+		statusCode: 400,
+	},
+	TERM_HAS_EXPRIED: {
+		key: 'TERM_HAS_EXPRIED',
+		statusCode: 400,
+	},
+	TERM_SUBMIT_TOPIC_HAS_NOT_STARTED: {
+		key: 'TERM_SUBMIT_TOPIC_HAS_NOT_STARTED',
+		statusCode: 400,
+	},
+	TERM_SUBMIT_TOPIC_HAS_EXPRIED: {
+		key: 'TERM_SUBMIT_TOPIC_HAS_EXPRIED',
+		statusCode: 400,
+	},
+	TERM_CHOOSE_TOPIC_HAS_NOT_STARTED: {
+		key: 'TERM_CHOOSE_TOPIC_HAS_NOT_STARTED',
+		statusCode: 400,
+	},
+	TERM_CHOOSE_TOPIC_HAS_EXPRIED: {
+		key: 'TERM_CHOOSE_TOPIC_HAS_EXPRIED',
+		statusCode: 400,
+	},
+	TERM_DISCUSSION_HAS_NOT_STARTED: {
+		key: 'TERM_DISCUSSION_HAS_NOT_STARTED',
+		statusCode: 400,
+	},
+	TERM_DISCUSSION_HAS_EXPRIED: {
+		key: 'TERM_DISCUSSION_HAS_EXPRIED',
+		statusCode: 400,
+	},
+	TERM_REPORT_HAS_NOT_STARTED: {
+		key: 'TERM_REPORT_HAS_NOT_STARTED',
+		statusCode: 400,
+	},
+	TERM_REPORT_HAS_EXPRIED: {
+		key: 'TERM_REPORT_HAS_EXPRIED',
+		statusCode: 400,
 	},
 };
 export default class ErrorCode extends Error {
