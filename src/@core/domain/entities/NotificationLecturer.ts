@@ -1,7 +1,8 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import Lecturer from './Lecturer';
-export enum TypeNotificationLecturer {}
+export type TypeNotificationLecturer = 'UPDATE_STATUS_COMMENT_MY_TOPIC';
+
 export interface IProps {
 	lecturer: Lecturer;
 	message: string;
@@ -41,6 +42,6 @@ export default class NotificationLecturer extends Entity<IProps> {
 	get toJSON() {
 		const { lecturer, ...props } = lodash.cloneDeep(this._props || {});
 
-		return { id: this.id, ...props, lecturer: lecturer?.props };
+		return { id: this.id, ...props, lecturer: lecturer?.toJSON };
 	}
 }

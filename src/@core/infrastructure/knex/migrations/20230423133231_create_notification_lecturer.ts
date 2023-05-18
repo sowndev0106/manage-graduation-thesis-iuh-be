@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
-	return knex.schema.createTable('create_notification_lecturer', table => {
+	return knex.schema.createTable('notification_lecturer', table => {
 		table.increments('id').primary().unsigned();
 		table.text('message').notNullable();
 		table.boolean('read').defaultTo(false);
@@ -13,5 +13,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-	return knex.schema.dropTable('create_notification_lecturer');
+	return knex.schema.dropTable('notification_lecturer');
 }

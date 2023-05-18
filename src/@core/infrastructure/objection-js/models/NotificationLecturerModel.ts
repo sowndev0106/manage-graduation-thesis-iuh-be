@@ -6,7 +6,7 @@ import Lecturer from '@core/domain/entities/Lecturer';
 
 export default class NotificationLecturerModel extends Model {
 	static get tableName() {
-		return 'create_notification_lecturer';
+		return 'notification_lecturer';
 	}
 
 	static relationMappings = {
@@ -14,7 +14,7 @@ export default class NotificationLecturerModel extends Model {
 			relation: Model.BelongsToOneRelation,
 			modelClass: LecturerModel,
 			join: {
-				from: 'topic.lecturer_id',
+				from: 'notification_lecturer.lecturer_id',
 				to: 'lecturer.id',
 			},
 		},
@@ -24,7 +24,7 @@ export default class NotificationLecturerModel extends Model {
 		const model = new NotificationLecturerModel();
 		model.$set({
 			id: entity.id,
-			messag: entity.message,
+			message: entity.message,
 			type: entity.type,
 			read: entity.read,
 			lecturer_id: entity.lecturerId,

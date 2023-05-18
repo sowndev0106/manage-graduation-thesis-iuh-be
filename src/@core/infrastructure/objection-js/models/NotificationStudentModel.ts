@@ -6,7 +6,7 @@ import Student from '@core/domain/entities/Student';
 
 export default class NotificationStudentModel extends Model {
 	static get tableName() {
-		return 'create_notification_student';
+		return 'notification_student';
 	}
 
 	static relationMappings = {
@@ -14,7 +14,7 @@ export default class NotificationStudentModel extends Model {
 			relation: Model.BelongsToOneRelation,
 			modelClass: StudentModel,
 			join: {
-				from: 'topic.student_id',
+				from: 'notification_student.student_id',
 				to: 'student.id',
 			},
 		},
@@ -24,7 +24,7 @@ export default class NotificationStudentModel extends Model {
 		const model = new NotificationStudentModel();
 		model.$set({
 			id: entity.id,
-			messag: entity.message,
+			message: entity.message,
 			type: entity.type,
 			read: entity.read,
 			student_id: entity.studentId,

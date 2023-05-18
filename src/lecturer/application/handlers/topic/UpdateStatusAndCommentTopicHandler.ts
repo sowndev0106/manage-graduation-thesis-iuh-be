@@ -17,6 +17,8 @@ import IMajorsDao from '@lecturer/domain/daos/IMajorsDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ErrorCode from '@core/domain/errors/ErrorCode';
+import INotificationLecturerDao from '@lecturer/domain/daos/INotificationLecturerDao';
+import NotificationLecturer from '@core/domain/entities/NotificationLecturer';
 
 interface ValidatedInput {
 	id: number;
@@ -31,6 +33,7 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
+	@inject('NotificationLecturerDao') private notificationLecturerDao!: INotificationLecturerDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
 		const status = this.errorCollector.collect('status', () => StatusTopic.validate({ value: request.body['status'] }));
@@ -68,6 +71,14 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 
 		lecturerTerm && topic.update({ lecturerTerm });
 
+		await this.notificationLecturerDao.insertEntity(
+			NotificationLecturer.create({
+				lecturer: Lecturer.createById(input.lecturerId),
+				message: `Topic '${topic.name}' đã ${topic.status != TypeStatusTopic.REFUSE ? 'được Chấp nhận' : 'bị Từ chối'}`,
+				read: false,
+				type: 'UPDATE_STATUS_COMMENT_MY_TOPIC',
+			})
+		);
 		return topic.toJSON;
 	}
 }
