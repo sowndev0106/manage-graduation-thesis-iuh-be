@@ -5,6 +5,7 @@ import UpdateMyInfoHandler from '../handlers/me/UpdateMyInfoHandler';
 import UpdateMyPasswordHandler from '../handlers/me/UpdateMyPasswordHandler';
 import GetMyNotificationLecturerHandler from '../handlers/me/GetMyNotificationLecturerHandler';
 import UpdateStatusNotificationLecturerHandler from '../handlers/me/UpdateStatusNotificationLecturerHandler';
+import UpdateAllStatusNotificationLecturerHandler from '../handlers/me/UpdateAllStatusNotificationLecturerHandler';
 
 class MeController {
 	async getMyInfo(req: Request, res: Response, next: NextFunction) {
@@ -26,6 +27,10 @@ class MeController {
 	}
 	async readNotification(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(UpdateStatusNotificationLecturerHandler).handle(req);
+		return res.status(200).json(data);
+	}
+	async readAllNotification(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(UpdateAllStatusNotificationLecturerHandler).handle(req);
 		return res.status(200).json(data);
 	}
 }

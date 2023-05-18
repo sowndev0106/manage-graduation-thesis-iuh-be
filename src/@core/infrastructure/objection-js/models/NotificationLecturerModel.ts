@@ -48,6 +48,8 @@ export default class NotificationLecturerModel extends Model {
 				message: dbJson['message'],
 				read: dbJson['read'],
 				lecturer: Lecturer.createById(dbJson['lecturer_id']),
+				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
+				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
 			Number(dbJson['id'])
 		);

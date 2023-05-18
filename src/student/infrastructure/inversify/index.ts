@@ -32,7 +32,7 @@ import GroupLecturerMemberDao from '../objection-js/daos/GroupLecturerMemberDao'
 import IGroupLecturerMemberDao from '@student/domain/daos/IGroupLecturerMemberDao';
 import AssignDao from '../objection-js/daos/AssignDao';
 import IAssignDao from '@student/domain/daos/IAssignDao';
-import INotificationStudentDao from '@lecturer/domain/daos/INotificationStudentDao';
+import INotificationStudentDao from '@student/domain/daos/INotificationStudentDao';
 import NotificationStudentDao from '../objection-js/daos/NotificationStudentDao';
 
 const container = new Container({

@@ -5,6 +5,14 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class NotificationStudentDao extends NotificationStudentDaoCore implements INotificationStudentDao {
+	async readAll(props: { studentId: number }): Promise<boolean> {
+		const query = this.initQuery();
+
+		query.update({ read: true }).where({ student_id: props.studentId });
+
+		const result = await query.execute();
+		return !!result;
+	}
 	async findAll(props: { studentId: number }): Promise<NotificationStudent[]> {
 		const query = this.initQuery();
 		query.withGraphFetched('[student]');
