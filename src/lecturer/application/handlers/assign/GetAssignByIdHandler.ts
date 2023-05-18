@@ -29,8 +29,8 @@ export default class GetAssignByIdHandler extends RequestHandler {
 	}
 
 	async handle(request: Request) {
-		const input = await this.validate(request);
-
-		return input.assign.toJSON;
+		const { assign } = await this.validate(request);
+		const assignFull = await this.assignDao.findOne({ groupId: assign.groupId, groupLecturerId: assign.groupLecturerId, type: assign.typeEvaluation });
+		return assignFull?.toJSON;
 	}
 }

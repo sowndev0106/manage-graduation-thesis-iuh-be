@@ -74,7 +74,7 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 
 		await NotificationLecturerService.send({
 			user: Lecturer.createById(input.lecturerId),
-			message: `Topic '${topic.name}' đã ${topic.status != TypeStatusTopic.REFUSE ? 'được Chấp nhận' : 'bị Từ chối'}`,
+			message: `Đề tài '${topic.name}' đã ${topic.status != TypeStatusTopic.REFUSE ? 'được Chấp nhận' : 'bị Từ chối'}`,
 			type: 'UPDATE_STATUS_COMMENT_MY_TOPIC',
 		});
 

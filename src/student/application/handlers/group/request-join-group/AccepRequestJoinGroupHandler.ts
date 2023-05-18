@@ -13,6 +13,9 @@ import IGroupDao from '@student/domain/daos/IGroupDao';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import Group from '@core/domain/entities/Group';
+import NotificationStudentService from '@core/service/NotificationStudentService';
+import IStudentDao from '@student/domain/daos/IStudentDao';
+import { group } from 'console';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
@@ -26,6 +29,7 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
+	@inject('StudentDao') private studentDao!: IStudentDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
@@ -65,7 +69,7 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 		groupMember = await this.groupMemberDao.insertEntity(groupMember);
 
 		input.group.members?.push(groupMember);
-
+		await this.notification(input.group, input.studentTerm);
 		return groupMember.toJSON;
 	}
 	private async checkAccepRequestJoinHandler(input: ValidatedInput) {
@@ -80,6 +84,17 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 		// check authorization
 		if (input.studentTerm.id != input.requestJoinGroup.studentTermId) {
 			throw new Error("Can't accep because You are not invited");
+		}
+	}
+	async notification(group: Group, studentTerm: StudentTerm) {
+		const student = await this.studentDao.findEntityById(studentTerm.studentId);
+		const members = await this.groupMemberDao.findByGroupId(group.id!);
+		for (const member of members) {
+			await NotificationStudentService.send({
+				user: member.studentTerm!,
+				message: `'${student?.name}' vừa được thêm vào nhóm bạn`,
+				type: 'NEW_GROUP_MEMBER',
+			});
 		}
 	}
 }

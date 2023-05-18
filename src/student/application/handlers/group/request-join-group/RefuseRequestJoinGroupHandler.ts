@@ -11,10 +11,13 @@ import NotFoundError from '@core/domain/errors/NotFoundError';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
+import NotificationStudentService from '@core/service/NotificationStudentService';
+import Group from '@core/domain/entities/Group';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
 	requestJoinGroup: RequestJoinGroup;
+	group: Group;
 }
 
 @injectable()
@@ -42,7 +45,7 @@ export default class RefuseRequestJoinGroupHandler extends RequestHandler {
 		if (!studentTerm) {
 			throw new Error(`student not in term ${group.termId!}`);
 		}
-		return { requestJoinGroup, studentTerm };
+		return { requestJoinGroup, studentTerm, group };
 	}
 	async handle(request: Request) {
 		const input = await this.validate(request);
@@ -53,8 +56,28 @@ export default class RefuseRequestJoinGroupHandler extends RequestHandler {
 			if (!me) {
 				throw new Error("Can't refuse");
 			}
+			await this.notificationToUser(input.group, input.requestJoinGroup.studentTerm);
 		}
-
+		await this.notificationToGroup(input.group, input.requestJoinGroup.studentTerm);
 		return (await this.requestJoinGroupDao.deleteEntity(input.requestJoinGroup)).toJSON;
+	}
+	async notificationToUser(group: Group, studentTerm: StudentTerm) {
+		const student = await this.studentDao.findEntityById(studentTerm.studentId);
+		await NotificationStudentService.send({
+			user: student!,
+			message: `Nhóm '${group.name}' đã từ chối yêu cầu tham gia nhóm của bạn`,
+			type: 'REQUEST_JOIN_GROUP',
+		});
+	}
+	async notificationToGroup(group: Group, studentTerm: StudentTerm) {
+		const student = await this.studentDao.findEntityById(studentTerm.studentId);
+		const members = await this.groupMemberDao.findByGroupId(group.id!);
+		for (const member of members) {
+			await NotificationStudentService.send({
+				user: member.studentTerm!,
+				message: `'${student?.name}' đã từ chối lời mời tham gia nhóm của bạn`,
+				type: 'REQUEST_JOIN_GROUP',
+			});
+		}
 	}
 }

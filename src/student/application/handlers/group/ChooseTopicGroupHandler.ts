@@ -20,6 +20,8 @@ import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import Term from '@core/domain/entities/Term';
 import IGroupLecturerMemberDao from '@student/domain/daos/IGroupLecturerMemberDao';
 import GroupLecturerMember from '@core/domain/entities/GroupLecturerMember';
+import NotificationStudentService from '@core/service/NotificationStudentService';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
 
 interface ValidatedInput {
 	group: Group;
@@ -80,7 +82,23 @@ export default class ChooseTopicHandler extends RequestHandler {
 
 		const groupNew = await this.groupDao.updateEntity(group);
 		await this.updateAssignForLecturerOfTopic({ topic, group: groupNew });
+		await this.notification(topic, group);
 		return groupNew.toJSON;
+	}
+	async notification(topic: Topic, group: Group) {
+		const members = await this.groupMemberDao.findByGroupId(group.id!);
+		for (const member of members) {
+			await NotificationStudentService.send({
+				user: member.studentTerm!,
+				message: `Chọn đề tài '${topic.name}' thành công`,
+				type: 'CHOOSE_TOPIC',
+			});
+		}
+		await NotificationLecturerService.send({
+			user: topic.lecturerTerm!,
+			message: `Nhóm '${group.name}' đã chọn đề tài '${topic.name}' của bạn`,
+			type: 'CHOOSE_TOPIC',
+		});
 	}
 	async updateAssignForLecturerOfTopic({ topic, group }: ValidatedInput) {
 		// autho create assign advisor for lecturer of topic

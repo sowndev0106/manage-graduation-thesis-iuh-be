@@ -1,7 +1,7 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import Student from './Student';
-export type TypeNotificationStudent = 'ACHIEVEMENT' | 'STUDENT';
+export type TypeNotificationStudent = 'ACHIEVEMENT' | 'STUDENT' | 'GROUP_MEMBER' | 'CHOOSE_TOPIC' | 'NEW_GROUP_MEMBER' | 'REQUEST_JOIN_GROUP';
 export interface IProps {
 	student: Student;
 	message: string;
