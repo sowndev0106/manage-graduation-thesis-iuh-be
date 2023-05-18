@@ -19,6 +19,7 @@ import Email from '@core/domain/validate-objects/Email';
 import SortText from '@core/domain/validate-objects/SortText';
 import Gender from '@core/domain/validate-objects/Gender';
 import Degree from '@core/domain/validate-objects/Degree';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
 
 interface ValidatedInput {
 	username: string;
@@ -85,16 +86,28 @@ export default class AddLecturerHandler extends RequestHandler {
 			lecturer = await this.lecturerDao.insertEntity(lecturer);
 		}
 
-		const lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturer.id!);
+		let lecturerTerm = await this.lecturerTermDao.findOne(termId, lecturer.id!);
 		if (!lecturerTerm) {
-			await this.lecturerTermDao.insertEntity(
+			lecturerTerm = await this.lecturerTermDao.insertEntity(
 				LecturerTerm.create({
 					lecturer,
 					term,
 					role: lecturer.role,
 				})
 			);
+			await NotificationLecturerService.send({
+				user: lecturerTerm!,
+				message: `Bạn vừa được thêm vào học kỳ '${term.name}' với vai trò là ${
+					lecturer.role == TypeRoleLecturer.HEAD_LECTURER
+						? "'Chủ nhiệm ngành'"
+						: lecturer.role == TypeRoleLecturer.SUB_HEAD_LECTURER
+						? "'Phó chủ nhiệm ngành'"
+						: "'Giảng viên'"
+				}`,
+				type: 'LECTURER',
+			});
 		}
+
 		return lecturer.toJSON;
 	}
 }

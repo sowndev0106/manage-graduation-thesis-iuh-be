@@ -14,6 +14,8 @@ import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ErrorCode from '@core/domain/errors/ErrorCode';
+import NotificationStudentService from '@core/service/NotificationStudentService';
+import Student from '@core/domain/entities/Student';
 
 interface ValidatedInput {
 	name: string;
@@ -73,6 +75,12 @@ export default class CreateAchievementHandler extends RequestHandler {
 
 		if (!achievement) throw new ErrorCode('FAIL_CREATE_ENTITY', 'Create Achievement fail');
 		achievement.update({ studentTerm });
+		await NotificationStudentService.send({
+			user: Student.createById(studentTerm.studentId),
+			message: `Bạn vừa được cộng ${bonusGrade} điểm cho thành tích '${name}'`,
+			type: 'ACHIEVEMENT',
+		});
+
 		return achievement.toJSON;
 	}
 }

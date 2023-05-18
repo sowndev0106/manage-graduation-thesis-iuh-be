@@ -8,6 +8,12 @@ import ITermDao from '@lecturer/domain/daos/ITermDao';
 import Term from '@core/domain/entities/Term';
 import Assign from '@core/domain/entities/Assign';
 import NotFoundError from '@core/domain/errors/NotFoundError';
+import { assign } from 'lodash';
+import IGroupDao from '@lecturer/domain/daos/IGroupDao';
+import IGroupLecturerMemberDao from '@lecturer/domain/daos/IGroupLecturerMemberDao';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
+import { TypeNotificationLecturer } from '@core/domain/entities/NotificationLecturer';
+import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 
 interface ValidatedInput {
 	assign: Assign;
@@ -16,6 +22,8 @@ interface ValidatedInput {
 @injectable()
 export default class DeleteAssignHandler extends RequestHandler {
 	@inject('AssignDao') private assignDao!: IAssignDao;
+	@inject('GroupDao') private groupDao!: IGroupDao;
+	@inject('GroupLecturerMemberDao') private groupLecturerMemberDao!: IGroupLecturerMemberDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
 
@@ -34,6 +42,25 @@ export default class DeleteAssignHandler extends RequestHandler {
 
 		let result = await this.assignDao.deleteEntity(input.assign);
 
+		const group = await this.groupDao.findEntityById(input.assign.groupId);
+
+		const message = `Bạn vừa bị hủy bỏ quyền chấm điểm cho nhóm ${group?.name}`;
+
+		const members = await this.groupLecturerMemberDao.findAll({ groupLecturerId: input.assign.groupLecturerId! });
+		const typeNoti: TypeNotificationLecturer =
+			input.assign.typeEvaluation == TypeEvaluation.REVIEWER
+				? 'ASSIGN_REVIEW'
+				: input.assign.typeEvaluation == TypeEvaluation.SESSION_HOST
+				? 'ASSIGN_SESSION_HOST'
+				: 'ASSIGN_ADVISOR';
+
+		for (const member of members) {
+			await NotificationLecturerService.send({
+				user: member.lecturerTerm,
+				message,
+				type: typeNoti,
+			});
+		}
 		return result ? 'Delete Assign success' : 'Delete Assign fail';
 	}
 }

@@ -1,7 +1,7 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import Student from './Student';
-export enum TypeNotificationStudent {}
+export type TypeNotificationStudent = 'ACHIEVEMENT' | 'STUDENT';
 export interface IProps {
 	student: Student;
 	message: string;

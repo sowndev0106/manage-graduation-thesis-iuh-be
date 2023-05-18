@@ -20,6 +20,7 @@ import Student, { TypeTraining } from '@core/domain/entities/Student';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import ErrorCode from '@core/domain/errors/ErrorCode';
 import NotFoundError from '@core/domain/errors/NotFoundError';
+import NotificationStudentService from '@core/service/NotificationStudentService';
 
 interface IValidatedInput {
 	users: Array<{
@@ -119,12 +120,17 @@ export default class ImportStudentByExcelHandler extends RequestHandler {
 			let studentterm = await this.studentTermDao.findOne(term.id!, student.id!);
 			if (!studentterm) {
 				// insert to student term
-				await this.studentTermDao.insertEntity(
+				studentterm = await this.studentTermDao.insertEntity(
 					StudentTerm.create({
 						student,
 						term,
 					})
 				);
+				await NotificationStudentService.send({
+					user: studentterm!,
+					message: `Bạn vừa được thêm vào học kỳ '${term.name}'`,
+					type: 'STUDENT',
+				});
 			}
 			return student;
 		});

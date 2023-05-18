@@ -17,6 +17,9 @@ import IGroupLecturerDao from '@lecturer/domain/daos/IGroupLecturerDao';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import Term from '@core/domain/entities/Term';
 import ErrorCode from '@core/domain/errors/ErrorCode';
+import IGroupLecturerMemberDao from '@lecturer/domain/daos/IGroupLecturerMemberDao';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
+import { TypeNotificationLecturer } from '@core/domain/entities/NotificationLecturer';
 
 interface ValidatedInput {
 	typeEvaluation: TypeEvaluation;
@@ -26,6 +29,7 @@ interface ValidatedInput {
 @injectable()
 export default class CreateAssignHandler extends RequestHandler {
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
+	@inject('GroupLecturerMemberDao') private groupLecturerMemberDao!: IGroupLecturerMemberDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
 	@inject('AssignDao') private assignDao!: IAssignDao;
 	async validate(request: Request): Promise<ValidatedInput> {
@@ -78,7 +82,24 @@ export default class CreateAssignHandler extends RequestHandler {
 				groupId: group.id!,
 			});
 		}
+		const type =
+			typeEvaluation == TypeEvaluation.REVIEWER ? 'Phản biện' : typeEvaluation == TypeEvaluation.SESSION_HOST ? 'Hội đồng' : 'Giáo viên hướng dẫn';
+		const typeNoti: TypeNotificationLecturer =
+			typeEvaluation == TypeEvaluation.REVIEWER
+				? 'ASSIGN_REVIEW'
+				: typeEvaluation == TypeEvaluation.SESSION_HOST
+				? 'ASSIGN_SESSION_HOST'
+				: 'ASSIGN_ADVISOR';
 
+		const message = `Bạn vừa được phân công chấm điểm cho nhóm '${group.name}' với vai trò là '${type}'`;
+		const members = await this.groupLecturerMemberDao.findAll({ groupLecturerId: groupLecturer.id! });
+		for (const member of members) {
+			await NotificationLecturerService.send({
+				user: member.lecturerTerm,
+				message,
+				type: typeNoti,
+			});
+		}
 		return assign?.toJSON;
 	}
 }

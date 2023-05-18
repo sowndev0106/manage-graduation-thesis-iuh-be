@@ -19,6 +19,7 @@ import NotFoundError from '@core/domain/errors/NotFoundError';
 import ErrorCode from '@core/domain/errors/ErrorCode';
 import INotificationLecturerDao from '@lecturer/domain/daos/INotificationLecturerDao';
 import NotificationLecturer from '@core/domain/entities/NotificationLecturer';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
 
 interface ValidatedInput {
 	id: number;
@@ -71,14 +72,12 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 
 		lecturerTerm && topic.update({ lecturerTerm });
 
-		await this.notificationLecturerDao.insertEntity(
-			NotificationLecturer.create({
-				lecturer: Lecturer.createById(input.lecturerId),
-				message: `Topic '${topic.name}' đã ${topic.status != TypeStatusTopic.REFUSE ? 'được Chấp nhận' : 'bị Từ chối'}`,
-				read: false,
-				type: 'UPDATE_STATUS_COMMENT_MY_TOPIC',
-			})
-		);
+		await NotificationLecturerService.send({
+			user: Lecturer.createById(input.lecturerId),
+			message: `Topic '${topic.name}' đã ${topic.status != TypeStatusTopic.REFUSE ? 'được Chấp nhận' : 'bị Từ chối'}`,
+			type: 'UPDATE_STATUS_COMMENT_MY_TOPIC',
+		});
+
 		return topic.toJSON;
 	}
 }

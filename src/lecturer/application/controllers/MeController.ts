@@ -20,7 +20,6 @@ class MeController {
 		const data = await Ioc.get(UpdateMyInfoHandler).handle(req);
 		return res.status(200).json(data);
 	}
-
 	async updateMyPassword(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(UpdateMyPasswordHandler).handle(req);
 		return res.status(200).json(data);
