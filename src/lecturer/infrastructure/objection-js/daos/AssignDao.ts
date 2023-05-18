@@ -32,7 +32,10 @@ export default class AssignDao extends AssignDaoCore implements IAssignDao {
 	}
 	async findOne(props: { groupLecturerId?: number; type?: TypeEvaluation; groupId?: number }): Promise<Assign | null> {
 		const query = this.initQuery();
-		query.withGraphFetched('[group_lecturer, group]');
+		query.withGraphFetched(
+			'[group_lecturer, group_lecturer.members,group_lecturer.members.lecturer_term, group_lecturer.members.lecturer_term.lecturer, group, group.members]'
+		);
+
 		const whereClause: Record<string, any> = {};
 
 		if (props.groupLecturerId) whereClause['group_lecturer_id'] = props.groupLecturerId;

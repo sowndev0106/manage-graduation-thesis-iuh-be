@@ -16,6 +16,7 @@ import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import ITermDao from '@student/domain/daos/ITermDao';
 import Term from '@core/domain/entities/Term';
 import StudentTerm from '@core/domain/entities/StudentTerm';
+import NotificationStudentService from '@core/service/NotificationStudentService';
 
 interface ValidatedInput {
 	term: Term;
@@ -78,7 +79,7 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 		} else {
 			requestJoinGroup = await this.handleNewRequestJoin(input, group);
 		}
-
+		await this.notificationToUser(group, input.studentTermInvite);
 		return requestJoinGroup?.toJSON;
 	}
 	private async handleNewRequestJoin(input: ValidatedInput, group: Group) {
@@ -100,5 +101,13 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 			await this.requestJoinGroupDao.updateEntity(requestJoinGroup);
 		}
 		return requestJoinGroup;
+	}
+	async notificationToUser(group: Group, studentTerm: StudentTerm) {
+		const student = await this.studentDao.findEntityById(studentTerm.studentId);
+		await NotificationStudentService.send({
+			user: student!,
+			message: `Nhóm '${group.name}' đã gửi lời mời tham gia nhóm cho bạn`,
+			type: 'REQUEST_JOIN_GROUP',
+		});
 	}
 }

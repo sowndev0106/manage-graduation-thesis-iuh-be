@@ -15,6 +15,7 @@ import GroupMember from '@core/domain/entities/GroupMember';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
+import NotificationStudentService from '@core/service/NotificationStudentService';
 
 interface ValidatedInput {
 	group: Group;
@@ -49,6 +50,7 @@ export default class SendRequestJoinGroupHandler extends RequestHandler {
 		if (!studentTerm) {
 			throw new Error(`student not in term ${group.termId}`);
 		}
+		studentTerm.update({ student });
 		return { group, studentTerm, message };
 	}
 
@@ -71,6 +73,7 @@ export default class SendRequestJoinGroupHandler extends RequestHandler {
 			requestJoinGroup = await this.handleNewRequestJoin(input);
 		}
 		requestJoinGroup.update({ studentTerm: input.studentTerm });
+		await this.notificationToGroup(input.group, input.studentTerm);
 		return requestJoinGroup.toJSON;
 	}
 	private async handleNewRequestJoin(input: ValidatedInput) {
@@ -92,5 +95,16 @@ export default class SendRequestJoinGroupHandler extends RequestHandler {
 			await this.requestJoinGroupDao.updateEntity(requestJoinGroup);
 		}
 		return requestJoinGroup;
+	}
+	async notificationToGroup(group: Group, studentTerm: StudentTerm) {
+		const student = await this.studentDao.findEntityById(studentTerm.studentId);
+		const members = await this.groupMemberDao.findByGroupId(group.id!);
+		for (const member of members) {
+			await NotificationStudentService.send({
+				user: member.studentTerm!,
+				message: `'${student?.name}' đã gửi yêu cầu tham gia nhóm`,
+				type: 'REQUEST_JOIN_GROUP',
+			});
+		}
 	}
 }

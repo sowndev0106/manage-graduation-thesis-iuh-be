@@ -9,6 +9,8 @@ import ITermDao from '@student/domain/daos/ITermDao';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import Term from '@core/domain/entities/Term';
 import StudentTerm from '@core/domain/entities/StudentTerm';
+import NotificationStudentService from '@core/service/NotificationStudentService';
+import IStudentDao from '@student/domain/daos/IStudentDao';
 
 interface ValidatedInput {
 	term: Term;
@@ -19,6 +21,7 @@ interface ValidatedInput {
 export default class OutGroupHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('GroupDao') private groupDao!: IGroupDao;
+	@inject('StudentDao') private studentDao!: IStudentDao;
 	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
 	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
 	async validate(request: Request): Promise<ValidatedInput> {
@@ -47,20 +50,29 @@ export default class OutGroupHandler extends RequestHandler {
 		const group = await this.groupDao.findOne({
 			studentTermId: input.studentTerm.id!,
 		});
+
 		if (!group) throw new Error('You not have group');
 
 		const members = await this.groupMemberDao.findByGroupId(group.id!);
 
 		group.updateMembers(members);
+		const student = await this.studentDao.findEntityById(input.studentTerm.studentId);
 
 		// check if only me in group then delete group
 		if (members.length == 1) {
 			await this.groupMemberDao.deleteEntity(members[0]);
 			result = await this.groupDao.deleteEntity(group);
 		} else {
-			const myMember = members.find(e => e.studentTermId == input.studentTerm.id!);
-			if (myMember) {
-				result = await this.groupMemberDao.deleteEntity(myMember);
+			for (const member of members) {
+				if (member.studentTermId == input.studentTerm.id!) {
+					result = await this.groupMemberDao.deleteEntity(member);
+				} else {
+					await NotificationStudentService.send({
+						user: member.studentTerm!,
+						message: `Thành viên '${student?.name + ' - ' + student?.username}' vừa rời khỏi nhóm'  `,
+						type: 'GROUP_MEMBER',
+					});
+				}
 			}
 		}
 

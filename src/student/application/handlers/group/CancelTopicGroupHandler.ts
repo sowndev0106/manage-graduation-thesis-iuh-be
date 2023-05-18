@@ -15,6 +15,9 @@ import IGroupLecturerDao from '@student/domain/daos/IGroupLecturerDao';
 import IGroupLecturerMemberDao from '@student/domain/daos/IGroupLecturerMemberDao';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import { TypeEvaluation } from '@core/domain/entities/Evaluation';
+import Topic from '@core/domain/entities/Topic';
+import NotificationStudentService from '@core/service/NotificationStudentService';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
 
 interface ValidatedInput {
 	group: Group;
@@ -57,16 +60,35 @@ export default class CancelTopicGroupHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { group } = await this.validate(request);
+		const topic = await this.topicDao.findEntityById(group.topicId);
 
 		group.update({ topic: undefined });
 
 		const groupNew = await this.groupDao.updateEntity(group);
 		await this.updateAssignForLecturerOfTopic({ group });
+
+		await this.notification(topic!, group);
+
 		return groupNew.toJSON;
 	}
 	async updateAssignForLecturerOfTopic({ group }: ValidatedInput) {
 		// autho delete assign advisor for lecturer of topic
 		const assign = await this.assignDao.findOne({ groupId: group.id, type: TypeEvaluation.ADVISOR });
 		if (assign) await this.assignDao.deleteEntity(assign);
+	}
+	async notification(topic: Topic, group: Group) {
+		const members = await this.groupMemberDao.findByGroupId(group.id!);
+		for (const member of members) {
+			await NotificationStudentService.send({
+				user: member.studentTerm!,
+				message: `Bạn đã hủy chọn đề tài '${topic.name}' thành công`,
+				type: 'CHOOSE_TOPIC',
+			});
+		}
+		await NotificationLecturerService.send({
+			user: topic.lecturerTerm!,
+			message: `Nhóm '${group.name}' đã hủy chọn đề tài '${topic.name}' của bạn`,
+			type: 'CHOOSE_TOPIC',
+		});
 	}
 }

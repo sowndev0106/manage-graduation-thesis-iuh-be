@@ -7,7 +7,8 @@ export type TypeNotificationLecturer =
 	| 'ASSIGN_SESSION_HOST'
 	| 'ASSIGN_ADVISOR'
 	| 'LECTURER'
-	| 'GROUP_STUDENT';
+	| 'GROUP_STUDENT'
+	| 'CHOOSE_TOPIC';
 
 export interface IProps {
 	lecturer: Lecturer;
