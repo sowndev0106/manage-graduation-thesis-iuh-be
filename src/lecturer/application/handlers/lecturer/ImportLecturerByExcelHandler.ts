@@ -20,6 +20,7 @@ import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import Nodemailer from '@core/infrastructure/nodemailer';
 import ErrorCode from '@core/domain/errors/ErrorCode';
 import NotFoundError from '@core/domain/errors/NotFoundError';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
 
 interface IValidatedInput {
 	users: Array<{
@@ -121,13 +122,24 @@ export default class ImportLecturerByExcelHandler extends RequestHandler {
 			let lecturerterm = await this.LecturertermDao.findOne(term.id!, lecturer.id!);
 			if (!lecturerterm) {
 				// insert to lecturer term
-				await this.LecturertermDao.insertEntity(
+				lecturerterm = await this.LecturertermDao.insertEntity(
 					LecturerTerm.create({
 						lecturer,
 						term,
 						role: lecturer.role,
 					})
 				);
+				await NotificationLecturerService.send({
+					user: lecturerterm!,
+					message: `Bạn vừa được thêm vào học kỳ '${term.name}' với vai trò là ${
+						lecturer.role == TypeRoleLecturer.HEAD_LECTURER
+							? "'Chủ nhiệm ngành'"
+							: lecturer.role == TypeRoleLecturer.SUB_HEAD_LECTURER
+							? "'Phó chủ nhiệm ngành'"
+							: "'Giảng viên'"
+					}`,
+					type: 'LECTURER',
+				});
 			}
 			return lecturer;
 		});
@@ -135,17 +147,5 @@ export default class ImportLecturerByExcelHandler extends RequestHandler {
 		const lecturers = await Promise.all(lecturersPromise);
 
 		return lecturers.map(e => e.toJSON);
-	}
-	private async sendMailNotification() {
-		const from = 'graduation-thesis-iuh';
-		const to = 'nguyenthanhson162001@gmail.com';
-		const subject = 'Notification ';
-		const content = 'helo';
-		await this.nodeMailer.sendTextMail({
-			from,
-			to,
-			subject,
-			text: content,
-		});
 	}
 }

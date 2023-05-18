@@ -28,6 +28,9 @@ import Group, { TypeStatusGroup } from '@core/domain/entities/Group';
 import GroupMember from '@core/domain/entities/GroupMember';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import { forIn, sum } from 'lodash';
+import ITopicDao from '@lecturer/domain/daos/ITopicDao';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
+import { TypeStatusTopic } from '@core/domain/entities/Topic';
 
 interface ValidatedInput {
 	assign: Assign;
@@ -59,6 +62,7 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 	@inject('TranscriptDao') private transcriptDao!: ITranscriptDao;
 	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
+	@inject('TopicDao') private topic!: ITopicDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const assignId = this.errorCollector.collect('assignId', () => EntityId.validate({ value: request.body['assignId'] }));
@@ -155,8 +159,16 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 			}
 			transcripts.push(transcript);
 		}
+		const topic = (await this.topic.findEntityById(group.topicId))!;
+		group.update({ topic });
 		await this.updateStatusGroup(group, groupLecturer!, assign.typeEvaluation);
-		// const isFinishTranscript = await this.transcriptDao.isFinishTranscript({ groupId: group.id!, type: assign.typeEvaluation });
+		if (topic) {
+			await NotificationLecturerService.send({
+				user: topic.lecturerTerm,
+				message: `Nhóm sinh viên '${group.name}' vừa được chấm điểm`,
+				type: 'GROUP_STUDENT',
+			});
+		}
 
 		return transcripts.map(e => e.toJSON);
 	}
@@ -170,24 +182,32 @@ export default class CreateOrUpdateTranscriptHandler extends RequestHandler {
 			if (transcripts.length == 0) return; // stop
 
 			const summary = this.caculateAVGGrade(transcripts);
-			console.log(summary.lecturerTermIds);
+
 			// checll all lecturer was have transcripts with this student
 			for (const lecturerMember of groupLecturerMember) {
 				//Stop the function so someone hasn't transcript it yet
 				if (!summary.lecturerTermIds.find(e => e == lecturerMember.lecturerTermId)) return;
 			}
-
 			// if someone in member have grade < 5 => fail all group
 			if (summary.avgGrader < gradeMinPass) pass = false;
 		}
+		let message = `Nhóm sinh viên '${group.name}' đã ${pass ? ' VƯỢT QUA ' : ' RỚT '} vòng `;
 		if (type == TypeEvaluation.ADVISOR) {
 			group.update({ status: pass ? TypeStatusGroup.PASS_ADVISOR : TypeStatusGroup.FAIL_ADVISOR });
+			message += `Giáo viên hướng dẫn`;
 		} else if (type == TypeEvaluation.REVIEWER) {
 			group.update({ status: pass ? TypeStatusGroup.PASS_REVIEWER : TypeStatusGroup.FAIL_REVIEWER });
+			message += `Phản biện`;
 		} else {
 			// SESSION_HOST
 			group.update({ status: pass ? TypeStatusGroup.PASS_SESSION_HOST : TypeStatusGroup.FAIL_SESSION_HOST });
+			message += `Hội đồng`;
 		}
+		await NotificationLecturerService.send({
+			user: group.topic?.lecturerTerm!,
+			message,
+			type: 'GROUP_STUDENT',
+		});
 
 		await this.groupDao.updateEntity(group);
 	}

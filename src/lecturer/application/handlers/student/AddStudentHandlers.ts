@@ -21,6 +21,7 @@ import PhoneNumber from '@core/domain/validate-objects/PhoneNumber';
 import SortText from '@core/domain/validate-objects/SortText';
 import Training from '@core/domain/validate-objects/Training';
 import Gender from '@core/domain/validate-objects/Gender';
+import NotificationStudentService from '@core/service/NotificationStudentService';
 
 interface ValidatedInput {
 	username: string;
@@ -93,12 +94,17 @@ export default class AddStudentHandlers extends RequestHandler {
 		let studentterm = await this.studentTermDao.findOne(term.id!, student.id!);
 		if (!studentterm) {
 			// insert to student term
-			await this.studentTermDao.insertEntity(
+			studentterm = await this.studentTermDao.insertEntity(
 				StudentTerm.create({
 					student,
 					term,
 				})
 			);
+			await NotificationStudentService.send({
+				user: studentterm!,
+				message: `Bạn vừa được thêm vào học kỳ '${term.name}' `,
+				type: 'STUDENT',
+			});
 		}
 		return student.toJSON;
 	}

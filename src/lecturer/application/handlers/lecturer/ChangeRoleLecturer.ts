@@ -8,6 +8,7 @@ import BooleanValidate from '@core/domain/validate-objects/BooleanValidate';
 import RoleLecturer from '@core/domain/validate-objects/RoleLecturer';
 import Lecturer, { TypeRoleLecturer } from '@core/domain/entities/Lecturer';
 import NotFoundError from '@core/domain/errors/NotFoundError';
+import NotificationLecturerService from '@core/service/NotificationLecturerService';
 
 interface ValidatedInput {
 	lecturer: Lecturer;
@@ -43,6 +44,14 @@ export default class ChangeRoleLecturer extends RequestHandler {
 		lecturer.update({ role });
 
 		const lecturerUpdated = await this.lecturerDao.updateEntity(lecturer);
+		const roleMessage =
+			role == TypeRoleLecturer.HEAD_LECTURER ? "'Chủ nhiệm ngành'" : role == TypeRoleLecturer.SUB_HEAD_LECTURER ? "'Phó chủ nhiệm ngành'" : 'Giảng viên';
+
+		await NotificationLecturerService.send({
+			user: lecturer!,
+			message: `Bạn vừa được đổi quyền người dùng thành ${roleMessage}`,
+			type: 'LECTURER',
+		});
 
 		return lecturerUpdated?.toJSON || {};
 	}
@@ -52,6 +61,12 @@ export default class ChangeRoleLecturer extends RequestHandler {
 			oldLecturerByRole.update({ role: TypeRoleLecturer.LECTURER });
 			// update old lecturer
 			await this.lecturerDao.updateEntity(oldLecturerByRole);
+
+			await NotificationLecturerService.send({
+				user: lecturer!,
+				message: `Bạn vừa được đổi quyền người dùng thành 'Giảng viên'`,
+				type: 'LECTURER',
+			});
 		}
 	}
 }

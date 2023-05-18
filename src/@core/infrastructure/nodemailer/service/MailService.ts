@@ -1,5 +1,6 @@
 import Nodemailer from '..';
 import sendMailForgotPasswordHandler, { ISendMailForgotPassword } from './sendMailForgotPasswordHandler';
+import sendMailNotificationHandler from './sendMailNotificationHandler';
 
 class MailService {
 	private nodeMailer: Nodemailer;
@@ -10,6 +11,15 @@ class MailService {
 		return sendMailForgotPasswordHandler({
 			...props,
 			nodeMailer: this.nodeMailer,
+		});
+	}
+	async sendEmailNotification(email: string, message: string, url?: string) {
+		if (!email) return;
+		return sendMailNotificationHandler({
+			to: email,
+			message,
+			nodeMailer: this.nodeMailer,
+			url,
 		});
 	}
 }

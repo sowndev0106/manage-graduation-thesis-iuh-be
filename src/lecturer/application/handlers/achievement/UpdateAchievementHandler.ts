@@ -13,6 +13,7 @@ import StudentTerm from '@core/domain/entities/StudentTerm';
 import IStudentTermDao from '@lecturer/domain/daos/IStudentTermDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
 import ErrorCode from '@core/domain/errors/ErrorCode';
+import NotificationStudentService from '@core/service/NotificationStudentService';
 
 interface ValidatedInput {
 	achievement: Achievement;
@@ -78,6 +79,13 @@ export default class UpdateAchievementHandler extends RequestHandler {
 
 		if (!achievementResult) throw new ErrorCode('FAIL_CREATE_ENTITY', 'Create Achievement fail');
 		achievementResult.update({ studentTerm });
+		const student = await this.studentDao.findEntityById(achievement.studentTermId);
+
+		await NotificationStudentService.send({
+			user: student!,
+			message: `Thành tích '${achievement.name}' của bạn vừa được cập nhật`,
+			type: 'ACHIEVEMENT',
+		});
 
 		return achievementResult.toJSON;
 	}

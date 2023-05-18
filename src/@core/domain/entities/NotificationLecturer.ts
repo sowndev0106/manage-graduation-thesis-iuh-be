@@ -1,7 +1,13 @@
 import Entity from './Entity';
 import lodash from 'lodash';
 import Lecturer from './Lecturer';
-export type TypeNotificationLecturer = 'UPDATE_STATUS_COMMENT_MY_TOPIC';
+export type TypeNotificationLecturer =
+	| 'UPDATE_STATUS_COMMENT_MY_TOPIC'
+	| 'ASSIGN_REVIEW'
+	| 'ASSIGN_SESSION_HOST'
+	| 'ASSIGN_ADVISOR'
+	| 'LECTURER'
+	| 'GROUP_STUDENT';
 
 export interface IProps {
 	lecturer: Lecturer;

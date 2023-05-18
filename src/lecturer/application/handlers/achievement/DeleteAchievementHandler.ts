@@ -5,6 +5,9 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IAchievementDao from '@lecturer/domain/daos/IAchievementDao';
 import NotFoundError from '@core/domain/errors/NotFoundError';
+import NotificationStudentService from '@core/service/NotificationStudentService';
+import Student from '@core/domain/entities/Student';
+import IStudentDao from '@lecturer/domain/daos/IStudentDao';
 
 interface ValidatedInput {
 	id: number;
@@ -13,6 +16,7 @@ interface ValidatedInput {
 @injectable()
 export default class DeleteAchievementHandler extends RequestHandler {
 	@inject('AchievementDao') private achievementDao!: IAchievementDao;
+	@inject('StudentDao') private studentDao!: IStudentDao;
 	async validate(request: Request): Promise<ValidatedInput> {
 		const id = this.errorCollector.collect('id', () => EntityId.validate({ value: request.params['id'] }));
 
@@ -25,13 +29,19 @@ export default class DeleteAchievementHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const input = await this.validate(request);
-		const term = await this.achievementDao.findEntityById(input.id);
+		const achievement = await this.achievementDao.findEntityById(input.id);
 
-		if (!term) {
+		if (!achievement) {
 			throw new NotFoundError('achievement not found');
 		}
 
-		const result = await this.achievementDao.deleteEntity(term);
+		const result = await this.achievementDao.deleteEntity(achievement);
+		const student = await this.studentDao.findEntityById(achievement.studentTermId);
+		await NotificationStudentService.send({
+			user: student!,
+			message: `Thành tích '${achievement.name} của bạn vừa được xóa'`,
+			type: 'ACHIEVEMENT',
+		});
 		return result ? 'delete success' : 'delete fail';
 	}
 }
