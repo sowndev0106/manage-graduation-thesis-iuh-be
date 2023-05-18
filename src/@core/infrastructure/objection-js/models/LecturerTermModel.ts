@@ -47,6 +47,8 @@ export default class lecturerTermModel extends Model {
 				term: Term.createById(dbJson['term_id']),
 				lecturer: Lecturer.createById(dbJson['lecturer_id']),
 				role: dbJson['role'],
+				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
+				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
 			Number(dbJson['id'])
 		);

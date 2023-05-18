@@ -28,6 +28,8 @@ export default class MajorsModel extends Model {
 		const entity = Majors.create(
 			{
 				name: dbJson['name'],
+				createdAt: dbJson['created_at'] && new Date(dbJson['created_at']),
+				updatedAt: dbJson['updated_at'] && new Date(dbJson['updated_at']),
 			},
 			Number(dbJson['id'])
 		);
