@@ -40,7 +40,11 @@ export default class GetListGroupLecturerHandler extends RequestHandler {
 				typeEvaluation: input.typeEvaluation,
 			},
 		});
-
+		let assignsFilter = groupLecturers;
+		// default remove type =  ADVISOR
+		// if (!type) {
+		// 	assignsFilter = groupLecturers.filter(e => e.t != TypeEvaluation.ADVISOR);
+		// }
 		return groupLecturers.map(e => e.toJSON);
 	}
 }

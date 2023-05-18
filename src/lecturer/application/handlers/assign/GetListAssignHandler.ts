@@ -35,6 +35,11 @@ export default class GetAssignByIdHandler extends RequestHandler {
 	async handle(request: Request) {
 		const { type, groupId, groupLecturerId, termId } = await this.validate(request);
 		const assigns = await this.assignDao.findAll({ groupLecturerId, termId, type, groupId });
+		let assignsFilter = assigns;
+		// default remove type =  ADVISOR
+		if (!type) {
+			assignsFilter = assigns.filter(e => e.typeEvaluation != TypeEvaluation.ADVISOR);
+		}
 
 		return assigns.map(e => e.toJSON);
 	}
