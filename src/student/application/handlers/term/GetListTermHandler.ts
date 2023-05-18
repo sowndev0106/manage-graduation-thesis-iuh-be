@@ -5,6 +5,7 @@ import { Request } from 'express';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import ITermDao from '@student/domain/daos/ITermDao';
 import PositiveNumber from '@core/domain/validate-objects/PositiveNumber';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	majorsId: number;
@@ -24,7 +25,7 @@ export default class GetListTermHandler extends RequestHandler {
 			throw new ValidationError(this.errorCollector.errors);
 		}
 		if (fromYear && toYear && toYear < fromYear) {
-			throw new Error('fromYear must be bigger toYear');
+			throw new ErrorCode('COMMON', 'fromYear must be bigger toYear');
 		}
 
 		return { majorsId, fromYear, toYear };

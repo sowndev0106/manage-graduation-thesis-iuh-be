@@ -13,6 +13,7 @@ import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 import NotificationStudentService from '@core/service/NotificationStudentService';
 import Group from '@core/domain/entities/Group';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
@@ -39,11 +40,11 @@ export default class RefuseRequestJoinGroupHandler extends RequestHandler {
 		if (!requestJoinGroup) throw new NotFoundError('request not found');
 
 		const group = await this.groupDao.findEntityById(requestJoinGroup.groupId);
-		if (!group) throw new Error('group have been deleted');
+		if (!group) throw new NotFoundError('group have been deleted');
 
 		const studentTerm = await this.studentTermDao.findOne(group.termId!, studentId);
 		if (!studentTerm) {
-			throw new Error(`student not in term ${group.termId!}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${group.termId!}`);
 		}
 		return { requestJoinGroup, studentTerm, group };
 	}
@@ -54,7 +55,7 @@ export default class RefuseRequestJoinGroupHandler extends RequestHandler {
 			const members = await this.groupMemberDao.findByGroupId(input.requestJoinGroup.groupId!);
 			const me = members.find(e => e.studentTermId === input.studentTerm.id);
 			if (!me) {
-				throw new Error("Can't refuse");
+				throw new ErrorCode('STUDENT_DONT_HAVE_PERMISSIONS', "Can't refuse");
 			}
 			await this.notificationToUser(input.group, input.requestJoinGroup.studentTerm);
 		}

@@ -16,6 +16,7 @@ import StudentTerm from '@core/domain/entities/StudentTerm';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 import NotificationStudentService from '@core/service/NotificationStudentService';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	group: Group;
@@ -60,7 +61,7 @@ export default class SendRequestJoinGroupHandler extends RequestHandler {
 		const groupExist = await this.groupDao.findOne({
 			studentTermId: input.studentTerm.id!,
 		});
-		if (groupExist) throw new Error('You already have a group');
+		if (groupExist) throw new ErrorCode('STUDENT_ALREADY_EXIST_GROUP', 'You already have a group');
 
 		// check exist
 		let requestJoinGroup = await this.requestJoinGroupDao.findOneByGroupIdAndStudentTermId({

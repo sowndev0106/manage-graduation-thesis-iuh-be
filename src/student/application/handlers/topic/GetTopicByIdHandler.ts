@@ -6,6 +6,7 @@ import EntityId from '@core/domain/validate-objects/EntityID';
 import ITopicDao from '@student/domain/daos/ITopicDao';
 import ILecturerDao from '@student/domain/daos/ILecturerDao';
 import ILecturerTermDao from '@student/domain/daos/ILecturerTermDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -31,7 +32,7 @@ export default class GetTopicByIdHandler extends RequestHandler {
 		const topic = await this.topicDao.findEntityById(input.id);
 
 		if (!topic) {
-			throw new Error('topic not found');
+			throw new NotFoundError('topic not found');
 		}
 		const lecturerTerm = await this.lecturerTermDao.findOneGraphById(topic.lecturerTermId!);
 
