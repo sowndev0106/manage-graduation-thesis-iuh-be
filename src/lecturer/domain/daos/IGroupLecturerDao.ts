@@ -4,12 +4,5 @@ import GroupLecturer from '@core/domain/entities/GroupLecturer';
 
 export default interface IGroupLecturerDao extends IDao<GroupLecturer> {
 	findOne(props: { termId: number; name?: string }): Promise<GroupLecturer | null>;
-	findAll(props: {
-		termId: number;
-		name?: string;
-		assign?: {
-			groupStudentId: number;
-			typeEvaluation: TypeEvaluation;
-		};
-	}): Promise<GroupLecturer[]>;
+	findAll(props: { termId: number; name?: string; groupId: number; type: TypeEvaluation }): Promise<GroupLecturer[]>;
 }

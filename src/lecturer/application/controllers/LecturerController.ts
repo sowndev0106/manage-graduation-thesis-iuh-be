@@ -6,6 +6,7 @@ import GetLecturerById from '../handlers/lecturer/GetLecturerById';
 import ChangeRoleLecturer from '../handlers/lecturer/ChangeRoleLecturer';
 import AddLecturerHandler from '../handlers/lecturer/AddLecturerHandler';
 import ResetPassword from '../handlers/lecturer/ResetPassword';
+import GetListLecturerAvailableGroupHandler from '../handlers/lecturer/GetListLecturerAvailableGroupHandler';
 
 class LecturerController {
 	async importLecturerByExcel(req: Request, res: Response, next: NextFunction) {
@@ -14,6 +15,10 @@ class LecturerController {
 	}
 	async getListLecturer(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(GetListLecturer).handle(req);
+		return res.status(200).json(data);
+	}
+	async getListAvailableGroup(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(GetListLecturerAvailableGroupHandler).handle(req);
 		return res.status(200).json(data);
 	}
 	async getListLecturerById(req: Request, res: Response, next: NextFunction) {

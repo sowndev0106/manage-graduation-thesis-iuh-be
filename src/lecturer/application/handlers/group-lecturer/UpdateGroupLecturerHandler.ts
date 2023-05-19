@@ -16,6 +16,7 @@ import EntityIds from '@core/domain/validate-objects/EntityIds';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
+import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
 
 interface ValidatedInput {
 	groupLecturer: GroupLecturer;
@@ -28,7 +29,6 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 	@inject('TermDao') private termDao!: ITermDao;
 	@inject('GroupLecturerDao') private groupLecturerDao!: IGroupLecturerDao;
 	@inject('GroupLecturerMemberDao') private groupMemberDao!: IGroupLecturerMemberDao;
-	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 
 	async validate(request: Request): Promise<ValidatedInput> {
@@ -36,7 +36,7 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const lecturerIds = this.errorCollector.collect('lecturerIds', () => EntityIds.validate({ value: request.body['lecturerIds'], required: false }));
-		console.log(lecturerIds);
+
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
 		}

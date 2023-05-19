@@ -4,6 +4,7 @@ export async function up(knex: Knex): Promise<void> {
 	return knex.schema.createTable('group_lecturer', table => {
 		table.increments('id').primary();
 		table.string('name');
+		table.string('type');
 		table.integer('term_id').unsigned().references('id').inTable('term');
 		table.timestamps();
 	});

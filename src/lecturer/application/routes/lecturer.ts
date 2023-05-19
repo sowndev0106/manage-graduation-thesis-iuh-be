@@ -6,6 +6,8 @@ const router = Router();
 
 router.get('/', LecturerController.getListLecturer);
 
+router.get('/available-group', LecturerController.getListAvailableGroup);
+
 router.post('/', LecturerAuth.headLecturer, LecturerController.addLecturer);
 
 router.get('/:id', LecturerController.getListLecturerById);

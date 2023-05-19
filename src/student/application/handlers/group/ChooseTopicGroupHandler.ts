@@ -103,7 +103,7 @@ export default class ChooseTopicHandler extends RequestHandler {
 	async updateAssignForLecturerOfTopic({ topic, group }: ValidatedInput) {
 		// autho create assign advisor for lecturer of topic
 		const groupLecturer = await this.groupLecturerDao.insertEntity(
-			GroupLecturer.create({ name: `ADVISOR -${topic.name} - ${group.id}`, term: group.term })
+			GroupLecturer.create({ name: `ADVISOR -${topic.name} - ${group.id}`, term: group.term, type: TypeEvaluation.ADVISOR })
 		);
 		const groupLecturerMember = await this.groupLecturerMemberDao.insertEntity(
 			GroupLecturerMember.create({

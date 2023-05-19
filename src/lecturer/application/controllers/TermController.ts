@@ -7,6 +7,7 @@ import GetListTermHandler from '../handlers/term/GetListTermHandler';
 import GetTermByIdHandler from '../handlers/term/GetTermByIdHandler';
 import DeleteTermHandler from '../handlers/term/DeleteTermHandler';
 import GetTermNowHandler from '../handlers/term/GetTermNowHandler';
+import UpdatePublicResultHandler from '../handlers/term/UpdatePublicResultHandler';
 
 class TermController {
 	async createTerm(req: Request, res: Response, next: NextFunction) {
@@ -27,6 +28,10 @@ class TermController {
 	}
 	async getTermNow(req: Request, res: Response, next: NextFunction) {
 		const data = await Ioc.get(GetTermNowHandler).handle(req);
+		return res.status(200).json(data);
+	}
+	async updatePublicResultTerm(req: Request, res: Response, next: NextFunction) {
+		const data = await Ioc.get(UpdatePublicResultHandler).handle(req);
 		return res.status(200).json(data);
 	}
 	async deleteTerm(req: Request, res: Response, next: NextFunction) {

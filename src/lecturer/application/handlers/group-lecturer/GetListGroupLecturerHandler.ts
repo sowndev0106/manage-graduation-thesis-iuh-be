@@ -19,9 +19,7 @@ export default class GetListGroupLecturerHandler extends RequestHandler {
 	async validate(request: Request): Promise<ValidatedInput> {
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.query['termId'] }));
 		const groupId = this.errorCollector.collect('groupId', () => EntityId.validate({ value: request.query['groupId'], required: false }));
-		const typeEvaluation = this.errorCollector.collect('typeEvaluation', () =>
-			TypeEvaluationValidate.validate({ value: request.query['typeEvaluation'], required: false })
-		);
+		const typeEvaluation = this.errorCollector.collect('type', () => TypeEvaluationValidate.validate({ value: request.query['type'], required: false }));
 
 		if (this.errorCollector.hasError()) {
 			throw new ValidationError(this.errorCollector.errors);
@@ -35,10 +33,8 @@ export default class GetListGroupLecturerHandler extends RequestHandler {
 
 		const groupLecturers = await this.groupLecturerDao.findAll({
 			termId: input.termId,
-			assign: {
-				groupStudentId: input.groupId,
-				typeEvaluation: input.typeEvaluation,
-			},
+			groupId: input.groupId,
+			type: input.typeEvaluation,
 		});
 
 		return groupLecturers.map(e => e.toJSON);

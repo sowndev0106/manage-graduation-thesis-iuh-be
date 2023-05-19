@@ -2,9 +2,11 @@ import Entity from './Entity';
 import lodash from 'lodash';
 import Term from './Term';
 import GroupLecturerMember from './GroupLecturerMember';
+import { TypeEvaluation } from './Evaluation';
 export interface IProps {
 	name: string;
 	term: Term;
+	type: TypeEvaluation;
 	members?: Array<GroupLecturerMember>;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -18,6 +20,9 @@ export default class GroupLecturer extends Entity<IProps> {
 	}
 	get name() {
 		return this.props?.name;
+	}
+	get type() {
+		return this.props?.type;
 	}
 	get termId() {
 		return this.props?.term?.id;

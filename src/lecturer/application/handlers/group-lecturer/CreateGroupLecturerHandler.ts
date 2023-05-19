@@ -10,17 +10,19 @@ import ITermDao from '@lecturer/domain/daos/ITermDao';
 import ValidationError from '@core/domain/errors/ValidationError';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
 import GroupLecturerMember from '@core/domain/entities/GroupLecturerMember';
-import Lecturer from '@core/domain/entities/Lecturer';
 import Term from '@core/domain/entities/Term';
 import EntityIds from '@core/domain/validate-objects/EntityIds';
 import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
 import ILecturerTermDao from '@lecturer/domain/daos/ILecturerTermDao';
 import LecturerTerm from '@core/domain/entities/LecturerTerm';
 import ErrorCode from '@core/domain/errors/ErrorCode';
+import TypeEvaluationValidate from '@core/domain/validate-objects/TypeEvaluationValidate';
+import { TypeEvaluation } from '@core/domain/entities/Evaluation';
 
 interface ValidatedInput {
 	name: string;
 	term: Term;
+	type: TypeEvaluation;
 	lecturerTerms: LecturerTerm[];
 }
 @injectable()
@@ -33,6 +35,7 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 
 	async validate(request: Request): Promise<ValidatedInput> {
 		const name = this.errorCollector.collect('name', () => SortText.validate({ value: request.body['name'] }));
+		const type = this.errorCollector.collect('type', () => TypeEvaluationValidate.validate({ value: request.body['type'] }));
 		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
 		const lecturerIds = this.errorCollector.collect('lecturerIds', () => EntityIds.validate({ value: request.body['lecturerIds'], required: false }));
 
@@ -53,11 +56,12 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 			name,
 			term,
 			lecturerTerms,
+			type,
 		};
 	}
 
 	async handle(request: Request) {
-		const { name, term, lecturerTerms } = await this.validate(request);
+		const { name, term, lecturerTerms, type } = await this.validate(request);
 
 		let groupLecturer = await this.groupLecturerDao.findOne({
 			termId: term.id!,
@@ -69,6 +73,7 @@ export default class CreateGroupLecturerHandler extends RequestHandler {
 			GroupLecturer.create({
 				term: term,
 				name: name,
+				type,
 			})
 		);
 
