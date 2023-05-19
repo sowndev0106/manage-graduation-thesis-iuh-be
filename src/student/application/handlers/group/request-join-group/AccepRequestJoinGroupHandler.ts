@@ -16,6 +16,7 @@ import Group from '@core/domain/entities/Group';
 import NotificationStudentService from '@core/service/NotificationStudentService';
 import IStudentDao from '@student/domain/daos/IStudentDao';
 import { group } from 'console';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
@@ -43,11 +44,11 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 
 		const group = await this.groupDao.findEntityById(requestJoinGroup.groupId);
 		if (!group) {
-			throw new Error('Group have been deleted');
+			throw new NotFoundError('Group have been deleted');
 		}
 		const studentTerm = await this.studentTermDao.findOne(group.termId!, studentId);
 		if (!studentTerm) {
-			throw new Error(`student not in term ${group.termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${group.termId}`);
 		}
 		return { requestJoinGroup, studentTerm, group };
 	}
@@ -77,13 +78,13 @@ export default class accepRequestJoinGroupHandler extends RequestHandler {
 		const members = await this.groupMemberDao.findByGroupId(input.requestJoinGroup.groupId!);
 		const me = members.find(e => e.studentTermId === input.studentTerm.id!);
 		if (!me) {
-			throw new Error("Can't accep because You are not member in group");
+			throw new ErrorCode('STUDENT_DONT_HAVE_PERMISSIONS', "Can't accep because You are not member in group");
 		}
 	}
 	private async checkAccepInviteHandler(input: ValidatedInput) {
 		// check authorization
 		if (input.studentTerm.id != input.requestJoinGroup.studentTermId) {
-			throw new Error("Can't accep because You are not invited");
+			throw new ErrorCode('STUDENT_DONT_HAVE_PERMISSIONS', "Can't accep because You are not invited");
 		}
 	}
 	async notification(group: Group, studentTerm: StudentTerm) {

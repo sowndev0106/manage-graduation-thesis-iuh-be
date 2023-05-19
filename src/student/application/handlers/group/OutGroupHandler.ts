@@ -11,6 +11,8 @@ import Term from '@core/domain/entities/Term';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import NotificationStudentService from '@core/service/NotificationStudentService';
 import IStudentDao from '@student/domain/daos/IStudentDao';
+import ErrorCode from '@core/domain/errors/ErrorCode';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	term: Term;
@@ -33,11 +35,11 @@ export default class OutGroupHandler extends RequestHandler {
 		}
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('term not found');
+			throw new NotFoundError('term not found');
 		}
 		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 		if (!studentTerm) {
-			throw new Error(`student not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
 		}
 		return { term, studentTerm };
 	}
@@ -51,7 +53,7 @@ export default class OutGroupHandler extends RequestHandler {
 			studentTermId: input.studentTerm.id!,
 		});
 
-		if (!group) throw new Error('You not have group');
+		if (!group) throw new ErrorCode('STUDENT_DONT_HAVE_GROUP', 'You not have group');
 
 		const members = await this.groupMemberDao.findByGroupId(group.id!);
 

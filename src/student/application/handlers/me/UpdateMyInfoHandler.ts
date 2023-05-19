@@ -11,6 +11,7 @@ import IStudentDao from '@student/domain/daos/IStudentDao';
 import Training from '@core/domain/validate-objects/Training';
 import { TypeTraining } from '@core/domain/entities/Student';
 import { TypeGender } from '@core/domain/entities/Lecturer';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	id: number;
@@ -55,7 +56,7 @@ export default class UpdateMyInfoHandler extends RequestHandler {
 
 		const studentByEmail = await this.studentDao.findOneByEmail(input.email);
 
-		if (studentByEmail && studentByEmail.id != input.id) throw new Error('Email already exists');
+		if (studentByEmail && studentByEmail.id != input.id) throw new ErrorCode('DUPLICATE_EMAIL', 'Email already exists');
 
 		let student = await this.studentDao.findEntityById(input.id);
 

@@ -7,6 +7,7 @@ import IStudentDao from '@student/domain/daos/IStudentDao';
 import EntityId from '@core/domain/validate-objects/EntityID';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import StudentTerm from '@core/domain/entities/StudentTerm';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
@@ -26,7 +27,7 @@ export default class GetListAchievementHandler extends RequestHandler {
 
 		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 		if (!studentTerm) {
-			throw new Error(`student not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
 		}
 		return { studentTerm };
 	}

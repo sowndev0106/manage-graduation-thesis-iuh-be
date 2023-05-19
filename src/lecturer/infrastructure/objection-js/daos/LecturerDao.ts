@@ -29,7 +29,7 @@ export default class LecturerDao extends LecturerDaoCore implements ILecturerDao
 			query.join('lecturer_term', 'lecturer_term.lecturer_id', '=', 'lecturer.id');
 			query.where('lecturer_term.term_id', '=', termId);
 		}
-		query.where(whereClause);
+		query.where(whereClause).orderBy('updated_at', 'desc');
 
 		const result = await query.execute();
 

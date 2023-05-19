@@ -16,6 +16,7 @@ import Term from '@core/domain/entities/Term';
 import Topic from '@core/domain/entities/Topic';
 import ITopicDao from '@student/domain/daos/ITopicDao';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	name: string;
@@ -51,7 +52,7 @@ export default class CreateGroupHandler extends RequestHandler {
 		}
 		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 		if (!studentTerm) {
-			throw new Error(`student not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
 		}
 
 		return {
@@ -69,7 +70,7 @@ export default class CreateGroupHandler extends RequestHandler {
 			studentTermId: input.studentTerm.id!,
 		});
 
-		if (group) throw new Error('group already exists in student');
+		if (group) throw new ErrorCode('STUDENT_ALREADY_EXIST_GROUP', 'group already exists in student');
 
 		group = await this.groupDao.insertEntity(
 			Group.create({

@@ -4,6 +4,8 @@ import Term from '@core/domain/entities/Term';
 import TermModel from './TermModel';
 import GroupLecturerMemberModel from './GroupLecturerMemberModel';
 import GroupLecturer from '@core/domain/entities/GroupLecturer';
+import Assign from '@core/domain/entities/Assign';
+import AssignModel from './AssignModel';
 
 export default class GroupLecturerModel extends Model {
 	static get tableName() {
@@ -27,6 +29,14 @@ export default class GroupLecturerModel extends Model {
 				to: 'group_lecturer_member.group_lecturer_id',
 			},
 		},
+		// assign: {
+		// 	relation: Model.HasManyRelation,
+		// 	modelClass: AssignModel,
+		// 	join: {
+		// 		from: 'group_lecturer.id',
+		// 		to: 'assign.group_lecturer_id',
+		// 	},
+		// },
 	};
 
 	static convertEntityToPartialModelObject(entity: GroupLecturer) {

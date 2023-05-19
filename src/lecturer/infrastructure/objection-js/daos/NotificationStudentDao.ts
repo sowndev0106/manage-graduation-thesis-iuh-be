@@ -21,7 +21,7 @@ export default class NotificationStudentDao extends NotificationStudentDaoCore i
 
 		whereClause['student_id'] = props.studentId;
 
-		query.where(whereClause);
+		query.where(whereClause).orderBy('created_at', 'desc');
 
 		const result = await query.execute();
 

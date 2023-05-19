@@ -20,6 +20,7 @@ import ErrorCode from '@core/domain/errors/ErrorCode';
 import INotificationLecturerDao from '@lecturer/domain/daos/INotificationLecturerDao';
 import NotificationLecturer from '@core/domain/entities/NotificationLecturer';
 import NotificationLecturerService from '@core/service/NotificationLecturerService';
+import LecturerTerm from '@core/domain/entities/LecturerTerm';
 
 interface ValidatedInput {
 	id: number;
@@ -73,7 +74,7 @@ export default class UpdateStatusAndCommentTopicHandler extends RequestHandler {
 		lecturerTerm && topic.update({ lecturerTerm });
 
 		await NotificationLecturerService.send({
-			user: Lecturer.createById(input.lecturerId),
+			user: LecturerTerm.createById(topic.lecturerTermId),
 			message: `Đề tài '${topic.name}' đã ${topic.status != TypeStatusTopic.REFUSE ? 'được Chấp nhận' : 'bị Từ chối'}`,
 			type: 'UPDATE_STATUS_COMMENT_MY_TOPIC',
 		});

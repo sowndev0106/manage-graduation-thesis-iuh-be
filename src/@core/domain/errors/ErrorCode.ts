@@ -45,7 +45,11 @@ export type IKeyErrorCode =
 	| 'TERM_DISCUSSION_HAS_NOT_STARTED'
 	| 'TERM_DISCUSSION_HAS_EXPRIED'
 	| 'TERM_REPORT_HAS_NOT_STARTED'
-	| 'TERM_REPORT_HAS_EXPRIED';
+	| 'TERM_REPORT_HAS_EXPRIED'
+	| 'ACHIEVEMENT_NOT_FOUND'
+	| 'DUPLICATE_EMAIL'
+	| 'STUDENT_ALREADY_EXIST_GROUP'
+	| 'STUDENT_DONT_HAVE_PERMISSIONS';
 
 export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 	SERVER: {
@@ -109,6 +113,10 @@ export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 		key: 'DONT_HAVE_PERMISSION_THIS_MAJORS',
 		statusCode: 403,
 	},
+	DUPLICATE_EMAIL: {
+		key: 'DUPLICATE_EMAIL',
+		statusCode: 409,
+	},
 	// USER TERM
 	LECTURER_NOT_IN_TERM: {
 		key: 'LECTURER_NOT_IN_TERM',
@@ -167,6 +175,10 @@ export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 		key: 'STUDENT_NOT_IN_THIS_GROUP',
 		statusCode: 400,
 	},
+	STUDENT_ALREADY_EXIST_GROUP: {
+		key: 'STUDENT_ALREADY_EXIST_GROUP',
+		statusCode: 400,
+	},
 	STUDENT_DONT_HAVE_GROUP: {
 		key: 'STUDENT_DONT_HAVE_GROUP',
 		statusCode: 400,
@@ -177,6 +189,10 @@ export const ErrorCodeDefine: Record<IKeyErrorCode | string, IErrorCodeInfo> = {
 	},
 	GROUP_MAX_QUALITY: {
 		key: 'GROUP_MAX_QUALITY',
+		statusCode: 400,
+	},
+	STUDENT_DONT_HAVE_PERMISSIONS: {
+		key: 'STUDENT_DONT_HAVE_PERMISSIONS',
 		statusCode: 400,
 	},
 	// MAJORS

@@ -36,7 +36,7 @@ export default class UpdateMyPasswordHandler extends RequestHandler {
 		const input = await this.validate(request);
 		let student = await this.studentDao.findEntityById(input.id);
 
-		if (!student) throw new Error('Error! Please login again');
+		if (!student) throw new ForbiddenError('Error! Please login again');
 
 		const isCorrectPassword = await compareTextBcrypt(input.oldPassword, student?.password!);
 

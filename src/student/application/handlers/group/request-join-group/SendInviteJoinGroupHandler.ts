@@ -17,6 +17,8 @@ import ITermDao from '@student/domain/daos/ITermDao';
 import Term from '@core/domain/entities/Term';
 import StudentTerm from '@core/domain/entities/StudentTerm';
 import NotificationStudentService from '@core/service/NotificationStudentService';
+import ErrorCode from '@core/domain/errors/ErrorCode';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	term: Term;
@@ -45,19 +47,19 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 		}
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('term not found');
+			throw new NotFoundError('term not found');
 		}
 		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 		if (!studentTerm) {
-			throw new Error(`student not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
 		}
 
 		const student = await this.studentDao.findEntityById(studentInviteId);
-		if (!student) throw new Error('Student invite not found');
+		if (!student) throw new NotFoundError('Student invite not found');
 
 		const studentTermInvite = await this.studentTermDao.findOne(termId, studentInviteId);
 		if (!studentTermInvite) {
-			throw new Error(`student invite not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student invite not in term ${termId}`);
 		}
 		return { term, studentTerm, message, studentTermInvite };
 	}
@@ -67,10 +69,10 @@ export default class SendInviteJoinGroupHandler extends RequestHandler {
 		const group = await this.groupDao.findOne({
 			studentTermId: input.studentTerm.id!,
 		});
-		if (!group) throw new Error("You don't have a group");
+		if (!group) throw new ErrorCode('STUDENT_DONT_HAVE_GROUP', "You don't have a group");
 
 		const groupStudentInvite = await this.groupDao.findOne({ studentTermId: input.studentTermInvite.id! });
-		if (groupStudentInvite) throw new Error(`student already exists group in ${input.term.id}`);
+		if (groupStudentInvite) throw new ErrorCode('STUDENT_ALREADY_EXIST_GROUP', `student already exists group in ${input.term.id}`);
 
 		// check exist
 		let requestJoinGroup = await this.requestJoinGroupDao.findOneByGroupIdAndStudentTermId({ groupId: group.id!, studentTermId: input.studentTerm.id! });

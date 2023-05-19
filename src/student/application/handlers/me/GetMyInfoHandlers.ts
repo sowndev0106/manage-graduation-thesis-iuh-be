@@ -5,6 +5,7 @@ import { Request } from 'express';
 import ConflictError from '@core/domain/errors/ConflictError';
 import IMajorsDao from '@student/domain/daos/IMajorsDao';
 import IStudentDao from '@student/domain/daos/IStudentDao';
+import NotFoundError from '@core/domain/errors/NotFoundError';
 
 interface ValidatedInput {
 	id: number;
@@ -29,7 +30,7 @@ export default class GetMyInfoHandlers extends RequestHandler {
 
 		let student = await this.studentDao.findEntityById(input.id);
 
-		if (!student) throw new ConflictError('student not found');
+		if (!student) throw new NotFoundError('student not found');
 
 		return student!.toJSON;
 	}

@@ -10,6 +10,8 @@ import ITopicDao from '@student/domain/daos/ITopicDao';
 import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
 import Term from '@core/domain/entities/Term';
 import StudentTerm from '@core/domain/entities/StudentTerm';
+import NotFoundError from '@core/domain/errors/NotFoundError';
+import ErrorCode from '@core/domain/errors/ErrorCode';
 
 interface ValidatedInput {
 	studentTerm: StudentTerm;
@@ -32,11 +34,11 @@ export default class GetMyGroupHandler extends RequestHandler {
 		}
 		const term = await this.termDao.findEntityById(termId);
 		if (!term) {
-			throw new Error('term not found');
+			throw new NotFoundError('term not found');
 		}
 		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
 		if (!studentTerm) {
-			throw new Error(`student not in term ${termId}`);
+			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
 		}
 		return { term, studentTerm };
 	}
