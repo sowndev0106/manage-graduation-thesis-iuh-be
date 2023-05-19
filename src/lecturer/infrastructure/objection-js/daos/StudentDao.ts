@@ -10,6 +10,7 @@ export default class StudentDao extends StudentDaoCore implements IStudentDao {
 		if (majorsId) {
 			query.where('majors_id', majorsId);
 		}
+		query.orderBy('updated_at', 'desc');
 		const result = await query.execute();
 
 		return result && result.map(e => this.convertModelToEntity(e));
