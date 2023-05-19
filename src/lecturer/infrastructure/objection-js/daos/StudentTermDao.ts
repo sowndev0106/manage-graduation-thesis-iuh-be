@@ -5,6 +5,19 @@ import { injectable } from 'inversify';
 
 @injectable()
 export default class StudentTermDao extends StudentTermDaoCore implements IStudentTermDao {
+	async findAll(termId: number): Promise<StudentTerm[]> {
+		const query = this.initQuery();
+		const whereClause: Record<string, any> = {};
+
+		query.withGraphFetched('[student]');
+
+		whereClause['term_id'] = termId;
+
+		query.where(whereClause);
+
+		const result = await query.execute();
+		return result && result.map(e => this.convertModelToEntity(e));
+	}
 	async findOneGraphById(id: number): Promise<StudentTerm | null> {
 		const query = this.initQuery();
 		query.withGraphFetched('[student]');
