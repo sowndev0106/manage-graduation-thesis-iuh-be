@@ -9,9 +9,9 @@
 </head>
 <style>
 	body {
-		font-family: 'Times New Roman', Times, serif;
-		padding: 40px 20px;
+		padding: 40px 40px;
 		font-size: 12px;
+		font-family: 'Times New Roman', Times, serif;
 	}
 
 	header {
@@ -92,65 +92,36 @@
 			<li>Tên đề tài:</li>
 			<li>
 				Nhóm thực hiện:
-				<table>
-					<thead>
-						<tr>
-							<th>TT</th>
-							<th>MSSV</th>
-							<th>Họ tên</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>1</td>
-							<td>&#x200B</td>
-							<td style="width: 70%;"></td>
-
-						</tr>
-						<tr>
-							<td>3</td>
-							<td>&#x200B</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>2</td>
-							<td>&#x200B</td>
-							<td></td>
-						</tr>
-					</tbody>
-				</table>
+				<br>
+				<div style="font-weight: normal;">
+					<p> 19507471 - Nguyễn Thanh Sơn</p>
+					<p> 19507471 - Nguyễn Thanh Sơn </p>
+				</div>
 			</li>
 			<li>Họ tên người chấm điểm:</li>
-			<li>Vai trò của người đánh giá:</li>
+			<li>Vai trò của người đánh giá: <span style="font-weight: 400;"> ${typeEvalutionHTML} </span></li>
 		</ol>
 	</div>
 	<div class="content-evaluation">
-		<h1>Nội dung đánh giá</h1>
+			<br />
+		<h2>Nội dung đánh giá</h2>
 		<table>
 			<thead>
 				<tr>
-					<th style="width: 10%;">TT</th>
+					<th style="width: 5%;">TT</th>
 					<th style="width: 40%;">Nội dung</th>
 					<th>Điểm tối đa</th>
-					<th>Điểm Sinh viên 1</th>
-					<th>Điểm Sinh viên 2 </th>
-					<th>Điểm Sinh viên 3 </th>
-					<th style="width: 20%;">CÁC Ý KIẾN NHẬN XÉT</th>
+					<th>Điểm SV 1</th>
+					<th>Điểm SV 2 </th>
+					<th>Điểm SV 3 </th>
+					<th style="width: 25%;">CÁC Ý KIẾN NHẬN XÉT</th>
 				</tr>
 			</thead>
 			<tbody>
+				${evaluationsHTML}
 				<tr>
 					<td>&#x200B</td>
-					<td class="text-left">Thuyết trình</td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-				</tr>
-				<tr>
-					<td>&#x200B</td>
-					<td class="text-left">Cộng</td>
+					<td>Cộng</td>
 					<td>10</td>
 					<td></td>
 					<td></td>
