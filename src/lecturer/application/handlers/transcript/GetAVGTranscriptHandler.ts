@@ -182,6 +182,8 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 			const oldGrade = gradeByLecturer.get(transcript.lecturerTermId!);
 			if (!oldGrade) {
 				const lecturerTerm = await this.lecturerTermDao.findEntityById(transcript.lecturerTermId);
+				const lecturer = await this.lecturerDao.findEntityById(lecturerTerm?.lecturerId);
+				lecturerTerm?.update({ lecturer: lecturer! });
 				gradeByLecturer.set(transcript.lecturerTermId!, {
 					grade: transcript.grade,
 					lecturerTerm: lecturerTerm!,

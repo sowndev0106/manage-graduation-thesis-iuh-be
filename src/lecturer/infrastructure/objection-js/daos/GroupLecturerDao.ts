@@ -20,31 +20,22 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 
 		return result ? this.convertModelToEntity(result) : null;
 	}
-	async findAll(props: {
-		termId: number;
-		name?: string;
-		assign: {
-			groupStudentId: number;
-			typeEvaluation: TypeEvaluation;
-		};
-	}): Promise<GroupLecturer[]> {
+	async findAll(props: { termId: number; name?: string; groupId?: number; type?: TypeEvaluation }): Promise<GroupLecturer[]> {
 		const query = this.initQuery();
 		const whereClause: Record<string, any> = {};
 
 		query.withGraphFetched('[members, members.lecturer_term ,members.lecturer_term.lecturer]');
 
-		query.leftJoin('assign', 'assign.group_lecturer_id', '=', 'group_lecturer.id').distinct('group_lecturer.*');
-
 		if (props.termId) whereClause['term_id'] = props.termId;
 		if (props.name) whereClause['name'] = props.name;
 
-		if (props.assign.groupStudentId) {
-			query.where('assign.group_id', '=', props.assign.groupStudentId);
-			query.where('assign.type_evaluation', '=', props.assign.typeEvaluation);
-		} else {
-			// auto filter type evaluation = ADVISOR
-			query.andWhereRaw("(`assign`.`type_evaluation` != '" + TypeEvaluation.ADVISOR + "' or  `assign`.`type_evaluation` is null)");
+		if (props.groupId) {
+			query.leftJoin('assign', 'assign.group_lecturer_id', '=', 'group_lecturer.id').distinct('group_lecturer.*');
+			query.where('assign.group_id', '=', props.groupId);
 		}
+		// auto filter type evaluation = ADVISOR
+		if (props.type) whereClause['type'] = props.type;
+		else query.where('type', '!=', TypeEvaluation.ADVISOR);
 
 		query.where(whereClause);
 

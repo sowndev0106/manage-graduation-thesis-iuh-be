@@ -44,6 +44,7 @@ export default class GroupLecturerModel extends Model {
 		model.$set({
 			name: entity.name,
 			term_id: entity.termId,
+			type: entity.type,
 			created_at: entity.createdAt,
 			updated_at: entity.updatedAt,
 		});
@@ -61,6 +62,7 @@ export default class GroupLecturerModel extends Model {
 		const entity = GroupLecturer.create(
 			{
 				name: dbJson['name'],
+				type: dbJson['type'],
 				term: Term.createById(dbJson['term_id']),
 			},
 			Number(dbJson['id'])

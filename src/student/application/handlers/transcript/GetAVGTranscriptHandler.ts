@@ -76,26 +76,16 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 
 	async handle(request: Request) {
 		const { studentTerm } = await this.validate(request);
-
+		const term = await this.termDao.findEntityById(studentTerm.termId);
+		// check public result
+		if (!term?.isPublicResult) {
+			return this.sendEmpty(studentTerm);
+		}
 		const transcriptByType: Record<TypeEvaluation, Array<Transcript>> = {
 			ADVISOR: [],
 			REVIEWER: [],
 			SESSION_HOST: [],
 		};
-
-		transcriptByType.ADVISOR = await this.transcriptDao.findByStudentAndType({
-			studentTermId: studentTerm.id!,
-			type: TypeEvaluation.ADVISOR,
-		});
-		transcriptByType.REVIEWER = await this.transcriptDao.findByStudentAndType({
-			studentTermId: studentTerm.id!,
-			type: TypeEvaluation.REVIEWER,
-		});
-		transcriptByType.SESSION_HOST = await this.transcriptDao.findByStudentAndType({
-			studentTermId: studentTerm.id!,
-			type: TypeEvaluation.SESSION_HOST,
-		});
-
 		const gradeByType: Record<TypeEvaluation, IGradeByTypeEluvation> = {
 			ADVISOR: {
 				avgGrader: 0,
@@ -116,6 +106,19 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 				details: [],
 			},
 		};
+
+		transcriptByType.ADVISOR = await this.transcriptDao.findByStudentAndType({
+			studentTermId: studentTerm.id!,
+			type: TypeEvaluation.ADVISOR,
+		});
+		transcriptByType.REVIEWER = await this.transcriptDao.findByStudentAndType({
+			studentTermId: studentTerm.id!,
+			type: TypeEvaluation.REVIEWER,
+		});
+		transcriptByType.SESSION_HOST = await this.transcriptDao.findByStudentAndType({
+			studentTermId: studentTerm.id!,
+			type: TypeEvaluation.SESSION_HOST,
+		});
 
 		gradeByType.ADVISOR = (await this.caculateAVGGrade(transcriptByType.ADVISOR)) || [];
 		gradeByType.REVIEWER = (await this.caculateAVGGrade(transcriptByType.REVIEWER)) || [];
@@ -170,6 +173,26 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 			},
 		};
 	}
+	sendEmpty(studentTerm: StudentTerm) {
+		return {
+			student: studentTerm.toJSON,
+			gradeSummary: null,
+			missings: ['ADVISOR', 'REVIEWER', 'SESSION_HOST'],
+			achievements: [],
+			ADVISOR: {
+				avgGrader: null,
+				details: [],
+			},
+			REVIEWER: {
+				avgGrader: null,
+				details: [],
+			},
+			SESSION_HOST: {
+				avgGrader: null,
+				details: [],
+			},
+		};
+	}
 	async caculateAVGGrade(transcripts: Array<Transcript>): Promise<IGradeByTypeEluvation> {
 		const gradeByLecturer = new Map<number, IGraderByLecturerTerm>();
 		let sumGrade = 0;
@@ -178,6 +201,8 @@ export default class GetAVGTranscriptHandler extends RequestHandler {
 			const oldGrade = gradeByLecturer.get(transcript.lecturerTermId!);
 			if (!oldGrade) {
 				const lecturerTerm = await this.lecturerTermDao.findEntityById(transcript.lecturerTermId);
+				const lecturer = await this.lecturerDao.findEntityById(lecturerTerm?.lecturerId);
+				lecturerTerm?.update({ lecturer: lecturer! });
 				gradeByLecturer.set(transcript.lecturerTermId!, {
 					grade: transcript.grade,
 					lecturerTerm: lecturerTerm!,

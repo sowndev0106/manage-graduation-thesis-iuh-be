@@ -34,7 +34,6 @@ interface ValidatedInput {
 export default class CreateTermHandler extends RequestHandler {
 	@inject('MajorsDao') private majorsDao!: IMajorsDao;
 	@inject('TermDao') private termDao!: ITermDao;
-
 	@inject('LecturerTermDao') private lecturerTermDao!: ILecturerTermDao;
 	@inject('LecturerDao') private lecturerDao!: ILecturerDao;
 
