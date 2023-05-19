@@ -33,7 +33,7 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 
 		query.withGraphFetched('[members, members.lecturer_term ,members.lecturer_term.lecturer]');
 
-		query.join('assign', 'assign.group_lecturer_id', '=', 'group_lecturer.id').distinct('group_lecturer.*');
+		query.leftJoin('assign', 'assign.group_lecturer_id', '=', 'group_lecturer.id').distinct('group_lecturer.*');
 
 		if (props.termId) whereClause['term_id'] = props.termId;
 		if (props.name) whereClause['name'] = props.name;
@@ -43,7 +43,7 @@ export default class GroupLecturerDao extends GroupLecturerDaoCore implements IG
 			query.where('assign.type_evaluation', '=', props.assign.typeEvaluation);
 		} else {
 			// auto filter type evaluation = ADVISOR
-			query.where('assign.type_evaluation', '!=', TypeEvaluation.ADVISOR);
+			query.andWhereRaw("(`assign`.`type_evaluation` != '" + TypeEvaluation.ADVISOR + "' or  `assign`.`type_evaluation` is null)");
 		}
 
 		query.where(whereClause);
