@@ -1,11 +1,7 @@
 import Evaluation, { TypeEvaluation } from "@core/domain/entities/Evaluation";
 import puppeteer from "puppeteer";
 import hb from "handlebars";
-import Assign from "@core/domain/entities/Assign";
-import Group from "@core/domain/entities/Group";
-import GroupLecturer from "@core/domain/entities/GroupLecturer";
 import GroupMember from "@core/domain/entities/GroupMember";
-import GroupLecturerMember from "@core/domain/entities/GroupLecturerMember";
 import Lecturer from "@core/domain/entities/Lecturer";
 // Example of options with args //
 
@@ -16,11 +12,13 @@ export default class GenerateEvalutionPDFDetail {
   private lecturer: Lecturer;
   constructor(
     evaluations: Array<Evaluation>,
-    typeEvalution: TypeEvaluation,
     groupMembers: Array<GroupMember>,
     lecturer: Lecturer
   ) {
-    this.assign = assign;
+    this.evaluations = evaluations;
+    this.typeEvalution = evaluations[0]?.type;
+    this.groupMembers = groupMembers;
+    this.lecturer = lecturer;
   }
   async excute() {
     return this.printPDF();
@@ -38,7 +36,9 @@ export default class GenerateEvalutionPDFDetail {
     // we have compile our code with handlebars
     const templateHTML = generateHTMLEvaluation(
       this.evaluations,
-      this.evaluations[0]?.type
+      this.typeEvalution,
+      this.groupMembers,
+      this.lecturer
     );
     const template = hb.compile(templateHTML, { strict: true });
     const result = template(templateHTML);

@@ -11,32 +11,55 @@ import PDFKitService from "@core/infrastructure/pdfkit/PDFKitService";
 import Assign from "@core/domain/entities/Assign";
 import IAssignDao from "@lecturer/domain/daos/IAssignDao";
 import NotFoundError from "@core/domain/errors/NotFoundError";
+import ILecturerTermDao from "@lecturer/domain/daos/ILecturerTermDao";
+import ILecturerDao from "@lecturer/domain/daos/ILecturerDao";
+import Lecturer from "@core/domain/entities/Lecturer";
+import IGroupMemberDao from "@lecturer/domain/daos/IGroupMemberDao";
+import IGroupDao from "@lecturer/domain/daos/IGroupDao";
 interface ValidatedInput {
   assign: Assign;
+  lecturer: Lecturer;
 }
 
 @injectable()
 export default class ExportPDFEvaluationByGroupHandler extends RequestHandler {
   @inject("TermDao") private termDao!: ITermDao;
+  @inject("GroupMemberDao") private groupMemberDao!: IGroupMemberDao;
+  @inject("GroupDao") private groupDao!: IGroupDao;
   @inject("AssignDao") private assignDao!: IAssignDao;
   @inject("EvaluationDao") private evaluationDao!: IEvaluationDao;
+  @inject("LecturerTermDao") private lecturerTermDao!: ILecturerTermDao;
+  @inject("LecturerDao") private lecturerDao!: ILecturerDao;
   async validate(request: Request): Promise<ValidatedInput> {
     const assignId = this.errorCollector.collect("assignId", () =>
       EntityId.validate({ value: request.params["assignId"] })
     );
-
+    const lecturerId = Number(request.params["id"]);
+    const lecturer = await this.lecturerDao.findEntityById(lecturerId);
     if (this.errorCollector.hasError()) {
       throw new ValidationError(this.errorCollector.errors);
     }
     let assign = await this.assignDao.findEntityById(assignId);
     if (!assign) throw new NotFoundError("term not found");
-    return { assign };
+    return { assign, lecturer: lecturer! };
   }
 
   async handle(request: Request) {
     const input = await this.validate(request);
+    const group = await this.groupDao.findEntityById(input.assign.groupId);
+    const members = await this.groupMemberDao.findByGroupId({
+      groupId: input.assign.groupId!,
+    });
+    const evaluations = await this.evaluationDao.findAll(
+      group?.termId,
+      input.assign.typeEvaluation
+    );
 
-    const doc = PDFKitService.generateEvalutionPDFByAssign(input.assign);
+    const doc = PDFKitService.generateEvalutionPDFDetail(
+      evaluations,
+      members,
+      input.lecturer
+    );
 
     return doc;
   }
