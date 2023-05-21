@@ -9,6 +9,7 @@ import GroupMemberDao from "@lecturer/infrastructure/objection-js/daos/GroupMemb
 import EvaluationDao from "../objection-js/daos/EvaluationDao";
 import Lecturer from "@core/domain/entities/Lecturer";
 import GroupMember from "@core/domain/entities/GroupMember";
+import Group from "@core/domain/entities/Group";
 export default class PDFKitService {
   static generateEvalutionPDF(evaluations: Array<Evaluation>) {
     const generateEvalutionPDF = new GenerateEvalutionPDF(evaluations);
@@ -16,12 +17,12 @@ export default class PDFKitService {
   }
   static generateEvalutionPDFDetail(
     evaluations: Array<Evaluation>,
-    groupMembers: Array<GroupMember>,
+    group: Group,
     lecturer: Lecturer
   ) {
     const generateEvalutionPDF = new GenerateEvalutionPDFByAssign(
       evaluations,
-      groupMembers,
+      group,
       lecturer
     );
     return generateEvalutionPDF.excute();

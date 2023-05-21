@@ -3,21 +3,25 @@ import puppeteer from "puppeteer";
 import hb from "handlebars";
 import GroupMember from "@core/domain/entities/GroupMember";
 import Lecturer from "@core/domain/entities/Lecturer";
+import { group } from "console";
+import Group from "@core/domain/entities/Group";
 // Example of options with args //
 
 export default class GenerateEvalutionPDFDetail {
   private evaluations: Array<Evaluation>;
   private typeEvalution: TypeEvaluation;
-  private groupMembers: Array<GroupMember>;
+  //   private groupMembers: Array<GroupMember>;
+  private group: Group;
   private lecturer: Lecturer;
   constructor(
     evaluations: Array<Evaluation>,
-    groupMembers: Array<GroupMember>,
+    group: Group,
     lecturer: Lecturer
   ) {
     this.evaluations = evaluations;
     this.typeEvalution = evaluations[0]?.type;
-    this.groupMembers = groupMembers;
+    // this.groupMembers = groupMembers;
+    this.group = group;
     this.lecturer = lecturer;
   }
   async excute() {
@@ -37,7 +41,7 @@ export default class GenerateEvalutionPDFDetail {
     const templateHTML = generateHTMLEvaluation(
       this.evaluations,
       this.typeEvalution,
-      this.groupMembers,
+      this.group,
       this.lecturer
     );
     const template = hb.compile(templateHTML, { strict: true });
@@ -61,7 +65,7 @@ export default class GenerateEvalutionPDFDetail {
 const generateHTMLEvaluation = (
   evaluations: Array<Evaluation>,
   typeEvalution: TypeEvaluation,
-  groupMembers: Array<GroupMember>,
+  group: Group,
   lecturer: Lecturer
 ) => {
   const typeEvalutionHTML = typeEvalution
@@ -71,17 +75,17 @@ const generateHTMLEvaluation = (
       ? "Phản biện"
       : "Hội đồng"
     : "";
-  const groupMemberHTML = groupMembers
-    .map((member) => {
-      return `<p> ${member.studentTerm?.student.username} - ${member.studentTerm?.student.name}</p>`;
+  const groupMemberHTML = group?.members
+    ?.map((member) => {
+      return `<p> ${member.studentTerm?.student?.username} - ${member.studentTerm?.student?.name}</p>`;
     })
     .join("");
-  const colHeaderStudent = groupMembers
+  const colHeaderStudent = group?.members
     .map((member, index) => {
       return `<th>Điểm SV ${index + 1}</th>`;
     })
     .join("");
-  const colBodytudent = groupMembers
+  const colBodytudent = group?.members
     .map((member, index) => {
       return `<td></td>`;
     })
@@ -90,11 +94,9 @@ const generateHTMLEvaluation = (
     .map((e, index) => {
       return `	<tr>
 					<td>${index + 1}</td>
-					<td class="text-left">${e.name}</td>
+					<td class="text-left">${e?.name}</td>
 					<td>${e.gradeMax}</td>
-					<td></td>
-					<td></td>
-					<td></td>
+					${colBodytudent}
 					<td></td>
 				</tr>`;
     })
@@ -191,15 +193,20 @@ const generateHTMLEvaluation = (
 	<br />
 	<div class="content-info">
 		<ol>
-			<li>Tên đề tài:</li>
+			<li>Tên đề tài: <span style="font-weight: 400;"> ${
+        group.topic?.name || ""
+      } </span> 
+  }</li>
 			<li>
-				Nhóm thực hiện:
+				Nhóm thực hiện: Nhóm <span style="font-weight: 400;"> ${group.id || ""} </span> 
 				<br>
 				<div style="font-weight: normal;">
 					${groupMemberHTML}	
 				</div>
 			</li>
-			<li>Họ tên người chấm điểm: ${lecturer.name}</li>
+			<li>Họ tên người chấm điểm:  <span style="font-weight: 400;"> ${
+        lecturer?.name
+      } </span></li>
 			<li>Vai trò của người đánh giá: <span style="font-weight: 400;"> ${typeEvalutionHTML} </span></li>
 		</ol>
 	</div>

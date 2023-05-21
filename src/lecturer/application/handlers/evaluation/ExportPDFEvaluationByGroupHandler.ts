@@ -16,6 +16,7 @@ import ILecturerDao from "@lecturer/domain/daos/ILecturerDao";
 import Lecturer from "@core/domain/entities/Lecturer";
 import IGroupMemberDao from "@lecturer/domain/daos/IGroupMemberDao";
 import IGroupDao from "@lecturer/domain/daos/IGroupDao";
+import ITopicDao from "@lecturer/domain/daos/ITopicDao";
 interface ValidatedInput {
   assign: Assign;
   lecturer: Lecturer;
@@ -24,6 +25,7 @@ interface ValidatedInput {
 @injectable()
 export default class ExportPDFEvaluationByGroupHandler extends RequestHandler {
   @inject("TermDao") private termDao!: ITermDao;
+  @inject("TopicDao") private topicDao!: ITopicDao;
   @inject("GroupMemberDao") private groupMemberDao!: IGroupMemberDao;
   @inject("GroupDao") private groupDao!: IGroupDao;
   @inject("AssignDao") private assignDao!: IAssignDao;
@@ -34,30 +36,33 @@ export default class ExportPDFEvaluationByGroupHandler extends RequestHandler {
     const assignId = this.errorCollector.collect("assignId", () =>
       EntityId.validate({ value: request.params["assignId"] })
     );
-    const lecturerId = Number(request.params["id"]);
+    const lecturerId = Number(request.headers["id"]);
     const lecturer = await this.lecturerDao.findEntityById(lecturerId);
     if (this.errorCollector.hasError()) {
       throw new ValidationError(this.errorCollector.errors);
     }
     let assign = await this.assignDao.findEntityById(assignId);
-    if (!assign) throw new NotFoundError("term not found");
+    if (!assign) throw new NotFoundError("assign not found");
     return { assign, lecturer: lecturer! };
   }
 
   async handle(request: Request) {
     const input = await this.validate(request);
     const group = await this.groupDao.findEntityById(input.assign.groupId);
+    const topic = await this.topicDao.findEntityById(group?.topicId);
     const members = await this.groupMemberDao.findByGroupId({
       groupId: input.assign.groupId!,
     });
+
     const evaluations = await this.evaluationDao.findAll(
       group?.termId,
       input.assign.typeEvaluation
     );
-
+    group?.update({ members });
+    if (topic) group?.update({ topic });
     const doc = PDFKitService.generateEvalutionPDFDetail(
       evaluations,
-      members,
+      group!,
       input.lecturer
     );
 
