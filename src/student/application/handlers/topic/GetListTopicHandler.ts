@@ -8,6 +8,7 @@ import EntityId from "@core/domain/validate-objects/EntityID";
 import ILecturerTermDao from "@student/domain/daos/ILecturerTermDao";
 import withRedisCache from "@core/utils/WithRedisCache";
 import Topic from "@core/domain/entities/Topic";
+import IGroupDao from "@student/domain/daos/IGroupDao";
 
 interface ValidatedInput {
   termId: number;
@@ -18,6 +19,7 @@ interface ValidatedInput {
 export default class GetListTopicHandler extends RequestHandler {
   @inject("TopicDao") private topicDao!: ITopicDao;
   @inject("LecturerDao") private lecturerDao!: ILecturerDao;
+  @inject("GroupDao") private groupDao!: IGroupDao;
   @inject("LecturerTermDao") private lecturerTermDao!: ILecturerTermDao;
   async validate(request: Request): Promise<ValidatedInput> {
     const termId = this.errorCollector.collect("termId", () =>
@@ -51,6 +53,13 @@ export default class GetListTopicHandler extends RequestHandler {
       if (lecturerTerm) props.lecturerTermId = lecturerTerm?.id;
     }
     const listTopic = await this.topicDao.findAll(props);
-    return listTopic.map((e) => e.toJSON);
+    const reponsePromise = listTopic.map(async (topic) => {
+      const groups = await this.groupDao.findAll({ topicId: topic.id });
+      return {
+        ...topic.toJSON,
+        totalGroupChoose: groups?.length | 0,
+      };
+    });
+    return await Promise.all(reponsePromise);
   }
 }

@@ -6,10 +6,11 @@
 	"license": "ISC",
 	"scripts": {
 		"build": "node ./tools/scripts/build.js",
+		"start": "node -r ts-node/register -r tsconfig-paths/register ./dist",
 		"start-proxy": "node -r ts-node/register -r tsconfig-paths/register ./dist/@core",
 		"start-lecturer": "node -r ts-node/register -r tsconfig-paths/register ./dist/lecturer",
 		"start-student": "node -r ts-node/register -r tsconfig-paths/register ./dist/student",
-		"local": "SET NODE_ENV=local&&nodemon",
+		"local": "SET NODE_ENV=local&&nodemon src",
 		"develop": "SET NODE_ENV=develop&&nodemon src",
 		"develop-proxy": "SET NODE_ENV=develop&&nodemon src/@core",
 		"develop-student": "SET NODE_ENV=develop&&nodemon  ./src/student",
