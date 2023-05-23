@@ -42,7 +42,7 @@ export default class GetListTopicHandler extends RequestHandler {
 
     return listJSONTopic;
   }
-  @withRedisCache()
+  @withRedisCache(60)
   private async getListTopic(input: ValidatedInput) {
     const props: any = { termId: input.termId };
     if (input.termId && input.lecturerId) {
