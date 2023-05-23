@@ -6,13 +6,9 @@ export default class RedisCache {
   private _client: RedisClientType<any>;
 
   private constructor() {
-    if (process.env.NODE_ENV === "local") {
-      this._client = createClient();
-    } else {
-      this._client = createClient({
-        url: process.env.REDIS_URL,
-      });
-    }
+    this._client = createClient({
+      url: process.env.REDIS_URL,
+    });
     console.log({ REDIS_URL: process.env.REDIS_URL });
 
     this._client.on("connect", () => {
