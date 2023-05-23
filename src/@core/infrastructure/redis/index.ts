@@ -13,6 +13,7 @@ export default class RedisCache {
         url: process.env.REDIS_URL,
       });
     }
+    console.log({ REDIS_URL: process.env.REDIS_URL });
 
     this._client.on("connect", () => {
       console.log("Redis connected");

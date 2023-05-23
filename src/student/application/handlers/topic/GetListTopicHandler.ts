@@ -7,6 +7,7 @@ import ILecturerDao from "@student/domain/daos/ILecturerDao";
 import EntityId from "@core/domain/validate-objects/EntityID";
 import ILecturerTermDao from "@student/domain/daos/ILecturerTermDao";
 import withRedisCache from "@core/utils/WithRedisCache";
+import Topic from "@core/domain/entities/Topic";
 
 interface ValidatedInput {
   termId: number;
@@ -35,9 +36,9 @@ export default class GetListTopicHandler extends RequestHandler {
 
   async handle(request: Request) {
     const input = await this.validate(request);
-    const listTopic = await this.getListTopic(input);
+    let listJSONTopic = await this.getListTopic(input);
 
-    return listTopic.map((e) => e.toJSON);
+    return listJSONTopic;
   }
   @withRedisCache()
   private async getListTopic(input: ValidatedInput) {
@@ -50,6 +51,6 @@ export default class GetListTopicHandler extends RequestHandler {
       if (lecturerTerm) props.lecturerTermId = lecturerTerm?.id;
     }
     const listTopic = await this.topicDao.findAll(props);
-    return listTopic;
+    return listTopic.map((e) => e.toJSON);
   }
 }

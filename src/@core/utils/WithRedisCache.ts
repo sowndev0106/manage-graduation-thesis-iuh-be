@@ -15,7 +15,8 @@ function withRedisCache(ttlSeconds: number = 300) {
       const cachedData = await cache.get(cacheKey);
       if (cachedData !== null) {
         try {
-          return JSON.parse(cachedData);
+          const data = JSON.parse(cachedData);
+          return data;
         } catch (error: any) {
           return cachedData;
         }
@@ -28,10 +29,10 @@ function withRedisCache(ttlSeconds: number = 300) {
       } else {
         await cache.set(cacheKey, JSON.stringify(result), ttlSeconds);
       }
+      console.log(result);
 
       return result;
     };
-
     return descriptor;
   };
 }
