@@ -1,83 +1,97 @@
-import { inject, injectable } from 'inversify';
-import RequestHandler from '@core/application/RequestHandler';
-import ValidationError from '@core/domain/errors/ValidationError';
-import { Request } from 'express';
-import EntityId from '@core/domain/validate-objects/EntityID';
-import IGroupDao from '@student/domain/daos/IGroupDao';
-import IGroupMemberDao from '@student/domain/daos/IGroupMemberDao';
-import ITermDao from '@student/domain/daos/ITermDao';
-import IStudentTermDao from '@student/domain/daos/IStudentTermDao';
-import Term from '@core/domain/entities/Term';
-import StudentTerm from '@core/domain/entities/StudentTerm';
-import NotificationStudentService from '@core/service/NotificationStudentService';
-import IStudentDao from '@student/domain/daos/IStudentDao';
-import ErrorCode from '@core/domain/errors/ErrorCode';
-import NotFoundError from '@core/domain/errors/NotFoundError';
+import { inject, injectable } from "inversify";
+import RequestHandler from "@core/application/RequestHandler";
+import ValidationError from "@core/domain/errors/ValidationError";
+import { Request } from "express";
+import EntityId from "@core/domain/validate-objects/EntityID";
+import IGroupDao from "@student/domain/daos/IGroupDao";
+import IGroupMemberDao from "@student/domain/daos/IGroupMemberDao";
+import ITermDao from "@student/domain/daos/ITermDao";
+import IStudentTermDao from "@student/domain/daos/IStudentTermDao";
+import Term from "@core/domain/entities/Term";
+import StudentTerm from "@core/domain/entities/StudentTerm";
+import NotificationStudentService from "@core/service/NotificationStudentService";
+import IStudentDao from "@student/domain/daos/IStudentDao";
+import ErrorCode from "@core/domain/errors/ErrorCode";
+import NotFoundError from "@core/domain/errors/NotFoundError";
+import checkDateTerm from "@core/utils/checkDateTerm";
 
 interface ValidatedInput {
-	term: Term;
-	studentTerm: StudentTerm;
+  term: Term;
+  studentTerm: StudentTerm;
 }
 
 @injectable()
 export default class OutGroupHandler extends RequestHandler {
-	@inject('TermDao') private termDao!: ITermDao;
-	@inject('GroupDao') private groupDao!: IGroupDao;
-	@inject('StudentDao') private studentDao!: IStudentDao;
-	@inject('GroupMemberDao') private groupMemberDao!: IGroupMemberDao;
-	@inject('StudentTermDao') private studentTermDao!: IStudentTermDao;
-	async validate(request: Request): Promise<ValidatedInput> {
-		const termId = this.errorCollector.collect('termId', () => EntityId.validate({ value: request.body['termId'] }));
-		const studentId = Number(request.headers['id']);
+  @inject("TermDao") private termDao!: ITermDao;
+  @inject("GroupDao") private groupDao!: IGroupDao;
+  @inject("StudentDao") private studentDao!: IStudentDao;
+  @inject("GroupMemberDao") private groupMemberDao!: IGroupMemberDao;
+  @inject("StudentTermDao") private studentTermDao!: IStudentTermDao;
+  async validate(request: Request): Promise<ValidatedInput> {
+    const termId = this.errorCollector.collect("termId", () =>
+      EntityId.validate({ value: request.body["termId"] })
+    );
+    const studentId = Number(request.headers["id"]);
 
-		if (this.errorCollector.hasError()) {
-			throw new ValidationError(this.errorCollector.errors);
-		}
-		const term = await this.termDao.findEntityById(termId);
-		if (!term) {
-			throw new NotFoundError('term not found');
-		}
-		const studentTerm = await this.studentTermDao.findOne(termId, studentId);
-		if (!studentTerm) {
-			throw new ErrorCode('STUDENT_NOT_IN_TERM', `student not in term ${termId}`);
-		}
-		return { term, studentTerm };
-	}
+    if (this.errorCollector.hasError()) {
+      throw new ValidationError(this.errorCollector.errors);
+    }
+    const term = await this.termDao.findEntityById(termId);
+    if (!term) {
+      throw new NotFoundError("term not found");
+    }
+    // check validate time
+    checkDateTerm(term, "UPDATE_GROUP");
 
-	async handle(request: Request) {
-		const input = await this.validate(request);
+    const studentTerm = await this.studentTermDao.findOne(termId, studentId);
+    if (!studentTerm) {
+      throw new ErrorCode(
+        "STUDENT_NOT_IN_TERM",
+        `student not in term ${termId}`
+      );
+    }
+    return { term, studentTerm };
+  }
 
-		let result: any;
+  async handle(request: Request) {
+    const input = await this.validate(request);
 
-		const group = await this.groupDao.findOne({
-			studentTermId: input.studentTerm.id!,
-		});
+    let result: any;
 
-		if (!group) throw new ErrorCode('STUDENT_DONT_HAVE_GROUP', 'You not have group');
+    const group = await this.groupDao.findOne({
+      studentTermId: input.studentTerm.id!,
+    });
 
-		const members = await this.groupMemberDao.findByGroupId(group.id!);
+    if (!group)
+      throw new ErrorCode("STUDENT_DONT_HAVE_GROUP", "You not have group");
 
-		group.updateMembers(members);
-		const student = await this.studentDao.findEntityById(input.studentTerm.studentId);
+    const members = await this.groupMemberDao.findByGroupId(group.id!);
 
-		// check if only me in group then delete group
-		if (members.length == 1) {
-			await this.groupMemberDao.deleteEntity(members[0]);
-			result = await this.groupDao.deleteEntity(group);
-		} else {
-			for (const member of members) {
-				if (member.studentTermId == input.studentTerm.id!) {
-					result = await this.groupMemberDao.deleteEntity(member);
-				} else {
-					await NotificationStudentService.send({
-						user: member.studentTerm!,
-						message: `Thành viên '${student?.name + ' - ' + student?.username}' vừa rời khỏi nhóm'  `,
-						type: 'GROUP_MEMBER',
-					});
-				}
-			}
-		}
+    group.updateMembers(members);
+    const student = await this.studentDao.findEntityById(
+      input.studentTerm.studentId
+    );
 
-		return result ? 'out group success' : 'out group fail';
-	}
+    // check if only me in group then delete group
+    if (members.length == 1) {
+      await this.groupMemberDao.deleteEntity(members[0]);
+      result = await this.groupDao.deleteEntity(group);
+    } else {
+      for (const member of members) {
+        if (member.studentTermId == input.studentTerm.id!) {
+          result = await this.groupMemberDao.deleteEntity(member);
+        } else {
+          await NotificationStudentService.send({
+            user: member.studentTerm!,
+            message: `Thành viên '${
+              student?.name + " - " + student?.username
+            }' vừa rời khỏi nhóm'  `,
+            type: "GROUP_MEMBER",
+          });
+        }
+      }
+    }
+
+    return result ? "out group success" : "out group fail";
+  }
 }

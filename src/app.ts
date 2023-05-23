@@ -1,21 +1,17 @@
-import 'express-async-errors';
+import "express-async-errors";
 // parse variable environment *** requie first
-import './env';
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import morgan from 'morgan';
-import helmet from 'helmet';
-import cors from 'cors';
-import http from 'http';
-import path from 'path';
-// import socket from '@core/infrastructure/socket';
-// import router from './router';
-// import ServerSocket from '@core/infrastructure/socket';
+import "./env";
+import express from "express";
+import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import helmet from "helmet";
+import cors from "cors";
+import path from "path";
 
 // connect database
-import '@core/infrastructure/objection-js';
+import "@core/infrastructure/objection-js";
 // connect redis
-import '@core/infrastructure/redis';
+import "@core/infrastructure/redis";
 
 const app = express();
 // const server = http.createServer(app);
@@ -28,21 +24,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
-app.set('views', path.join(__dirname, '/@core/infrastructure/ejs/views'));
-app.set('view engine', 'ejs');
+app.set("views", path.join(__dirname, "/@core/infrastructure/ejs/views"));
+app.set("view engine", "ejs");
 
 // Show routes called in console during development
-if (process.env.NODE_ENV !== 'production') {
-	app.use(morgan('dev'));
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
 }
 
 // Security
 app.use(
-	helmet({
-		contentSecurityPolicy: false,
-	})
+  helmet({
+    contentSecurityPolicy: false,
+  })
 );
 
 // Start the server
