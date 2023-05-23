@@ -1,9 +1,54 @@
-// import * as redis from 'redis';
-// const client = redis.createClient({ url: process.env.REDIS_URL });
+import { RedisClientType } from "@node-redis/client/dist/lib/client";
+import { createClient } from "redis";
 
-// client
-// 	.connect()
-// 	.then(() => console.log('redis connected successfully'))
-// 	.catch((err: any) => console.log(err));
+export default class RedisCache {
+  private static _instance: RedisCache;
+  private _client: RedisClientType<any>;
 
-// export default client;
+  private constructor() {
+    if (process.env.NODE_ENV === "local") {
+      this._client = createClient();
+    } else {
+      this._client = createClient({
+        url: process.env.REDIS_URL,
+      });
+    }
+
+    this._client.on("connect", () => {
+      console.log("Redis connected");
+    });
+
+    this._client.on("error", (err: any) => {
+      console.log("Redis Error", err);
+    });
+  }
+
+  public static async instance() {
+    if (!RedisCache._instance) {
+      RedisCache._instance = new RedisCache();
+      await RedisCache._instance.connect();
+    }
+
+    return RedisCache._instance;
+  }
+
+  public async connect() {
+    this._client.connect();
+  }
+
+  async set(key: string, value: string, ttl?: number) {
+    if (ttl) {
+      await this._client.setEx(key, ttl, value);
+    } else {
+      await this._client.set(key, value);
+    }
+  }
+
+  async get(key: string) {
+    return await this._client.get(key);
+  }
+
+  async delete(key: string) {
+    await this._client.del(key);
+  }
+}

@@ -60,6 +60,7 @@
 		]
 	},
 	"dependencies": {
+		"@node-redis/client": "^1.0.6",
 		"@types/ejs": "^3.0.4",
 		"@types/express-flash": "0.0.2",
 		"@types/express-session": "^1.17.0",
@@ -102,7 +103,7 @@
 		"objection": "^3.0.1",
 		"pdfkit": "^0.13.0",
 		"puppeteer": "^19.10.1",
-		"redis": "^4.6.4",
+		"redis": "^4.0.0",
 		"reflect-metadata": "^0.1.13",
 		"socket.io": "^4.6.1",
 		"swagger-jsdoc": "^6.2.8",
