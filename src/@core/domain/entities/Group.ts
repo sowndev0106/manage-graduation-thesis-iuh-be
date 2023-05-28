@@ -12,12 +12,18 @@ export enum TypeStatusGroup {
   PASS_REVIEWER = "PASS_REVIEWER",
   PASS_SESSION_HOST = "PASS_SESSION_HOST",
 }
+export enum TypeReportGroup {
+  POSTER = "POSTER",
+  OPEN = "OPEN",
+  SESSION_HOST = "SESSION_HOST",
+}
 export interface IProps {
   name: string;
   term: Term;
   topic?: Topic;
   members?: Array<GroupMember>;
   status: TypeStatusGroup;
+  typeReport?: TypeReportGroup;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -30,6 +36,9 @@ export default class Group extends Entity<IProps> {
   }
   get name() {
     return this.props.name;
+  }
+  get typeReport() {
+    return this.props.typeReport || TypeReportGroup.OPEN;
   }
   get status() {
     return this.props.status;
