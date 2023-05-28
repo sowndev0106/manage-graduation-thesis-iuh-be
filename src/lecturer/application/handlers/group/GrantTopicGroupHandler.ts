@@ -24,6 +24,7 @@ import { TypeEvaluation } from "@core/domain/entities/Evaluation";
 import GroupLecturerMember from "@core/domain/entities/GroupLecturerMember";
 import Assign from "@core/domain/entities/Assign";
 import IGroupLecturerMemberDao from "@lecturer/domain/daos/IGroupLecturerMemberDao";
+import NotificationStudentService from "@core/service/NotificationStudentService";
 
 interface ValidatedInput {
   student: Student;
@@ -116,15 +117,22 @@ export default class GrantTopicGroupHandler extends RequestHandler {
       member = await this.groupMemberDao.insertEntity(member);
       group.update({ members: [member] });
     }
+
     return group;
   }
   async chooseTopic(group: Group, topic: Topic): Promise<Group> {
     // update group
     group.update({ topic });
+    group.update({ name: String(topic.id) });
     await this.groupDao.updateEntity(group);
 
     // create assign
     await this.createAssign(group, topic);
+    await NotificationStudentService.send({
+      message: "Bạn vừa được giảng viên gán đề tài",
+      type: "CHOOSE_TOPIC",
+      user: group.members[0]?.studentTerm,
+    });
     return group;
   }
   async createAssign(group: Group, topic: Topic) {
