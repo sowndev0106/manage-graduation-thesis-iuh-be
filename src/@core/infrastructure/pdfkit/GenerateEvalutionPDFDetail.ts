@@ -196,7 +196,7 @@ const generateHTMLEvaluation = (
 			<li>Tên đề tài: <span style="font-weight: 400;"> ${
         group.topic?.name || ""
       } </span> 
-  }</li>
+  </li>
 			<li>
 				Nhóm thực hiện: Nhóm <span style="font-weight: 400;"> ${group.id || ""} </span> 
 				<br>

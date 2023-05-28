@@ -6,7 +6,10 @@ import EntityId from "@core/domain/validate-objects/EntityID";
 import ITopicDao from "@lecturer/domain/daos/ITopicDao";
 import NotFoundError from "@core/domain/errors/NotFoundError";
 import ILecturerDao from "@lecturer/domain/daos/ILecturerDao";
-import Topic, { TypeStatusTopic } from "@core/domain/entities/Topic";
+import Topic, {
+  TypeLevelTopic,
+  TypeStatusTopic,
+} from "@core/domain/entities/Topic";
 import PositiveNumber from "@core/domain/validate-objects/PositiveNumber";
 import Text from "@core/domain/validate-objects/Text";
 import Lecturer from "@core/domain/entities/Lecturer";
@@ -18,6 +21,8 @@ import LecturerTerm from "@core/domain/entities/LecturerTerm";
 import IStudentTermDao from "@lecturer/domain/daos/IStudentTermDao";
 import ILecturerTermDao from "@lecturer/domain/daos/ILecturerTermDao";
 import ErrorCode from "@core/domain/errors/ErrorCode";
+import TypeEvaluationValidate from "@core/domain/validate-objects/TypeEvaluationValidate";
+import TypeLevelTopicValidate from "@core/domain/validate-objects/TypeLevelTopicValidate";
 
 interface ValidatedInput {
   name: string;
@@ -29,6 +34,7 @@ interface ValidatedInput {
   requireInput: string;
   term: Term;
   lecturerTerm: LecturerTerm;
+  level: TypeLevelTopic;
 }
 @injectable()
 export default class CreateTopicHandler extends RequestHandler {
@@ -63,6 +69,10 @@ export default class CreateTopicHandler extends RequestHandler {
     const termId = this.errorCollector.collect("termId", () =>
       EntityId.validate({ value: request.body["termId"] })
     );
+
+    const level = this.errorCollector.collect("level", () =>
+      TypeLevelTopicValidate.validate({ value: request.body["level"] })
+    );
     const lecturerId = Number(request.headers["id"]);
     if (this.errorCollector.hasError()) {
       throw new ValidationError(this.errorCollector.errors);
@@ -90,6 +100,7 @@ export default class CreateTopicHandler extends RequestHandler {
       standradOutput,
       requireInput,
       term,
+      level,
     };
   }
 
@@ -115,6 +126,7 @@ export default class CreateTopicHandler extends RequestHandler {
         requireInput: input.requireInput,
         status: TypeStatusTopic.PEDING,
         lecturerTerm: input.lecturerTerm,
+        level: input.level,
       })
     );
     if (!topic) throw new ErrorCode("FAIL_CREATE_ENTITY", "Create Topic fail");

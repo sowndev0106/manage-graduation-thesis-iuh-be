@@ -7,7 +7,10 @@ import EntityId from "@core/domain/validate-objects/EntityID";
 import ITopicDao from "@lecturer/domain/daos/ITopicDao";
 import NotFoundError from "@core/domain/errors/NotFoundError";
 import ILecturerDao from "@lecturer/domain/daos/ILecturerDao";
-import Topic, { TypeStatusTopic } from "@core/domain/entities/Topic";
+import Topic, {
+  TypeLevelTopic,
+  TypeStatusTopic,
+} from "@core/domain/entities/Topic";
 import ITermDao from "@lecturer/domain/daos/ITermDao";
 import PositiveNumber from "@core/domain/validate-objects/PositiveNumber";
 import Text from "@core/domain/validate-objects/Text";
@@ -18,6 +21,7 @@ import LecturerTerm from "@core/domain/entities/LecturerTerm";
 import ILecturerTermDao from "@lecturer/domain/daos/ILecturerTermDao";
 import ErrorCode from "@core/domain/errors/ErrorCode";
 import ForbiddenError from "@core/domain/errors/ForbiddenError";
+import TypeLevelTopicValidate from "@core/domain/validate-objects/TypeLevelTopicValidate";
 
 interface ValidatedInput {
   id: number;
@@ -31,6 +35,7 @@ interface ValidatedInput {
   comment?: string;
   term: Term;
   lecturerTerm: LecturerTerm;
+  level: TypeLevelTopic;
 }
 @injectable()
 export default class UpdateTopicHandler extends RequestHandler {
@@ -68,7 +73,9 @@ export default class UpdateTopicHandler extends RequestHandler {
       EntityId.validate({ value: request.body["termId"] })
     );
     const lecturerId = Number(request.headers["id"]);
-
+    const level = this.errorCollector.collect("level", () =>
+      TypeLevelTopicValidate.validate({ value: request.body["level"] })
+    );
     if (this.errorCollector.hasError()) {
       throw new ValidationError(this.errorCollector.errors);
     }
@@ -96,6 +103,7 @@ export default class UpdateTopicHandler extends RequestHandler {
       requireInput,
       term,
       lecturerTerm,
+      level,
     };
   }
 
@@ -126,6 +134,7 @@ export default class UpdateTopicHandler extends RequestHandler {
       standradOutput: input.standradOutput,
       requireInput: input.requireInput,
       status: TypeStatusTopic.PEDING,
+      level: input.level,
     });
 
     topic = await this.topicDao.updateEntity(topic);
