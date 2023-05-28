@@ -10,6 +10,7 @@ router.patch(
   LecturerAuth.headLecturer,
   GroupController.updateTypeReport
 );
+// dont-have-group-or-topic
 router.get("/", GroupController.getListGroup);
 router.post("/grant-topic", GroupController.grantTopicGroup);
 router.get(
