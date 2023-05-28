@@ -1,38 +1,36 @@
-import { inject, injectable } from 'inversify';
-import RequestHandler from '@core/application/RequestHandler';
-import ValidationError from '@core/domain/errors/ValidationError';
-import { Request } from 'express';
-import ILecturerDao from '@lecturer/domain/daos/ILecturerDao';
-import EntityId from '@core/domain/validate-objects/EntityID';
-import BooleanValidate from '@core/domain/validate-objects/BooleanValidate';
-import IStudentDao from '@lecturer/domain/daos/IStudentDao';
+import { inject, injectable } from "inversify";
+import RequestHandler from "@core/application/RequestHandler";
+import ValidationError from "@core/domain/errors/ValidationError";
+import { Request } from "express";
+import ILecturerDao from "@lecturer/domain/daos/ILecturerDao";
+import EntityId from "@core/domain/validate-objects/EntityID";
+import BooleanValidate from "@core/domain/validate-objects/BooleanValidate";
+import IStudentDao from "@lecturer/domain/daos/IStudentDao";
 
 interface ValidatedInput {
-	majorsId: number;
-	isHeadLecturer: boolean;
+  termId: number;
 }
 
 @injectable()
 export default class GetListStudent extends RequestHandler {
-	@inject('StudentDao') private studentDao!: IStudentDao;
-	async validate(request: Request): Promise<ValidatedInput> {
-		const majorsId = this.errorCollector.collect('majorsId', () => EntityId.validate({ value: request.query['majorsId'], required: false }));
-		const isHeadLecturer = this.errorCollector.collect('isHeadLecturer', () =>
-			BooleanValidate.validate({ value: request.query['isHeadLecturer']!, required: false })
-		);
+  @inject("StudentDao") private studentDao!: IStudentDao;
+  async validate(request: Request): Promise<ValidatedInput> {
+    const termId = this.errorCollector.collect("termId", () =>
+      EntityId.validate({ value: request.query["termId"], required: false })
+    );
 
-		if (this.errorCollector.hasError()) {
-			throw new ValidationError(this.errorCollector.errors);
-		}
+    if (this.errorCollector.hasError()) {
+      throw new ValidationError(this.errorCollector.errors);
+    }
 
-		return { majorsId, isHeadLecturer };
-	}
+    return { termId };
+  }
 
-	async handle(request: Request) {
-		const input = await this.validate(request);
+  async handle(request: Request) {
+    const input = await this.validate(request);
 
-		const students = await this.studentDao.findAll(input.majorsId);
+    const students = await this.studentDao.findAll(input.termId);
 
-		return students?.map(e => e.toJSON);
-	}
+    return students?.map((e) => e.toJSON);
+  }
 }
