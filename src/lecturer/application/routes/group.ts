@@ -5,6 +5,7 @@ const router = Router();
 
 // group
 router.get("/", GroupController.getListGroup);
+router.post("/grant-topic", GroupController.grantTopicGroup);
 router.get(
   "/group-lecturer/:groupLecturerId",
   GroupController.getListGroupByGroupLecturer
