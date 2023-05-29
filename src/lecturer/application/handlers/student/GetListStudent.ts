@@ -63,7 +63,7 @@ export default class GetListStudent extends RequestHandler {
       studentsJson = [...studentExistsTopicJson, ...studentNotExistsTopicJson];
       studentsJson = studentsJson.sort(
         (a: any, b: any) =>
-          new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
     }
     return studentsJson;
