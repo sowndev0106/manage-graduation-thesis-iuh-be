@@ -6,6 +6,7 @@ import ILecturerDao from "@lecturer/domain/daos/ILecturerDao";
 import EntityId from "@core/domain/validate-objects/EntityID";
 import BooleanValidate from "@core/domain/validate-objects/BooleanValidate";
 import IStudentDao from "@lecturer/domain/daos/IStudentDao";
+import Student from "@core/domain/entities/Student";
 
 interface ValidatedInput {
   termId: number;
@@ -35,12 +36,40 @@ export default class GetListStudent extends RequestHandler {
 
   async handle(request: Request) {
     const input = await this.validate(request);
+    let studentsJson: any[] = [];
+    if (input.isTopicExists != undefined) {
+      const students = await this.studentDao.findAll(
+        input.termId,
+        input.isTopicExists
+      );
+      studentsJson = students?.map((e) => {
+        return { ...e.toJSON, isTopicExists: input.isTopicExists };
+      });
+    } else {
+      const studentExistsTopic = await this.studentDao.findAll(
+        input.termId,
+        true
+      );
+      const studentNotExistsTopic = await this.studentDao.findAll(
+        input.termId,
+        false
+      );
 
-    const students = await this.studentDao.findAll(
-      input.termId,
-      input.isTopicExists
-    );
-
-    return students?.map((e) => e.toJSON);
+      studentsJson.concat(
+        studentExistsTopic?.map((e) => {
+          return { ...e.toJSON, isTopicExists: true };
+        })
+      );
+      studentsJson.concat(
+        studentNotExistsTopic?.map((e) => {
+          return { ...e.toJSON, isTopicExists: false };
+        })
+      );
+      studentsJson = studentsJson.sort(
+        (a: any, b: any) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+    }
+    return studentsJson;
   }
 }
