@@ -50,21 +50,17 @@ export default class GetListStudent extends RequestHandler {
         input.termId,
         true
       );
+      const studentExistsTopicJson = studentExistsTopic?.map((e) => {
+        return { ...e.toJSON, isTopicExists: false };
+      });
       const studentNotExistsTopic = await this.studentDao.findAll(
         input.termId,
         false
       );
-
-      studentsJson.concat(
-        studentExistsTopic?.map((e) => {
-          return { ...e.toJSON, isTopicExists: true };
-        })
-      );
-      studentsJson.concat(
-        studentNotExistsTopic?.map((e) => {
-          return { ...e.toJSON, isTopicExists: false };
-        })
-      );
+      const studentNotExistsTopicJson = studentNotExistsTopic?.map((e) => {
+        return { ...e.toJSON, isTopicExists: false };
+      });
+      studentsJson = [...studentExistsTopicJson, ...studentNotExistsTopicJson];
       studentsJson = studentsJson.sort(
         (a: any, b: any) =>
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
