@@ -49,7 +49,7 @@ export default class CancelTopicGroupHandler extends RequestHandler {
     if (!term) throw new NotFoundError("term not found");
 
     // check validate time
-    checkDateTerm(term, "CHOOSE_TOPIC");
+    // checkDateTerm(term, "CHOOSE_TOPIC");
 
     const studentTerm = await this.studentTermDao.findOne(termId, studentId);
     if (!studentTerm) {

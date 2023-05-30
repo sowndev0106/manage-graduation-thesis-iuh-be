@@ -17,7 +17,6 @@ import Assign from "@core/domain/entities/Assign";
 import { TypeEvaluation } from "@core/domain/entities/Evaluation";
 import IGroupLecturerDao from "@student/domain/daos/IGroupLecturerDao";
 import GroupLecturer from "@core/domain/entities/GroupLecturer";
-import Term from "@core/domain/entities/Term";
 import IGroupLecturerMemberDao from "@student/domain/daos/IGroupLecturerMemberDao";
 import GroupLecturerMember from "@core/domain/entities/GroupLecturerMember";
 import NotificationStudentService from "@core/service/NotificationStudentService";
@@ -59,7 +58,7 @@ export default class ChooseTopicHandler extends RequestHandler {
     if (!term) throw new NotFoundError("term not found");
 
     // check validate time
-    checkDateTerm(term, "CHOOSE_TOPIC");
+    // checkDateTerm(term, "CHOOSE_TOPIC");
 
     const studentTerm = await this.studentTermDao.findOne(termId, studentId);
     if (!studentTerm) {
