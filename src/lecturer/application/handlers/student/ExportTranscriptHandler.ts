@@ -28,6 +28,7 @@ import ErrorCode from "@core/domain/errors/ErrorCode";
 import XLSX from "xlsx";
 import { binary } from "joi";
 import { group } from "console";
+import { TypeReportGroup, TypeStatusGroup } from "@core/domain/entities/Group";
 interface ValidatedInput {
   term: Term;
 }
@@ -73,6 +74,24 @@ export default class ExportTranscriptHandler extends RequestHandler {
       term,
     };
   }
+  convertStatusGroup(status: TypeStatusGroup): string {
+    switch (status) {
+      case TypeStatusGroup.FAIL_ADVISOR:
+        return "Rớt hướng dẫn";
+      case TypeStatusGroup.FAIL_REVIEWER:
+        return "Rớt phản biện";
+      case TypeStatusGroup.FAIL_SESSION_HOST:
+        return "Rớt hội đồng";
+      case TypeStatusGroup.PASS_ADVISOR:
+        return "Đậu hướng dẫn";
+      case TypeStatusGroup.PASS_REVIEWER:
+        return "Đậu phản biện";
+      case TypeStatusGroup.PASS_SESSION_HOST:
+        return "Đậu hội đồng";
+      default:
+        return "Chưa xác định";
+    }
+  }
   async handle(request: Request) {
     const { term } = await this.validate(request);
     const listStudentTerm = await this.studentTermDao.findAll(term.id!);
@@ -96,7 +115,14 @@ export default class ExportTranscriptHandler extends RequestHandler {
         "Điểm Phản biện": sumary.REVIEWER.avgGrader,
         "Điểm Hội đồng": sumary.SESSION_HOST.avgGrader,
         "Điểm cộng": sumary.bonusGrade || 0,
+        "Loại hội đồng":
+          sumary.group.typeReport == TypeReportGroup.POSTER
+            ? "POSTER"
+            : sumary.group.typeReport == TypeReportGroup.SESSION_HOST
+            ? "Hội đồng báo cáo"
+            : "Chưa xác định",
         "Tổng tổng kết": sumary.gradeSummary,
+        "Kết quả": this.convertStatusGroup(sumary.group.status),
       };
     });
     data = data.filter((e) => e != null);
