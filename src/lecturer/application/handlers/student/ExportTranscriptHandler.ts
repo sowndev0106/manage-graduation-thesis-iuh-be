@@ -62,9 +62,6 @@ export default class ExportTranscriptHandler extends RequestHandler {
     const termId = this.errorCollector.collect("termId", () =>
       EntityId.validate({ value: request.query["termId"] })
     );
-    const studentId = this.errorCollector.collect("studentId", () =>
-      EntityId.validate({ value: request.query["studentId"] })
-    );
 
     if (this.errorCollector.hasError()) {
       throw new ValidationError(this.errorCollector.errors);
